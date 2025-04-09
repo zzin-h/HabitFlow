@@ -13,7 +13,7 @@ final class CoreDataManager {
     let container: NSPersistentContainer
 
     private init() {
-        container = NSPersistentContainer(name: "HabitFlowModel")
+        container = NSPersistentContainer(name: "HabitEntity")
         container.loadPersistentStores { _, error in
             if let error = error {
                 fatalError("CoreData load error: \(error.localizedDescription)")

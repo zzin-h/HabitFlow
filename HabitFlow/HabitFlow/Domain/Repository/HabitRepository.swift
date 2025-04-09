@@ -6,8 +6,8 @@
 //
 
 public protocol HabitRepository {
-    func addHabit(_ habit: HabitModel) throws
-    func fetchHabits() throws -> [HabitModel]
-    func updateHabit(_ habit: HabitModel) throws
-    func deleteHabit(_ habit: HabitModel) throws
+    func add(_ habit: HabitModel) throws
+    func fetchAll() throws -> [HabitModel]
+    func update(_ habit: HabitModel) throws
+    func delete(_ habit: HabitModel) throws
 }

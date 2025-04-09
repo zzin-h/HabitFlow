@@ -8,30 +8,33 @@
 import SwiftUI
 
 struct HabitListView: View {
-    @State private var showingAddSheet = false
-    
+    @StateObject private var viewModel = HabitViewModel()
+    @State private var showingAddView = false
+
     var body: some View {
         NavigationStack {
             List {
-                VStack(alignment: .leading) {
-                    Text("title")
-                        .font(.headline)
-                    Text("category")
-                        .font(.subheadline)
+                ForEach(viewModel.habits) { habit in
+                    VStack(alignment: .leading) {
+                        Text(habit.title)
+                            .font(.headline)
+                        Text(habit.category.displayName)
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
+                }
+                .onDelete { indexSet in
+                    indexSet.map { viewModel.habits[$0] }.forEach(viewModel.delete)
                 }
             }
             .navigationTitle("오늘의 습관")
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showingAddSheet = true
-                    }) {
-                        Image(systemName: "plus")
-                    }
+                Button(action: { showingAddView = true }) {
+                    Image(systemName: "plus")
                 }
             }
-            .sheet(isPresented: $showingAddSheet) {
-                HabitAddEditView()
+            .sheet(isPresented: $showingAddView) {
+                HabitAddEditView(viewModel: viewModel)
             }
         }
     }
