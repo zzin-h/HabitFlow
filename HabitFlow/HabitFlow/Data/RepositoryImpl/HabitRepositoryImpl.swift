@@ -16,7 +16,11 @@ final class HabitRepositoryImpl: HabitRepository {
     }
 
     func fetchHabits() -> AnyPublisher<[HabitModel], Error> {
-        return Future { promise in
+        return Future { [weak self] promise in
+            guard let self = self else {
+                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                return
+            }
             do {
                 let habits = try self.storage.fetchAllHabits()
                 promise(.success(habits))
@@ -28,7 +32,11 @@ final class HabitRepositoryImpl: HabitRepository {
     }
 
     func addHabit(_ habit: HabitModel) -> AnyPublisher<Void, Error> {
-        return Future { promise in
+        return Future { [weak self] promise in
+            guard let self = self else {
+                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                return
+            }
             do {
                 try self.storage.addHabit(habit)
                 promise(.success(()))
@@ -40,7 +48,11 @@ final class HabitRepositoryImpl: HabitRepository {
     }
 
     func deleteHabit(_ id: UUID) -> AnyPublisher<Void, Error> {
-        return Future { promise in
+        return Future { [weak self] promise in
+            guard let self = self else {
+                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                return
+            }
             do {
                 try self.storage.deleteHabit(by: id)
                 promise(.success(()))
@@ -50,9 +62,13 @@ final class HabitRepositoryImpl: HabitRepository {
         }
         .eraseToAnyPublisher()
     }
-    
+
     func updateHabit(_ habit: HabitModel) -> AnyPublisher<Void, Error> {
-        return Future { promise in
+        return Future { [weak self] promise in
+            guard let self = self else {
+                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                return
+            }
             do {
                 try self.storage.updateHabit(habit)
                 promise(.success(()))
@@ -62,21 +78,4 @@ final class HabitRepositoryImpl: HabitRepository {
         }
         .eraseToAnyPublisher()
     }
-    
-//    func updateHabit(_ habit: HabitModel) -> AnyPublisher<Void, Error> {
-//        Future<Void, Error> { [weak self] promise in
-//            guard let self = self else {
-//                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
-//                return
-//            }
-//
-//            do {
-//                try self.storage.updateHabit(habit)
-//                promise(.success(()))
-//            } catch {
-//                promise(.failure(error))
-//            }
-//        }
-//        .eraseToAnyPublisher()
-//    }
 }
