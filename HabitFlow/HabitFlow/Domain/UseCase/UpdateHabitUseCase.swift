@@ -1,5 +1,5 @@
 //
-//  AddHabitUseCase.swift
+//  UpdateHabitUseCase.swift
 //  HabitFlow
 //
 //  Created by Haejin Park on 4/15/25.
@@ -7,11 +7,11 @@
 
 import Combine
 
-protocol AddHabitUseCase {
+protocol UpdateHabitUseCase {
     func execute(_ habit: HabitModel) -> AnyPublisher<Void, Error>
 }
 
-final class DefaultAddHabitUseCase: AddHabitUseCase {
+final class DefaultUpdateHabitUseCase: UpdateHabitUseCase {
     private let repository: HabitRepository
 
     init(repository: HabitRepository) {
@@ -19,6 +19,6 @@ final class DefaultAddHabitUseCase: AddHabitUseCase {
     }
 
     func execute(_ habit: HabitModel) -> AnyPublisher<Void, Error> {
-        return repository.addHabit(habit)
+        repository.updateHabit(habit)
     }
 }

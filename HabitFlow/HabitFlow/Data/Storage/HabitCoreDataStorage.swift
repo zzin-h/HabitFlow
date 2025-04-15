@@ -14,7 +14,7 @@ final class HabitCoreDataStorage {
         self.context = context
     }
 
-    func saveHabit(_ habit: HabitModel) throws {
+    func addHabit(_ habit: HabitModel) throws {
         let entity = HabitEntity(context: context)
         entity.id = habit.id
         entity.title = habit.title

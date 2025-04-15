@@ -17,6 +17,7 @@ final class HabitListViewModel: ObservableObject {
     private let fetchHabitUseCase: FetchHabitUseCase
     private let addHabitUseCase: AddHabitUseCase
     private let deleteHabitUseCase: DeleteHabitUseCase
+    private let updateHabitUseCase: UpdateHabitUseCase
 
     // MARK: - Combine
     private var cancellables = Set<AnyCancellable>()
@@ -25,12 +26,14 @@ final class HabitListViewModel: ObservableObject {
     init(
         fetchHabitUseCase: FetchHabitUseCase,
         addHabitUseCase: AddHabitUseCase,
-        deleteHabitUseCase: DeleteHabitUseCase
+        deleteHabitUseCase: DeleteHabitUseCase,
+        updateHabitUseCase: UpdateHabitUseCase
     ) {
         self.fetchHabitUseCase = fetchHabitUseCase
         self.addHabitUseCase = addHabitUseCase
         self.deleteHabitUseCase = deleteHabitUseCase
-
+        self.updateHabitUseCase = updateHabitUseCase
+        
         fetchHabits()
     }
 
@@ -64,6 +67,20 @@ final class HabitListViewModel: ObservableObject {
 
     func deleteHabit(id: UUID) {
         deleteHabitUseCase.execute(id)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    self?.fetchHabits()
+                case .failure(let error):
+                    self?.errorMessage = error.localizedDescription
+                }
+            } receiveValue: { _ in }
+            .store(in: &cancellables)
+    }
+    
+    func updateHabit(_ habit: HabitModel) {
+        updateHabitUseCase.execute(habit)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 switch completion {

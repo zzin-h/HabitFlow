@@ -9,23 +9,28 @@ import SwiftUI
 
 struct HabitListView: View {
     @StateObject private var viewModel: HabitListViewModel
-    
+
     init(viewModel: HabitListViewModel = HabitListDIContainer().makeHabitListViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     @State private var showingAddView = false
-    
+    @State private var selectedHabitToEdit: HabitModel? = nil
+
     var body: some View {
         NavigationView {
             List {
                 ForEach(viewModel.habits) { habit in
-                    HStack {
-                        Text(habit.title)
-                        Spacer()
-                        Text(habit.category.title)
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                    Button {
+                        selectedHabitToEdit = habit
+                    } label: {
+                        HStack {
+                            Text(habit.title)
+                            Spacer()
+                            Text(habit.category.title)
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
                     }
                 }
                 .onDelete(perform: deleteHabit)
@@ -46,9 +51,12 @@ struct HabitListView: View {
             .sheet(isPresented: $showingAddView) {
                 HabitAddEditView(viewModel: viewModel)
             }
+            .sheet(item: $selectedHabitToEdit) { habit in
+                HabitAddEditView(viewModel: viewModel, editingHabit: habit)
+            }
         }
     }
-    
+
     private func deleteHabit(at offsets: IndexSet) {
         offsets.forEach { index in
             let habit = viewModel.habits[index]
@@ -56,6 +64,7 @@ struct HabitListView: View {
         }
     }
 }
+
 
 #Preview {
     HabitListView()

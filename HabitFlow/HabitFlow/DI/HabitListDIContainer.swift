@@ -29,13 +29,18 @@ struct HabitListDIContainer {
     private var deleteHabitUseCase: DeleteHabitUseCase {
         return DefaultDeleteHabitUseCase(repository: repository)
     }
+    
+    private var updateHabitUseCase: UpdateHabitUseCase {
+        return DefaultUpdateHabitUseCase(repository: repository)
+    }
 
     // MARK: - ViewModel
     func makeHabitListViewModel() -> HabitListViewModel {
         return HabitListViewModel(
             fetchHabitUseCase: fetchHabitUseCase,
             addHabitUseCase: addHabitUseCase,
-            deleteHabitUseCase: deleteHabitUseCase
+            deleteHabitUseCase: deleteHabitUseCase,
+            updateHabitUseCase: updateHabitUseCase
         )
     }
 }
