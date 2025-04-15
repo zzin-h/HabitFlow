@@ -14,7 +14,7 @@ final class HabitCoreDataStorage {
         self.context = context
     }
 
-    func add(_ habit: HabitModel) throws {
+    func saveHabit(_ habit: HabitModel) throws {
         let entity = HabitEntity(context: context)
         entity.id = habit.id
         entity.title = habit.title
@@ -23,7 +23,7 @@ final class HabitCoreDataStorage {
         try context.save()
     }
 
-    func fetchAll() throws -> [HabitModel] {
+    func fetchAllHabits() throws -> [HabitModel] {
         let request: NSFetchRequest<HabitEntity> = HabitEntity.fetchRequest()
         return try context.fetch(request).map {
             HabitModel(
@@ -35,7 +35,7 @@ final class HabitCoreDataStorage {
         }
     }
 
-    func update(_ habit: HabitModel) throws {
+    func updateHabit(_ habit: HabitModel) throws {
         let request: NSFetchRequest<HabitEntity> = HabitEntity.fetchRequest()
         request.predicate = NSPredicate(format: "id == %@", habit.id as CVarArg)
 
@@ -46,9 +46,9 @@ final class HabitCoreDataStorage {
         }
     }
 
-    func delete(_ habit: HabitModel) throws {
+    func deleteHabit(by id: UUID) throws {
         let request: NSFetchRequest<HabitEntity> = HabitEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", habit.id as CVarArg)
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
 
         if let entity = try context.fetch(request).first {
             context.delete(entity)

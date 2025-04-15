@@ -6,51 +6,53 @@
 //
 
 import Foundation
+import Combine
 
-@MainActor
 final class HabitViewModel: ObservableObject {
     @Published var habits: [HabitModel] = []
+    
+    private let useCase: HabitUseCase
+    private var cancellables = Set<AnyCancellable>()
 
-    private let repository: HabitRepository
-
-    init(repository: HabitRepository = HabitRepositoryImpl()) {
-        self.repository = repository
-        loadHabits()
+    init(useCase: HabitUseCase) {
+        self.useCase = useCase
+        fetchHabits()
     }
 
-    func loadHabits() {
-        do {
-            habits = try repository.fetchAll()
-        } catch {
-            print("불러오기 실패: \(error)")
-        }
+    func fetchHabits() {
+        useCase.fetchHabits()
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { completion in
+                if case .failure(let error) = completion {
+                    print("Fetch Error: \(error)")
+                }
+            }, receiveValue: { [weak self] habits in
+                self?.habits = habits
+            })
+            .store(in: &cancellables)
     }
 
-    func add(title: String, category: HabitCategory) {
-        let habit = HabitModel(title: title, category: category)
-        do {
-            try repository.add(habit)
-            loadHabits()
-        } catch {
-            print("추가 실패: \(error)")
-        }
+    func addHabit(title: String, category: HabitCategory) {
+        let newHabit = HabitModel(
+            id: UUID(),
+            title: title,
+            category: category,
+            createdAt: Date()
+        )
+        useCase.createHabit(habit: newHabit)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { [weak self] _ in
+                self?.fetchHabits()
+            }, receiveValue: { })
+            .store(in: &cancellables)
     }
 
-    func update(_ habit: HabitModel) {
-        do {
-            try repository.update(habit)
-            loadHabits()
-        } catch {
-            print("수정 실패: \(error)")
-        }
-    }
-
-    func delete(_ habit: HabitModel) {
-        do {
-            try repository.delete(habit)
-            loadHabits()
-        } catch {
-            print("삭제 실패: \(error)")
-        }
+    func deleteHabit(id: UUID) {
+        useCase.deleteHabit(id: id)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { [weak self] _ in
+                self?.fetchHabits()
+            }, receiveValue: { })
+            .store(in: &cancellables)
     }
 }
