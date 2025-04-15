@@ -2,19 +2,17 @@
 //  HabitCategory.swift
 //  HabitFlow
 //
-//  Created by Haejin Park on 4/9/25.
+//  Created by Haejin Park on 4/15/25.
 //
 
-public enum HabitCategory: String, CaseIterable, Identifiable {
+enum HabitCategory: String, Codable, CaseIterable {
     case healthyIt
     case canDoIt
     case moneyIt
     case greenIt
     case myMindIt
 
-    public var id: String { rawValue }
-
-    public var displayName: String {
+    var title: String {
         switch self {
         case .healthyIt: return "헬시잇"
         case .canDoIt: return "할수잇"

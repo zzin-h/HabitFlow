@@ -8,34 +8,51 @@
 import SwiftUI
 
 struct HabitListView: View {
-    @StateObject private var viewModel = HabitViewModel()
+    @StateObject private var viewModel: HabitListViewModel
+    
+    init(viewModel: HabitListViewModel = HabitListDIContainer().makeHabitListViewModel()) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
+    
     @State private var showingAddView = false
-
+    
     var body: some View {
-        NavigationStack {
+        NavigationView {
             List {
                 ForEach(viewModel.habits) { habit in
-                    VStack(alignment: .leading) {
+                    HStack {
                         Text(habit.title)
-                            .font(.headline)
-                        Text(habit.category.displayName)
-                            .font(.subheadline)
+                        Spacer()
+                        Text(habit.category.title)
+                            .font(.caption)
                             .foregroundColor(.gray)
                     }
                 }
-                .onDelete { indexSet in
-                    indexSet.map { viewModel.habits[$0] }.forEach(viewModel.delete)
+                .onDelete(perform: deleteHabit)
+            }
+            .navigationTitle("Today's Habits")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showingAddView = true
+                    }) {
+                        Image(systemName: "plus")
+                    }
                 }
             }
-            .navigationTitle("오늘의 습관")
-            .toolbar {
-                Button(action: { showingAddView = true }) {
-                    Image(systemName: "plus")
-                }
+            .onAppear {
+                viewModel.fetchHabits()
             }
             .sheet(isPresented: $showingAddView) {
                 HabitAddEditView(viewModel: viewModel)
             }
+        }
+    }
+    
+    private func deleteHabit(at offsets: IndexSet) {
+        offsets.forEach { index in
+            let habit = viewModel.habits[index]
+            viewModel.deleteHabit(id: habit.id)
         }
     }
 }
