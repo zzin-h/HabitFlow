@@ -8,35 +8,56 @@
 import SwiftUI
 
 struct HabitListView: View {
-    @StateObject private var viewModel = HabitViewModel()
-    @State private var showingAddView = false
+    @StateObject private var viewModel: HabitListViewModel
+
+    init(viewModel: HabitListViewModel = HabitListDIContainer().makeHabitListViewModel()) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             List {
                 ForEach(viewModel.habits) { habit in
-                    VStack(alignment: .leading) {
+                    HStack {
                         Text(habit.title)
-                            .font(.headline)
-                        Text(habit.category.displayName)
-                            .font(.subheadline)
+                        Spacer()
+                        Text(habit.category.title)
+                            .font(.caption)
                             .foregroundColor(.gray)
                     }
                 }
-                .onDelete { indexSet in
-                    indexSet.map { viewModel.habits[$0] }.forEach(viewModel.delete)
-                }
+                .onDelete(perform: deleteHabit)
             }
-            .navigationTitle("오늘의 습관")
+            .navigationTitle("My Habits")
             .toolbar {
-                Button(action: { showingAddView = true }) {
-                    Image(systemName: "plus")
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: addDummyHabit) {
+                        Image(systemName: "plus")
+                    }
                 }
             }
-            .sheet(isPresented: $showingAddView) {
-                HabitAddEditView(viewModel: viewModel)
+            .onAppear {
+                viewModel.fetchHabits()
             }
         }
+    }
+
+    private func deleteHabit(at offsets: IndexSet) {
+        offsets.forEach { index in
+            let habit = viewModel.habits[index]
+            viewModel.deleteHabit(id: habit.id)
+        }
+    }
+
+    // 임시 더미 데이터 추가용
+    private func addDummyHabit() {
+        let dummyHabit = HabitModel(
+            id: UUID(),
+            title: "Read a book",
+            category: .healthyIt,
+            createdAt: Date()
+        )
+        viewModel.addHabit(dummyHabit)
     }
 }
 
