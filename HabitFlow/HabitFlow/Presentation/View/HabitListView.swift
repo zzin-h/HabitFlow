@@ -9,11 +9,13 @@ import SwiftUI
 
 struct HabitListView: View {
     @StateObject private var viewModel: HabitListViewModel
-
+    
     init(viewModel: HabitListViewModel = HabitListDIContainer().makeHabitListViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-
+    
+    @State private var showingAddView = false
+    
     var body: some View {
         NavigationView {
             List {
@@ -28,10 +30,12 @@ struct HabitListView: View {
                 }
                 .onDelete(perform: deleteHabit)
             }
-            .navigationTitle("My Habits")
+            .navigationTitle("Today's Habits")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: addDummyHabit) {
+                    Button(action: {
+                        showingAddView = true
+                    }) {
                         Image(systemName: "plus")
                     }
                 }
@@ -39,25 +43,17 @@ struct HabitListView: View {
             .onAppear {
                 viewModel.fetchHabits()
             }
+            .sheet(isPresented: $showingAddView) {
+                HabitAddEditView(viewModel: viewModel)
+            }
         }
     }
-
+    
     private func deleteHabit(at offsets: IndexSet) {
         offsets.forEach { index in
             let habit = viewModel.habits[index]
             viewModel.deleteHabit(id: habit.id)
         }
-    }
-
-    // 임시 더미 데이터 추가용
-    private func addDummyHabit() {
-        let dummyHabit = HabitModel(
-            id: UUID(),
-            title: "Read a book",
-            category: .healthyIt,
-            createdAt: Date()
-        )
-        viewModel.addHabit(dummyHabit)
     }
 }
 
