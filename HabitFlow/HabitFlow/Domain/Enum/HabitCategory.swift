@@ -6,11 +6,7 @@
 //
 
 enum HabitCategory: String, Codable, CaseIterable {
-    case healthyIt
-    case canDoIt
-    case moneyIt
-    case greenIt
-    case myMindIt
+    case healthyIt, canDoIt, moneyIt, greenIt, myMindIt
 
     var title: String {
         switch self {

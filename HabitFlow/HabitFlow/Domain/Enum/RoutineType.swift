@@ -6,15 +6,13 @@
 //
 
 enum RoutineType: String, Codable, CaseIterable {
-    case daily
-    case weekly
-    case interval
+    case daily, weekly, interval
     
     var title: String {
         switch self {
         case .daily: return "매일"
-        case .weekly: return "요일 주기"
-        case .interval: return "반복 주기"
+        case .weekly: return "요일"
+        case .interval: return "커스텀"
             
         }
     }
