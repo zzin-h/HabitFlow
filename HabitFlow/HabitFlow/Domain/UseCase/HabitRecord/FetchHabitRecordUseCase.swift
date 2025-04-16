@@ -12,7 +12,7 @@ protocol FetchHabitRecordUseCase {
     func execute() -> AnyPublisher<[HabitRecordModel], Error>
 }
 
-final class FetchHabitRecordUseCaseImpl: FetchHabitRecordUseCase {
+final class DefaultFetchHabitRecordUseCase: FetchHabitRecordUseCase {
     private let repository: HabitRecordRepository
 
     init(repository: HabitRecordRepository) {

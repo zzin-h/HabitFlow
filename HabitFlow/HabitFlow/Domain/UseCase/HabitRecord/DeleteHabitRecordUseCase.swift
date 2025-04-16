@@ -12,7 +12,7 @@ protocol DeleteHabitRecordUseCase {
     func execute(recordId: UUID) -> AnyPublisher<Void, Error>
 }
 
-final class DeleteHabitRecordUseCaseImpl: DeleteHabitRecordUseCase {
+final class DefaultDeleteHabitRecordUseCase: DeleteHabitRecordUseCase {
     private let repository: HabitRecordRepository
 
     init(repository: HabitRecordRepository) {
@@ -20,6 +20,6 @@ final class DeleteHabitRecordUseCaseImpl: DeleteHabitRecordUseCase {
     }
 
     func execute(recordId: UUID) -> AnyPublisher<Void, Error> {
-        return repository.deleteRecord(recordId)
+        return repository.deleteRecord(by: recordId)
     }
 }

@@ -9,17 +9,17 @@ import Foundation
 import Combine
 
 protocol UpdateHabitRecordUseCase {
-    func execute(_ updatedRecord: HabitRecordModel) -> AnyPublisher<Void, Error>
+    func execute(recordId: UUID, newDate: Date, newDuration: Int32) -> AnyPublisher<Void, Error>
 }
 
-final class UpdateHabitRecordUseCaseImpl: UpdateHabitRecordUseCase {
+final class DefaultUpdateHabitRecordUseCase: UpdateHabitRecordUseCase {
     private let repository: HabitRecordRepository
 
     init(repository: HabitRecordRepository) {
         self.repository = repository
     }
 
-    func execute(_ updatedRecord: HabitRecordModel) -> AnyPublisher<Void, Error> {
-        return repository.updateRecord(updatedRecord)
+    func execute(recordId: UUID, newDate: Date, newDuration: Int32) -> AnyPublisher<Void, Error> {
+        return repository.updateRecord(id: recordId, date: newDate, duration: Int32(newDuration))
     }
 }

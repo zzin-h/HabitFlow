@@ -12,7 +12,7 @@ protocol AddHabitRecordUseCase {
     func execute(habitId: UUID, date: Date, duration: Int) -> AnyPublisher<Void, Error>
 }
 
-final class AddHabitRecordUseCaseImpl: AddHabitRecordUseCase {
+final class DefaultAddHabitRecordUseCase: AddHabitRecordUseCase {
     private let repository: HabitRecordRepository
 
     init(repository: HabitRecordRepository) {
