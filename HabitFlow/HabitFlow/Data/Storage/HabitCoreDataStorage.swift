@@ -67,4 +67,17 @@ final class HabitCoreDataStorage {
             try context.save()
         }
     }
+    
+    func updateHabitStatus(habitId: UUID, completedAt: Date) throws {
+        let request: NSFetchRequest<HabitEntity> = HabitEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", habitId as CVarArg)
+
+        guard let habit = try context.fetch(request).first else {
+            throw NSError(domain: "Habit not found", code: 404)
+        }
+
+        habit.setValue(completedAt, forKey: "completedAt")
+
+        try context.save()
+    }
 }
