@@ -2,7 +2,7 @@
 //  HabitEntity+CoreDataProperties.swift
 //  HabitFlow
 //
-//  Created by Haejin Park on 4/9/25.
+//  Created by Haejin Park on 4/15/25.
 //
 //
 
@@ -16,10 +16,32 @@ extension HabitEntity {
         return NSFetchRequest<HabitEntity>(entityName: "HabitEntity")
     }
 
-    @NSManaged public var category: String?
-    @NSManaged public var createdAt: Date?
     @NSManaged public var id: UUID?
+    @NSManaged public var createdAt: Date?
     @NSManaged public var title: String?
+    @NSManaged public var category: String?
+    @NSManaged public var routineType: String?
+    @NSManaged public var selectedDays: NSObject?
+    @NSManaged public var intervalDays: Int32
+    @NSManaged public var goalMinutes: Int32
+    @NSManaged public var records: NSSet?
+
+}
+
+// MARK: Generated accessors for records
+extension HabitEntity {
+
+    @objc(addRecordsObject:)
+    @NSManaged public func addToRecords(_ value: HabitRecordEntity)
+
+    @objc(removeRecordsObject:)
+    @NSManaged public func removeFromRecords(_ value: HabitRecordEntity)
+
+    @objc(addRecords:)
+    @NSManaged public func addToRecords(_ values: NSSet)
+
+    @objc(removeRecords:)
+    @NSManaged public func removeFromRecords(_ values: NSSet)
 
 }
 

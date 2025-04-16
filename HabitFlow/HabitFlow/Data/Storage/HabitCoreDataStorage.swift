@@ -20,6 +20,10 @@ final class HabitCoreDataStorage {
         entity.title = habit.title
         entity.category = habit.category.rawValue
         entity.createdAt = habit.createdAt
+        entity.routineType = habit.routineType.rawValue
+        entity.selectedDays = habit.selectedDays as NSObject?
+        entity.intervalDays = Int32(habit.intervalDays ?? 0)
+        entity.goalMinutes = Int32(habit.goalMinutes ?? 0)
         try context.save()
     }
 
@@ -30,7 +34,11 @@ final class HabitCoreDataStorage {
                 id: $0.id ?? UUID(),
                 title: $0.title ?? "",
                 category: HabitCategory(rawValue: $0.category ?? "") ?? .canDoIt,
-                createdAt: $0.createdAt ?? Date()
+                createdAt: $0.createdAt ?? Date(),
+                routineType: RoutineType(rawValue: $0.routineType ?? "") ?? .daily,
+                selectedDays: $0.selectedDays as? [String] ?? [],
+                intervalDays: Int($0.intervalDays),
+                goalMinutes: Int($0.goalMinutes)
             )
         }
     }
@@ -42,6 +50,10 @@ final class HabitCoreDataStorage {
         if let entity = try context.fetch(request).first {
             entity.title = habit.title
             entity.category = habit.category.rawValue
+            entity.routineType = habit.routineType.rawValue
+            entity.selectedDays = habit.selectedDays as NSObject?
+            entity.intervalDays = Int32(habit.intervalDays ?? 0)
+            entity.goalMinutes = Int32(habit.goalMinutes ?? 0)
             try context.save()
         }
     }

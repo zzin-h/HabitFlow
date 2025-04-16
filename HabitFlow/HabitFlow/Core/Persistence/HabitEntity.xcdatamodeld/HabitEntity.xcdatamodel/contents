@@ -3,7 +3,18 @@
     <entity name="HabitEntity" representedClassName="HabitEntity" syncable="YES">
         <attribute name="category" optional="YES" attributeType="String"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="goalMinutes" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="intervalDays" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="routineType" optional="YES" attributeType="String"/>
+        <attribute name="selectedDays" optional="YES" attributeType="Transformable"/>
+        <attribute name="title" attributeType="String"/>
+        <relationship name="records" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="HabitRecordEntity" inverseName="habit" inverseEntity="HabitRecordEntity"/>
+    </entity>
+    <entity name="HabitRecordEntity" representedClassName="HabitRecordEntity" syncable="YES">
+        <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="duration" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="habit" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HabitEntity" inverseName="records" inverseEntity="HabitEntity"/>
     </entity>
 </model>
