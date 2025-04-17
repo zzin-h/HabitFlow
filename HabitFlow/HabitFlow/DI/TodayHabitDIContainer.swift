@@ -15,19 +15,28 @@ final class TodayHabitDIContainer {
 
     // MARK: - Repository
     private let habitRepository: HabitRepository
+    private let habitRecordRepository: HabitRecordRepository
 
     // MARK: - Init
     init() {
         self.habitStorage = HabitCoreDataStorage()
         self.habitRecordStorage = HabitRecordCoreDataStorage()
+
         self.habitRepository = HabitRepositoryImpl(
             storage: habitStorage,
             recordStorage: habitRecordStorage
+        )
+        
+        self.habitRecordRepository = HabitRecordRepositoryImpl(
+            storage: habitRecordStorage
         )
     }
 
     // MARK: - ViewModel Factory
     func makeTodayHabitViewModel() -> TodayHabitViewModel {
-        return TodayHabitViewModel(habitRepository: habitRepository)
+        return TodayHabitViewModel(
+            habitRepository: habitRepository,
+            habitRecordRepository: habitRecordRepository
+        )
     }
 }

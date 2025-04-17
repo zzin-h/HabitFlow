@@ -63,7 +63,7 @@ struct HabitListView: View {
                 HabitAddEditView(viewModel: viewModel, editingHabit: habit)
             }
             .sheet(item: $selectedHabitForStats) { habit in
-//                HabitRecordView(viewModel: HabitRecordViewModel)
+//                HabitRecordView(viewModel: recordViewModel)
             }
         }
     }
