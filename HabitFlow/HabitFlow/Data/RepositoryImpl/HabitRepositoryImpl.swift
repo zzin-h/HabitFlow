@@ -33,6 +33,24 @@ final class HabitRepositoryImpl: HabitRepository {
         .eraseToAnyPublisher()
     }
     
+    func fetchHabits(for date: Date) -> AnyPublisher<[HabitModel], Error> {
+        return Future { [weak self] promise in
+            guard let self = self else {
+                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                return
+            }
+
+            do {
+                let allHabits = try self.storage.fetchAllHabits()
+                let filtered = allHabits.filter { $0.isScheduled(for: date) }
+                promise(.success(filtered))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
     func addHabit(_ habit: HabitModel) -> AnyPublisher<Void, Error> {
         return Future { [weak self] promise in
             guard let self = self else {

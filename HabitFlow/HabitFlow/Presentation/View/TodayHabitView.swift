@@ -18,7 +18,8 @@ struct TodayHabitView: View {
 
     var body: some View {
         VStack {
-            WeeklyCalendarView(selectedDate: $selectedDate)
+            
+            WeeklyCalendarView(viewModel: viewModel, selectedDate: $selectedDate)
 
             List {
                 Section(header: Text("📋 해야 할 습관")) {
