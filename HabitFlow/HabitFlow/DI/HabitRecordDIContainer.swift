@@ -35,6 +35,7 @@ final class HabitRecordDIContainer {
     // MARK: - ViewModel Factory
     func makeHabitRecordViewModel(habitId: UUID) -> HabitRecordViewModel {
         return HabitRecordViewModel(
+            habitId: habitId,
             fetchHabitRecordsByHabitIdUseCase: fetchHabitRecordsByHabitIdUseCase,
             addHabitRecordUseCase: addHabitRecordUseCase,
             updateHabitRecordUseCase: updateHabitRecordUseCase,

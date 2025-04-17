@@ -49,11 +49,6 @@ struct HabitModel: Identifiable {
         self.selectedDays = entity.selectedDays as? [String]
         self.intervalDays = Int(entity.intervalDays)
         self.goalMinutes = Int(entity.goalMinutes)
-
-        if let recordSet = entity.records as? Set<HabitRecordEntity> {
-            self.records = recordSet.map { HabitRecordModel(entity: $0) }
-        } else {
-            self.records = []
-        }
+        self.records = []
     }
 }

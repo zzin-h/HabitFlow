@@ -8,12 +8,33 @@
 import SwiftUI
 
 struct HabitRecordView: View {
-    @ObservedObject var viewModel: HabitRecordViewModel
+    let habit: HabitModel
 
+    @StateObject private var viewModel: HabitRecordViewModel
     @State private var showingAddRecordSheet = false
+    @State private var editingRecord: HabitRecordModel? = nil
+
+    init(habit: HabitModel) {
+        self.habit = habit
+        _viewModel = StateObject(wrappedValue: HabitRecordDIContainer().makeHabitRecordViewModel(habitId: habit.id))
+    }
 
     var body: some View {
         VStack {
+            Spacer()
+
+            HStack {
+                Text("\(habit.title) (\(viewModel.records.count))")
+                    .font(.headline)
+                Spacer()
+                Button {
+                    showingAddRecordSheet = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+            .padding()
+
             if viewModel.records.isEmpty {
                 Spacer()
                 Text("아직 기록이 없어요 🕊️")
@@ -26,31 +47,38 @@ struct HabitRecordView: View {
                         HStack {
                             Text(record.date, style: .date)
                             Spacer()
-                            Text("\(record.duration)분")
-                                .foregroundColor(.accentColor)
+                            if record.duration > 0 {
+                                Text("\(record.duration)분")
+                                    .foregroundColor(.accentColor)
+                            }
+                        }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                viewModel.deleteRecord(recordId: record.id)
+                            } label: {
+                                Label("삭제", systemImage: "trash")
+                            }
+
+                            Button {
+                                editingRecord = record
+                            } label: {
+                                Label("수정", systemImage: "pencil")
+                            }
+                            .tint(.blue)
                         }
                     }
-//                    .onDelete(perform: deleteRecord)
                 }
             }
         }
         .navigationTitle("습관 기록")
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showingAddRecordSheet = true
-                } label: {
-                    Label("기록 추가", systemImage: "plus")
-                }
-            }
+        .onAppear {
+            viewModel.loadRecords()
         }
         .sheet(isPresented: $showingAddRecordSheet) {
-//            AddRecordSheet(viewModel: viewModel)
+            AddEditRecordSheet(viewModel: viewModel, habit: habit)
+        }
+        .sheet(item: $editingRecord) { record in
+            AddEditRecordSheet(viewModel: viewModel, habit: habit, existingRecord: record)
         }
     }
-
-//    private func deleteRecord(at offsets: IndexSet) {
-//        offsets.map { viewModel.records[$0].id }
-//            .forEach { viewModel.deleteRecord(id: $0) }
-//    }
 }

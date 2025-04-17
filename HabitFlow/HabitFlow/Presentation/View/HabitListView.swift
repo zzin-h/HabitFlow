@@ -13,7 +13,7 @@ struct HabitListView: View {
     init(viewModel: HabitListViewModel = HabitListDIContainer().makeHabitListViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     @State private var showingAddView = false
     @State private var selectedHabitToEdit: HabitModel? = nil
     @State private var selectedHabitForStats: HabitModel? = nil
@@ -46,9 +46,9 @@ struct HabitListView: View {
             .navigationTitle("My Habits")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
+                    Button {
                         showingAddView = true
-                    }) {
+                    } label: {
                         Image(systemName: "plus")
                     }
                 }
@@ -63,7 +63,7 @@ struct HabitListView: View {
                 HabitAddEditView(viewModel: viewModel, editingHabit: habit)
             }
             .sheet(item: $selectedHabitForStats) { habit in
-//                HabitRecordView(viewModel: HabitRecordViewModel)
+                HabitRecordView(habit: habit)
             }
         }
     }

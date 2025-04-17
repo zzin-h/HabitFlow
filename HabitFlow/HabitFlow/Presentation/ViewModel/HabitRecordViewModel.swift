@@ -16,27 +16,34 @@ final class HabitRecordViewModel: ObservableObject {
     private let deleteHabitRecordUseCase: DeleteHabitRecordUseCase
 
     private var cancellables = Set<AnyCancellable>()
+    
+    // MARK: - State
+    private let habitId: UUID
 
-    // MARK: - Published Properties
+    // MARK: - Published
     @Published var records: [HabitRecordModel] = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
 
     // MARK: - Init
     init(
+        habitId: UUID,
         fetchHabitRecordsByHabitIdUseCase: FetchHabitRecordsByHabitIdUseCase,
         addHabitRecordUseCase: AddHabitRecordUseCase,
         updateHabitRecordUseCase: UpdateHabitRecordUseCase,
         deleteHabitRecordUseCase: DeleteHabitRecordUseCase
     ) {
+        self.habitId = habitId
         self.fetchHabitRecordsByHabitIdUseCase = fetchHabitRecordsByHabitIdUseCase
         self.addHabitRecordUseCase = addHabitRecordUseCase
         self.updateHabitRecordUseCase = updateHabitRecordUseCase
         self.deleteHabitRecordUseCase = deleteHabitRecordUseCase
+        
+        loadRecords()
     }
 
     // MARK: - Actions
-    func loadRecords(for habitId: UUID) {
+    func loadRecords() {
         isLoading = true
         errorMessage = nil
 
@@ -53,29 +60,29 @@ final class HabitRecordViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    func addRecord(habitId: UUID, date: Date, duration: Int32) {
+    func addRecord(date: Date, duration: Int32) {
         addHabitRecordUseCase.execute(habitId: habitId, date: date, duration: Int(duration))
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] in
-                self?.loadRecords(for: habitId)
+                self?.loadRecords()
             })
             .store(in: &cancellables)
     }
 
-    func updateRecord(recordId: UUID, date: Date, duration: Int32, habitId: UUID) {
+    func updateRecord(recordId: UUID, date: Date, duration: Int32) {
         updateHabitRecordUseCase.execute(recordId: recordId, newDate: date, newDuration: duration)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] in
-                self?.loadRecords(for: habitId)
+                self?.loadRecords()
             })
             .store(in: &cancellables)
     }
 
-    func deleteRecord(recordId: UUID, habitId: UUID) {
+    func deleteRecord(recordId: UUID) {
         deleteHabitRecordUseCase.execute(recordId: recordId)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] in
-                self?.loadRecords(for: habitId)
+                self?.loadRecords()
             })
             .store(in: &cancellables)
     }
