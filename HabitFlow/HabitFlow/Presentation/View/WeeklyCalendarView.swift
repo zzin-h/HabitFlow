@@ -10,60 +10,78 @@ import SwiftUI
 struct WeeklyCalendarView: View {
     @ObservedObject var viewModel: TodayHabitViewModel
     @Binding var selectedDate: Date
-
+    
     private let calendar = Calendar.current
-
-    private var startOfWeek: Date {
-        guard let startOfWeek = calendar.dateInterval(of: .weekOfYear, for: selectedDate)?.start else {
-            return Date()
+    private let totalDays = 35
+    private var centerIndex: Int { totalDays / 2 }
+    
+    private var dateRange: [Date] {
+        guard let start = calendar.date(byAdding: .day, value: -centerIndex, to: Date()) else {
+            return []
         }
-        return startOfWeek
-    }
-
-    private var weekDates: [Date] {
-        var dates = [Date]()
-        for i in 0..<7 {
-            if let date = calendar.date(byAdding: .day, value: i, to: startOfWeek) {
-                dates.append(date)
-            }
+        return (0..<totalDays).compactMap {
+            calendar.date(byAdding: .day, value: $0, to: start)
         }
-        return dates
     }
-
+    
     var body: some View {
-        VStack {
-            HStack {
-                ForEach(Weekdays.allCases, id: \.self) { day in
-                    Text(day.koreanTitle)
-                        .frame(maxWidth: .infinity)
-                        .padding(8)
-                        .foregroundColor(.primary)
-                        .font(.headline)
-                }
-            }
-            .padding(.top)
-
-            HStack {
-                ForEach(weekDates, id: \.self) { date in
-                    VStack {
-                        Text("\(calendar.component(.day, from: date))")
-                            .padding(8)
-                            .cornerRadius(10)
-                            .background(calendar.isDate(selectedDate, inSameDayAs: date) ? Color.accentColor : Color.gray.opacity(0.2))
-                            .foregroundColor(calendar.isDate(selectedDate, inSameDayAs: date) ? .white : .primary)
-                            .onTapGesture {
-                                self.selectedDate = date
+        VStack(alignment: .center, spacing: 10) {
+            Text(formattedToday)
+                .font(.headline)
+                .padding(.horizontal)
+            
+            ScrollViewReader { scrollProxy in
+                GeometryReader { geometry in
+                    let itemWidth = geometry.size.width / 10
+                    
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(Array(dateRange.enumerated()), id: \.1) { index, date in
+                                VStack {
+                                    Text(date.weekdayShortSymbol())
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                    
+                                    Text("\(calendar.component(.day, from: date))")
+                                        .fontWeight(.semibold)
+                                        .frame(width: 36, height: 36)
+                                        .background(
+                                            calendar.isDate(selectedDate, inSameDayAs: date)
+                                            ? Color.accentColor
+                                            : Color.gray.opacity(0.2)
+                                        )
+                                        .foregroundColor(
+                                            calendar.isDate(selectedDate, inSameDayAs: date)
+                                            ? .white
+                                            : .primary
+                                        )
+                                        .clipShape(Circle())
+                                }
+                                .frame(width: itemWidth)
+                                .onTapGesture {
+                                    selectedDate = date
+                                }
+                                .id(index)
                             }
+                        }
+                        .padding(.horizontal, 4)
                     }
-                    .frame(maxWidth: .infinity)
+                    .onAppear {
+                        scrollProxy.scrollTo(centerIndex, anchor: .center)
+                    }
                 }
+                .frame(height: 60)
             }
-            .padding(.bottom)
         }
-        .padding()
+        .padding(.vertical)
         .background(Color.white)
-        .cornerRadius(10)
-        .shadow(radius: 5)
+        .cornerRadius(12)
+        .shadow(radius: 3)
+    }
+    
+    private var formattedToday: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy년 MM월 dd일 EEEE"
+        return formatter.string(from: Date())
     }
 }
-
