@@ -11,10 +11,11 @@ struct HabitListDIContainer {
     
     // MARK: - CoreData Storage
     private let storage = HabitCoreDataStorage()
+    private let recordStorage = HabitRecordCoreDataStorage()
 
     // MARK: - Repository
     private var repository: HabitRepository {
-        return HabitRepositoryImpl(storage: storage)
+        return HabitRepositoryImpl(storage: storage, recordStorage: recordStorage)
     }
 
     // MARK: - UseCases
