@@ -45,7 +45,7 @@ struct HabitRecordView: View {
                 List {
                     ForEach(viewModel.records.sorted(by: { $0.date > $1.date })) { record in
                         HStack {
-                            Text(record.date, style: .date)
+                            Text(record.date.description(with: .current))
                             Spacer()
                             if record.duration > 0 {
                                 Text("\(record.duration)분")
