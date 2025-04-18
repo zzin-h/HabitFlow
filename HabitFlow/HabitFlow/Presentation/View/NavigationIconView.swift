@@ -16,7 +16,7 @@ struct NavigationIconView: View {
                 Image(systemName: "list.bullet")
             }
             
-            NavigationLink(destination: HabitListView()) {
+            NavigationLink(destination: StatisticsOverviewView(viewModel: StatisticsViewModel())) {
                 Image(systemName: "chart.bar.xaxis")
             }
             
