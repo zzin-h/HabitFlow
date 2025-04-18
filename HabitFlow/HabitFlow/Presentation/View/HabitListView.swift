@@ -19,7 +19,7 @@ struct HabitListView: View {
     @State private var selectedHabitForStats: HabitModel? = nil
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 ForEach(viewModel.habits) { habit in
                     Button {

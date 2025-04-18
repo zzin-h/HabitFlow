@@ -42,7 +42,7 @@ struct AddEditRecordSheet: View {
                     DatePicker("날짜 및 시간", selection: $selectedDate, displayedComponents: [.date, .hourAndMinute])
                 }
 
-                if habit.goalMinutes != nil {
+                if habit.goalMinutes! > 0 {
                     Section(header: Text("수행 시간")) {
                         TextField("분 단위 입력", text: $durationMinutes)
                             .keyboardType(.numberPad)
