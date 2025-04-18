@@ -8,29 +8,35 @@
 import SwiftUI
 
 struct StatisticsCardView: View {
-    let item: StatisticsOverviewItemModel
-
+    let title: String
+    let icon: String
+    let value: String
+    let color: Color
+    let action: () -> Void
+    
     var body: some View {
         HStack {
-            Image(systemName: item.icon)
-                .font(.title2)
-                .padding()
-                .background(item.backgroundColor.opacity(0.2))
-                .clipShape(Circle())
-            
+            Image(systemName: icon)
+                .foregroundColor(color)
+                .font(.largeTitle)
             VStack(alignment: .leading) {
-                Text(item.title)
+                Text(title)
                     .font(.headline)
-                Text(item.valueDescription)
+                    .foregroundColor(.primary)
+                Text(value)
                     .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.secondary)
             }
             Spacer()
-            Image(systemName: "chevron.right")
-                .foregroundColor(.gray)
+            Button(action: action) {
+                Text("자세히 보기")
+                    .font(.subheadline)
+                    .foregroundColor(color)
+            }
         }
         .padding()
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(Color.white)
         .cornerRadius(12)
+        .shadow(radius: 5)
     }
 }

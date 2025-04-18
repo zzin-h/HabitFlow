@@ -21,6 +21,7 @@ final class StatisticsRepositoryImpl: StatisticsRepository {
                 promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
                 return
             }
+
             do {
                 let count = try self.storage.fetchTotalCompletedCount()
                 promise(.success(count))
@@ -73,8 +74,8 @@ final class StatisticsRepositoryImpl: StatisticsRepository {
             }
 
             do {
-                let bestHabit = try self.storage.fetchBestHabit()
-                promise(.success(bestHabit))
+                let habit = try self.storage.fetchBestHabit()
+                promise(.success(habit))
             } catch {
                 promise(.failure(error))
             }
@@ -90,8 +91,26 @@ final class StatisticsRepositoryImpl: StatisticsRepository {
             }
 
             do {
-                let total = try self.storage.fetchTotalTime()
-                promise(.success(total))
+                let time = try self.storage.fetchTotalTime()
+                promise(.success(time))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+
+    func fetchTimeBasedStats() -> AnyPublisher<TimeBasedStats, Error> {
+        return Future { [weak self] promise in
+            guard let self = self else {
+                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                return
+            }
+
+            do {
+                let result = try self.storage.fetchTimeBasedStats()
+                let model = TimeBasedStats(mostFrequentDay: result.mostFrequentDay, mostFrequentTime: result.mostFrequentTime)
+                promise(.success(model))
             } catch {
                 promise(.failure(error))
             }

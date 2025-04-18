@@ -21,24 +21,6 @@ final class TodayHabitViewModel: ObservableObject {
         self.habitRecordRepository = habitRecordRepository
     }
 
-//    func loadHabits(for date: Date) {
-//        habitRepository.fetchHabits(for: date)
-//            .receive(on: DispatchQueue.main)
-//            .sink(
-//                receiveCompletion: { completion in
-//                    if case let .failure(error) = completion {
-//                        print("Error fetching habits for date: \(error)")
-//                    }
-//                },
-//                receiveValue: { [weak self] habits in
-//                    guard let self = self else { return }
-//                    self.todos = habits
-//                    self.completed = []
-//                }
-//            )
-//            .store(in: &cancellables)
-//    }
-
     func loadHabits(for date: Date) {
         let habitsPublisher = habitRepository.fetchHabits(for: date)
         let recordsPublisher = habitRecordRepository.fetchAllRecords()
@@ -89,9 +71,9 @@ final class TodayHabitViewModel: ObservableObject {
         .sink { completion in
             switch completion {
             case .finished:
-                print("✅ Habit record 저장 완료")
+                print("✅ \(habit.title) 저장 완료")
             case .failure(let error):
-                print("❌ Habit record 저장 실패: \(error.localizedDescription)")
+                print("❌ \(habit.title) 저장 실패: \(error.localizedDescription)")
             }
         } receiveValue: { [weak self] in
             guard let self = self else { return }

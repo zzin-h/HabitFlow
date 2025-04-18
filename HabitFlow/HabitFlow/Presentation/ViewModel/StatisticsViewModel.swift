@@ -16,6 +16,8 @@ final class StatisticsViewModel: ObservableObject {
     @Published var favoriteCategory: String = ""
     @Published var bestHabitTitle: String = ""
     @Published var totalTimeSpent: Int = 0
+    @Published var mostFrequentDay: String = ""
+    @Published var mostFrequentTime: String = ""
 
     // MARK: - Use Cases
     private let fetchTotalCompletedCountUseCase: FetchTotalCompletedCountUseCase
@@ -23,6 +25,7 @@ final class StatisticsViewModel: ObservableObject {
     private let fetchFavoriteCategoryUseCase: FetchFavoriteCategoryUseCase
     private let fetchBestHabitUseCase: FetchBestHabitUseCase
     private let fetchTotalTimeUseCase: FetchTotalTimeUseCase
+    private let fetchTimeBasedStatsUseCase: FetchTimeBasedStatsUseCase
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -32,13 +35,15 @@ final class StatisticsViewModel: ObservableObject {
         fetchActiveDaysUseCase: FetchActiveDaysUseCase,
         fetchFavoriteCategoryUseCase: FetchFavoriteCategoryUseCase,
         fetchBestHabitUseCase: FetchBestHabitUseCase,
-        fetchTotalTimeUseCase: FetchTotalTimeUseCase
+        fetchTotalTimeUseCase: FetchTotalTimeUseCase,
+        fetchTimeBasedStatsUseCase: FetchTimeBasedStatsUseCase
     ) {
         self.fetchTotalCompletedCountUseCase = fetchTotalCompletedCountUseCase
         self.fetchActiveDaysUseCase = fetchActiveDaysUseCase
         self.fetchFavoriteCategoryUseCase = fetchFavoriteCategoryUseCase
         self.fetchBestHabitUseCase = fetchBestHabitUseCase
         self.fetchTotalTimeUseCase = fetchTotalTimeUseCase
+        self.fetchTimeBasedStatsUseCase = fetchTimeBasedStatsUseCase
 
         loadStatistics()
     }
@@ -50,6 +55,7 @@ final class StatisticsViewModel: ObservableObject {
         fetchFavoriteCategory()
         fetchBestHabit()
         fetchTotalTimeSpent()
+        fetchTimeBasedStats() 
     }
 
     private func fetchTotalCompletedCount() {
@@ -94,6 +100,16 @@ final class StatisticsViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }) { [weak self] time in
                 self?.totalTimeSpent = time
+            }
+            .store(in: &cancellables)
+    }
+
+    private func fetchTimeBasedStats() {
+        fetchTimeBasedStatsUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { _ in }) { [weak self] result in
+                self?.mostFrequentDay = result.mostFrequentDay
+                self?.mostFrequentTime = result.mostFrequentTime
             }
             .store(in: &cancellables)
     }

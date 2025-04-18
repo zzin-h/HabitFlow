@@ -14,4 +14,5 @@ protocol StatisticsRepository {
     func fetchFavoriteCategory() -> AnyPublisher<String, Error>
     func fetchBestHabit() -> AnyPublisher<String, Error>
     func fetchTotalTime() -> AnyPublisher<Int, Error>
+    func fetchTimeBasedStats() -> AnyPublisher<TimeBasedStats, Error>
 }

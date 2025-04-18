@@ -42,6 +42,11 @@ final class StatisticsDIContainer {
         return DefaultFetchTotalTimeUseCase(repository: statisticsRepository)
     }
 
+    // 날짜 기반 통계를 위한 UseCase 추가
+    func makeFetchTimeBasedStatsUseCase() -> FetchTimeBasedStatsUseCase {
+        return DefaultFetchTimeBasedStatsUseCase(repository: statisticsRepository)
+    }
+
     // MARK: - ViewModel
     func makeStatisticsViewModel() -> StatisticsViewModel {
         return StatisticsViewModel(
@@ -49,7 +54,8 @@ final class StatisticsDIContainer {
             fetchActiveDaysUseCase: makeFetchActiveDaysUseCase(),
             fetchFavoriteCategoryUseCase: makeFetchFavoriteCategoryUseCase(),
             fetchBestHabitUseCase: makeFetchBestHabitUseCase(),
-            fetchTotalTimeUseCase: makeFetchTotalTimeUseCase()
+            fetchTotalTimeUseCase: makeFetchTotalTimeUseCase(),
+            fetchTimeBasedStatsUseCase: makeFetchTimeBasedStatsUseCase()
         )
     }
 }
