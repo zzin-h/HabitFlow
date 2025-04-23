@@ -10,11 +10,11 @@ import Combine
 
 final class StatisticsRepositoryImpl: StatisticsRepository {
     private let storage: StatisticsCoreDataStorage
-
+    
     init(storage: StatisticsCoreDataStorage) {
         self.storage = storage
     }
-
+    
     func fetchTotalCompletedCount() -> AnyPublisher<Int, Error> {
         return Future { [weak self] promise in
             guard let self = self else {

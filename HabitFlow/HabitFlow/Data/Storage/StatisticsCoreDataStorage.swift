@@ -105,7 +105,7 @@ final class StatisticsCoreDataStorage {
         for record in records {
             if let date = record.date {
                 let weekday = calendar.component(.weekday, from: date)
-                let dayName = calendar.weekdaySymbols[weekday - 1] // 1 = Sunday
+                let dayName = calendar.weekdaySymbols[weekday - 1]
                 dayCount[dayName, default: 0] += 1
             }
         }
