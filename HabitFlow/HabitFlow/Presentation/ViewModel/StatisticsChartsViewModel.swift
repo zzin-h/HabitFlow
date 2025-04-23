@@ -9,17 +9,27 @@ import Foundation
 import Combine
 
 final class StatisticsChartViewModel: ObservableObject {
+    // MARK: - Published Properties
     @Published var completedStats: [TotalCompletedStat] = []
     @Published var selectedPeriod: Period = .weekly(Date())
+    @Published var activeDaysStat: ActiveDaysStat?
     @Published var errorMessage: String?
     
+    // MARK: - Use Cases
     private let fetchTotalCompletedStatsUseCase: FetchTotalCompletedStatsUseCase
+    private let fetchActiveDaysStatUseCase: FetchActiveDaysStatUseCase
     private var cancellables = Set<AnyCancellable>()
 
-    init(fetchTotalCompletedStatsUseCase: FetchTotalCompletedStatsUseCase) {
+    // MARK: - Init
+    init(
+        fetchTotalCompletedStatsUseCase: FetchTotalCompletedStatsUseCase,
+        fetchActiveDaysStatUseCase: FetchActiveDaysStatUseCase
+    ) {
         self.fetchTotalCompletedStatsUseCase = fetchTotalCompletedStatsUseCase
+        self.fetchActiveDaysStatUseCase = fetchActiveDaysStatUseCase
     }
 
+    // MARK: - TotalCompleted
     func loadCompletedStats() {
         fetchTotalCompletedStatsUseCase.execute()
             .receive(on: DispatchQueue.main)
@@ -40,8 +50,26 @@ final class StatisticsChartViewModel: ObservableObject {
         selectedPeriod = period
         loadCompletedStats()
     }
+    
+    // MARK: - ActiveDays
+    func loadActiveDaysStat() {
+        fetchActiveDaysStatUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    self?.errorMessage = error.localizedDescription
+                }
+            } receiveValue: { [weak self] stat in
+                self?.activeDaysStat = stat
+            }
+            .store(in: &cancellables)
+    }
 }
 
+// MARK: - extension
 extension StatisticsChartViewModel {
     var todayCompletedByCategory: [HabitCategory: [String]] {
         let todayStats = completedStats.filter {
@@ -54,19 +82,15 @@ extension StatisticsChartViewModel {
         }
         return result
     }
-}
 
-extension StatisticsChartViewModel {
-    
     var weeklyAverage: Double {
         let range = Period.weekly(Date()).dateRange
 
         let filtered = completedStats.filter { range.contains($0.date) }
         let totalCount = filtered.map(\.count).reduce(0, +)
 
-        // 활동일 수 (중복된 날짜 제거)
         let activeDays = Set(filtered.map { Calendar.current.startOfDay(for: $0.date) })
-        let activeDayCount = max(activeDays.count, 1) // 0으로 나눔 방지
+        let activeDayCount = max(activeDays.count, 1)
 
         return Double(totalCount) / Double(activeDayCount)
     }
@@ -83,9 +107,7 @@ extension StatisticsChartViewModel {
 
         return Double(totalCount) / Double(activeDayCount)
     }
-}
 
-extension StatisticsChartViewModel {
     struct ChangeSummary {
         let difference: Int
         let percentage: Double

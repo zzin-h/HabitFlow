@@ -9,4 +9,5 @@ import Combine
 
 protocol StatisticsChartsRepository {
     func fetchTotalCompletedStats() -> AnyPublisher<[TotalCompletedStat], Error>
+    func fetchActiveDaysStat() -> AnyPublisher<ActiveDaysStat, Error>
 }

@@ -11,25 +11,30 @@ final class StatisticsChartsDIContainer {
     
     // MARK: - CoreData Storages
     private let statisticsChartsStorage: StatisticsChartsCoreDataStorage
-
+    
     // MARK: - Repositories
     private let statisticsChartsRepository: StatisticsChartsRepository
-
+    
     // MARK: - Init
     init() {
         self.statisticsChartsStorage = StatisticsChartsCoreDataStorage()
         self.statisticsChartsRepository = StatisticsChartsRepositoryImpl(storage: statisticsChartsStorage)
     }
-
+    
     // MARK: - UseCases
     func makeFetchTotalCompletedStatsUseCase() -> FetchTotalCompletedStatsUseCase {
         return DefaultFetchTotalCompletedStatsUseCase(repository: statisticsChartsRepository)
     }
-
+    
+    func makeFetchActiveDaysStatUseCase() -> FetchActiveDaysStatUseCase {
+        DefaultFetchActiveDaysStatUseCase(repository: statisticsChartsRepository)
+    }
+    
     // MARK: - ViewModel
     func makeStatisticsChartViewModel() -> StatisticsChartViewModel {
         return StatisticsChartViewModel(
-            fetchTotalCompletedStatsUseCase: makeFetchTotalCompletedStatsUseCase()
+            fetchTotalCompletedStatsUseCase: makeFetchTotalCompletedStatsUseCase(),
+            fetchActiveDaysStatUseCase: makeFetchActiveDaysStatUseCase()
         )
     }
 }

@@ -52,17 +52,46 @@ final class StatisticsChartsCoreDataStorage {
         return result.sorted { $0.date < $1.date }
     }
     
-    //    // MARK: - 2. 함께한 일수 및 스트릭 계산
-    //    func fetchActiveDaysStat() throws -> ActiveDaysStat {
-    //        // TODO: 유니크한 날짜 수 & 연속 달성일 계산
-    //        return ActiveDaysStat(
-    //            totalDays: 0,
-    //            streakDays: 0,
-    //            firstStartDate: Date(),
-    //            lastActiveDate: Date()
-    //        )
-    //    }
-    //
+    // MARK: - 2. 함께한 일수 및 스트릭 계산
+    func fetchActiveDaysStat() throws -> ActiveDaysStat {
+        let fetchRequest: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()
+        let records = try context.fetch(fetchRequest)
+        
+        let completedDates: Set<Date> = Set(records.compactMap { record in
+            guard let date = record.date else { return nil }
+            return Calendar.current.startOfDay(for: date)
+        })
+        
+        let sortedDates = completedDates.sorted()
+
+        guard let firstDate = sortedDates.first, let lastDate = sortedDates.last else {
+            return ActiveDaysStat(totalDays: 0, streakDays: 0, firstStartDate: Date(), lastActiveDate: Date())
+        }
+
+        let calendar = Calendar.current
+        var streak = 1
+        var maxStreak = 1
+
+        for i in 1..<sortedDates.count {
+            let prev = sortedDates[i - 1]
+            let current = sortedDates[i]
+            if let diff = calendar.dateComponents([.day], from: prev, to: current).day,
+               diff == 1 {
+                streak += 1
+                maxStreak = max(maxStreak, streak)
+            } else {
+                streak = 1
+            }
+        }
+
+        return ActiveDaysStat(
+            totalDays: completedDates.count,
+            streakDays: maxStreak,
+            firstStartDate: firstDate,
+            lastActiveDate: lastDate
+        )
+    }
+    
     //    // MARK: - 3. 카테고리별 완료 비율
     //    func fetchFavoriteCategoryStats(period: Period) throws -> [CategoryStat] {
     //        // TODO: 기간 내 카테고리별 완료 비율 계산

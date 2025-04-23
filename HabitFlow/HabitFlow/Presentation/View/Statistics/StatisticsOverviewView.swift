@@ -18,7 +18,7 @@ struct StatisticsOverviewView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 16) {
+                LazyVStack(spacing: 16) {
                     NavigationLink(destination: TotalCompletedChartView()) {
                         Text("total completed")
                     }
