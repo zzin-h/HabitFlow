@@ -14,10 +14,16 @@ extension Date {
         formatter.dateFormat = "E"
         return formatter.string(from: self)
     }
-}
-
-extension Date {
+    
     var startOfDay: Date {
         return Calendar.current.startOfDay(for: self)
+    }
+    
+    var year: Int {
+        Calendar.current.component(.year, from: self)
+    }
+
+    var month: Int {
+        Calendar.current.component(.month, from: self)
     }
 }

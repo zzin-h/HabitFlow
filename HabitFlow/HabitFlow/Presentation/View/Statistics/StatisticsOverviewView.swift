@@ -19,7 +19,7 @@ struct StatisticsOverviewView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 16) {
-                    NavigationLink(destination: TotalCompletedChartView(viewModel: viewModel)) {
+                    NavigationLink(destination: TotalCompletedChartView()) {
                         Text("total completed")
                     }
                     
