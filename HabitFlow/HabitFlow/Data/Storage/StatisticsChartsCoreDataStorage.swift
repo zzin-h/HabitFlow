@@ -52,52 +52,54 @@ final class StatisticsChartsCoreDataStorage {
         return result.sorted { $0.date < $1.date }
     }
     
-    //    // MARK: - 2. 함께한 일수 및 스트릭 계산
-    //    func fetchActiveDaysStat() throws -> ActiveDaysStat {
-    //        // TODO: 유니크한 날짜 수 & 연속 달성일 계산
-    //        return ActiveDaysStat(
-    //            totalDays: 0,
-    //            streakDays: 0,
-    //            firstStartDate: Date(),
-    //            lastActiveDate: Date()
-    //        )
-    //    }
-    //
-    //    // MARK: - 3. 카테고리별 완료 비율
-    //    func fetchFavoriteCategoryStats(period: Period) throws -> [CategoryStat] {
-    //        // TODO: 기간 내 카테고리별 완료 비율 계산
-    //        return []
-    //    }
-    //
-    //    // MARK: - 4. 가장 자주 완료한 습관 Top 3
-    //    func fetchBestHabitStats(period: Period) throws -> [BestHabitStat] {
-    //        // TODO: Top 3 습관 제목 + 카운트 + 기간 ID
-    //        return []
-    //    }
-    //
-    //    // MARK: - 5. 습관별 누적 시간
-    //    func fetchTotalTimeStats(period: Period) throws -> [TotalTimeStat] {
-    //        // TODO: 습관별 총 시간 반환
-    //        return []
-    //    }
-    //
-    //    // MARK: - 6. 요일별 + 시간대별 완료 분포
-    //    func fetchMostFrequentStats(period: Period) throws -> TimePatternStat {
-    //        // TODO: 요일 & 시간대별 통계
-    //        return TimePatternStat(
-    //            weekdayStats: [],
-    //            timeSlotStats: []
-    //        )
-    //    }
-    //
-    //    // MARK: - 7. 요약 리포트 (한눈에 보는 통계)
-    //    func fetchSummaryReport(period: Period) throws -> SummaryReport {
-    //        return SummaryReport(
-    //            totalCompleted: 0,
-    //            totalTime: 0,
-    //            bestHabit: "",
-    //            frequentDay: "월요일",
-    //            frequentTimeSlot: "08:00 - 10:00"
-    //        )
-    //    }
+    // MARK: - 2. 함께한 일수 및 스트릭 계산
+    func fetchActiveDaysStat() throws -> ActiveDaysStat {
+        let fetchRequest: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()
+        let records = try context.fetch(fetchRequest)
+        
+        let completedDates: Set<Date> = Set(records.compactMap { record in
+            guard let date = record.date else { return nil }
+            return Calendar.current.startOfDay(for: date)
+        })
+        
+        let sortedDates = completedDates.sorted()
+        
+        guard let firstDate = sortedDates.first, let lastDate = sortedDates.last else {
+            return ActiveDaysStat(totalDays: 0, streakDays: 0, firstStartDate: Date(), lastActiveDate: Date())
+        }
+        
+        let calendar = Calendar.current
+        var streak = 1
+        var maxStreak = 1
+        
+        for i in 1..<sortedDates.count {
+            let prev = sortedDates[i - 1]
+            let current = sortedDates[i]
+            if let diff = calendar.dateComponents([.day], from: prev, to: current).day,
+               diff == 1 {
+                streak += 1
+                maxStreak = max(maxStreak, streak)
+            } else {
+                streak = 1
+            }
+        }
+        
+        return ActiveDaysStat(
+            totalDays: completedDates.count,
+            streakDays: maxStreak,
+            firstStartDate: firstDate,
+            lastActiveDate: lastDate
+        )
+    }
+    
+    // MARK: - 완료된 날짜들 가져오기
+    func fetchCompletedDates() throws -> [Date] {
+        let fetchRequest: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()
+        fetchRequest.propertiesToFetch = ["date"]
+        
+        let records = try context.fetch(fetchRequest)
+        let dates = records.compactMap { $0.date }
+        let uniqueDates = Set(dates.map { Calendar.current.startOfDay(for: $0) })
+        return Array(uniqueDates)
+    }
 }

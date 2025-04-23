@@ -10,33 +10,9 @@
 		84F100102DA4EE3200B62839 /* HabitFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HabitFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		84F1041A2DB8B19500B62839 /* Exceptions for "HabitFlow" folder in "HabitFlow" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Data/RepositoryImpl/.swift,
-			);
-			target = 84F1000F2DA4EE3200B62839 /* HabitFlow */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		84F1041B2DB8B19500B62839 /* Exceptions for "HabitFlow" folder in "Compile Sources" phase from "HabitFlow" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 84F1000C2DA4EE3200B62839 /* Sources */;
-			membershipExceptions = (
-				Data/RepositoryImpl/.swift,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		84F100122DA4EE3200B62839 /* HabitFlow */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				84F1041A2DB8B19500B62839 /* Exceptions for "HabitFlow" folder in "HabitFlow" target */,
-				84F1041B2DB8B19500B62839 /* Exceptions for "HabitFlow" folder in "Compile Sources" phase from "HabitFlow" target */,
-			);
 			path = HabitFlow;
 			sourceTree = "<group>";
 		};

@@ -7,7 +7,6 @@
 
 import Foundation
 
-// 1. 완료한 습관 수 (카테고리별 누적 막대그래프용)
 struct TotalCompletedStat: Hashable {
     let date: Date
     let title: String
@@ -15,46 +14,51 @@ struct TotalCompletedStat: Hashable {
     let count: Int
 }
 
-// 2. 함께한 일수
-struct ActiveDaysStat {
+struct ActiveDaysStat: Equatable {
     let totalDays: Int
     let streakDays: Int
     let firstStartDate: Date
     let lastActiveDate: Date
 }
 
-// 3. 관심 카테고리 비율
-struct CategoryStat: Identifiable {
+struct DayCell: Identifiable {
     let id = UUID()
-    let category: HabitCategory
-    let ratio: Double
+    let date: Date
+    let isCompleted: Bool
 }
 
-// 4. 베스트 습관
-struct BestHabitStat: Identifiable {
-    let id = UUID()
-    let habit: HabitModel
-    let count: Int
-}
-
-// 5. 총 시간
-struct TotalTimeStat: Identifiable {
-    let id = UUID()
-    let habit: HabitModel
-    let duration: TimeInterval
-}
-
-// 6. 날짜 기반 통계
-struct TimePatternStat {
-    let weekdayStats: [(weekday: Weekdays, count: Int)]
-    let timeSlotStats: [(slot: String, count: Int)]
-}
-
-// 7. 통계 요약 카드
-struct SummaryReport {
-    let totalCompleted: Int
-    let totalTime: TimeInterval
-    let bestHabit: String
-    let frequentDay: String
-    let frequentTimeSlot: String
-}
+//// 3. 관심 카테고리 비율
+//struct CategoryStat: Identifiable {
+//    let id = UUID()
+//    let category: HabitCategory
+//    let ratio: Double
+//}
+//
+//// 4. 베스트 습관
+//struct BestHabitStat: Identifiable {
+//    let id = UUID()
+//    let habit: HabitModel
+//    let count: Int
+//}
+//
+//// 5. 총 시간
+//struct TotalTimeStat: Identifiable {
+//    let id = UUID()
+//    let habit: HabitModel
+//    let duration: TimeInterval
+//}
+//
+//// 6. 날짜 기반 통계
+//struct TimePatternStat {
+//    let weekdayStats: [(weekday: Weekdays, count: Int)]
+//    let timeSlotStats: [(slot: String, count: Int)]
+//}
+//
+//// 7. 통계 요약 카드
+//struct SummaryReport {
+//    let totalCompleted: Int
+//    let totalTime: TimeInterval
+//    let bestHabit: String
+//    let frequentDay: String
+//    let frequentTimeSlot: String
+//}
