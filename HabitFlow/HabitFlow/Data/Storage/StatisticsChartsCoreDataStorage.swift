@@ -92,6 +92,17 @@ final class StatisticsChartsCoreDataStorage {
         )
     }
     
+    // MARK: - 완료된 날짜들 가져오기
+    func fetchCompletedDates() throws -> [Date] {
+        let fetchRequest: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()
+
+        let records = try context.fetch(fetchRequest)
+        
+        return records
+            .compactMap { $0.date }
+            .map { Calendar.current.startOfDay(for: $0) }
+    }
+    
     //    // MARK: - 3. 카테고리별 완료 비율
     //    func fetchFavoriteCategoryStats(period: Period) throws -> [CategoryStat] {
     //        // TODO: 기간 내 카테고리별 완료 비율 계산

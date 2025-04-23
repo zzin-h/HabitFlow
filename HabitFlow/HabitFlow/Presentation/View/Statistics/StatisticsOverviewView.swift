@@ -23,6 +23,10 @@ struct StatisticsOverviewView: View {
                         Text("total completed")
                     }
                     
+                    NavigationLink(destination: ActiveDaysChartView()) {
+                        Text("ActiveDays")
+                    }
+                    
                     StatisticsCardView(
                         title: "완료한 습관",
                         icon: "checkmark.circle.fill",

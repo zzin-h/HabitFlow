@@ -48,4 +48,17 @@ final class StatisticsChartsRepositoryImpl: StatisticsChartsRepository {
         }
         .eraseToAnyPublisher()
     }
+    
+    func fetchCompletedDates() -> AnyPublisher<Set<Date>, Error> {
+        Future { [weak self] promise in
+            guard let self else { return }
+            do {
+                let dates = try storage.fetchCompletedDates()
+                promise(.success(Set(dates)))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
 }

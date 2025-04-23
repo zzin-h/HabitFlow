@@ -21,6 +21,12 @@ struct ActiveDaysStat: Equatable {
     let lastActiveDate: Date
 }
 
+struct DayCell: Identifiable {
+    let id = UUID()
+    let date: Date
+    let isCompleted: Bool
+}
+
 //// 3. 관심 카테고리 비율
 //struct CategoryStat: Identifiable {
 //    let id = UUID()
