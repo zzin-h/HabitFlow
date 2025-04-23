@@ -9,13 +9,17 @@ import Foundation
 import Combine
 
 protocol FetchCompletedDatesUseCase {
-    func execute() -> AnyPublisher<Set<Date>, Error>
+    func execute() -> AnyPublisher<[Date], Error>
 }
 
-struct DefaultFetchCompletedDatesUseCase: FetchCompletedDatesUseCase {
-    let repository: StatisticsChartsRepository
+final class DefaultFetchCompletedDatesUseCase: FetchCompletedDatesUseCase {
+    private let repository: StatisticsChartsRepository
 
-    func execute() -> AnyPublisher<Set<Date>, Error> {
+    init(repository: StatisticsChartsRepository) {
+        self.repository = repository
+    }
+
+    func execute() -> AnyPublisher<[Date], Error> {
         repository.fetchCompletedDates()
     }
 }

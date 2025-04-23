@@ -16,6 +16,9 @@ struct ActiveDaysChartView: View {
 
     var body: some View {
         VStack {
+            
+            ActiveDaysCalendarView(viewModel: viewModel)
+            
             if let stat = viewModel.activeDaysStat {
                 Text("총 달성일: \(stat.totalDays)일")
                 Text("연속 달성일: \(stat.streakDays)일")
@@ -39,14 +42,14 @@ struct ActiveDaysCalendarView: View {
             // 월 변경 헤더
             HStack {
                 Button(action: {
-                    $viewModel.previousMonth
+                    viewModel.previousMonth()
                 }) {
                     Image(systemName: "chevron.left")
                 }
-
-                Text(viewModel.monthTitle)
+                
+                Text("\(viewModel.currentMonth.year.description)년 \(viewModel.currentMonth.month)월")
                     .font(.headline)
-
+                
                 Button(action: {
                     viewModel.nextMonth()
                 }) {
@@ -54,7 +57,7 @@ struct ActiveDaysCalendarView: View {
                 }
             }
             .padding()
-
+            
             // 요일 헤더
             HStack {
                 ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
@@ -64,7 +67,7 @@ struct ActiveDaysCalendarView: View {
                         .foregroundColor(.gray)
                 }
             }
-
+            
             // 날짜 셀
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
                 ForEach(viewModel.days) { dayCell in
@@ -76,7 +79,7 @@ struct ActiveDaysCalendarView: View {
                         } else {
                             Text("\(Calendar.current.component(.day, from: dayCell.date))")
                         }
-
+                        
                         if dayCell.isCompleted {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundColor(.green)
@@ -87,6 +90,9 @@ struct ActiveDaysCalendarView: View {
                     .frame(height: 50)
                 }
             }
+        }
+        .onAppear {
+            viewModel.fetchAndGenerateDays()
         }
     }
 }

@@ -30,11 +30,16 @@ final class StatisticsChartsDIContainer {
         DefaultFetchActiveDaysStatUseCase(repository: statisticsChartsRepository)
     }
     
+    func makeFetchCompletedDatesUseCase() -> FetchCompletedDatesUseCase {
+        DefaultFetchCompletedDatesUseCase(repository: statisticsChartsRepository)
+    }
+    
     // MARK: - ViewModel
     func makeStatisticsChartViewModel() -> StatisticsChartViewModel {
         return StatisticsChartViewModel(
             fetchTotalCompletedStatsUseCase: makeFetchTotalCompletedStatsUseCase(),
-            fetchActiveDaysStatUseCase: makeFetchActiveDaysStatUseCase()
+            fetchActiveDaysStatUseCase: makeFetchActiveDaysStatUseCase(),
+            fetchCompletedDatesUseCase: makeFetchCompletedDatesUseCase()
         )
     }
 }

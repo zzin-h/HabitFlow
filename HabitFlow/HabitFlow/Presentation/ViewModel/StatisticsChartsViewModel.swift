@@ -13,7 +13,7 @@ final class StatisticsChartViewModel: ObservableObject {
     @Published var completedStats: [TotalCompletedStat] = []
     @Published var selectedPeriod: Period = .weekly(Date())
     @Published var activeDaysStat: ActiveDaysStat?
-    @Published var completedDates: Set<Date> = []
+    @Published var completedDates: [Date] = []
     @Published var currentMonth: Date = Date()
     @Published var days: [DayCell] = []
     @Published var errorMessage: String?
@@ -82,7 +82,7 @@ final class StatisticsChartViewModel: ObservableObject {
                     self?.errorMessage = error.localizedDescription
                 }
             } receiveValue: { [weak self] dates in
-                self?.completedDates = dates
+                self?.completedDates = dates.sorted()
             }
             .store(in: &cancellables)
     }
@@ -97,7 +97,7 @@ final class StatisticsChartViewModel: ObservableObject {
         
         let prefixDays = firstWeekday - 1
         for _ in 0..<prefixDays {
-            days.append(DayCell(date: Date(), isCompleted: false)) // 비어있는 셀 (date는 의미 없음)
+            days.append(DayCell(date: Date(), isCompleted: false))
         }
         
         var current = monthInterval.start
@@ -127,10 +127,18 @@ final class StatisticsChartViewModel: ObservableObject {
     }
     
     func fetchAndGenerateDays() {
-        // 여기에 UseCase로부터 completedDates 받아와서 generateDays(for:completedDates:) 호출
-        // 예시:
-        // activeDaysUseCase.fetchCompletedDates()
-        //     .sink { ... }
+        fetchCompletedDatesUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.errorMessage = error.localizedDescription
+                }
+            } receiveValue: { [weak self] dates in
+                guard let self = self else { return }
+                self.completedDates = dates.map { Calendar.current.startOfDay(for: $0) }
+                self.generateDays(for: self.currentMonth, completedDates: Set(self.completedDates))
+            }
+            .store(in: &cancellables)
     }
 }
 
