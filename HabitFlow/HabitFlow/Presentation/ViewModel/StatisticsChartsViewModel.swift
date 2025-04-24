@@ -147,6 +147,44 @@ final class StatisticsChartViewModel: ObservableObject {
             }
             .store(in: &cancellables)
     }
+
+    func calculateMonthlyAchievement(from dates: [Date]) -> Int {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month], from: Date())
+        let startOfMonth = calendar.date(from: components)!
+        let range = calendar.range(of: .day, in: .month, for: startOfMonth)!
+        let daysInMonth = range.count
+        let endOfMonth = calendar.date(byAdding: .day, value: daysInMonth - 1, to: startOfMonth)!
+        let uniqueDates = Set(dates.map { calendar.startOfDay(for: $0) })
+        let completedThisMonth = uniqueDates.filter { $0 >= startOfMonth && $0 <= endOfMonth }
+        
+        return Int((Double(completedThisMonth.count) / Double(daysInMonth)) * 100)
+    }
+    
+    func longestBreakGap(from dates: [Date]) -> (start: Date, end: Date, days: Int)? {
+        let calendar = Calendar.current
+        let sortedDates = Set(dates.map { calendar.startOfDay(for: $0) }).sorted()
+
+        guard sortedDates.count >= 2 else { return nil }
+
+        var maxGap = 0
+        var gapStartDate: Date = sortedDates[0]
+        var gapEndDate: Date = sortedDates[1]
+
+        for i in 0..<sortedDates.count - 1 {
+            let current = sortedDates[i]
+            let next = sortedDates[i + 1]
+            let gap = calendar.dateComponents([.day], from: current, to: next).day ?? 0
+
+            if gap > maxGap {
+                maxGap = gap
+                gapStartDate = current
+                gapEndDate = next
+            }
+        }
+
+        return (gapStartDate, gapEndDate, maxGap - 1)
+    }
 }
 
 // MARK: - extension
