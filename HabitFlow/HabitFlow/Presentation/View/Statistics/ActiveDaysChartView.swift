@@ -72,13 +72,14 @@ struct ActiveDaysCalendarView: View {
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
                 ForEach(viewModel.days) { dayCell in
                     VStack {
-                        if Calendar.current.isDateInToday(dayCell.date) {
-                            Text("\(Calendar.current.component(.day, from: dayCell.date))")
-                                .fontWeight(.bold)
-                                .foregroundColor(.blue)
-                        } else {
-                            Text("\(Calendar.current.component(.day, from: dayCell.date))")
-                        }
+                        let day = Calendar.current.component(.day, from: dayCell.date)
+                        
+                        Text("\(day)")
+                            .fontWeight(Calendar.current.isDateInToday(dayCell.date) ? .bold : .regular)
+                            .foregroundColor(
+                                Calendar.current.isDateInToday(dayCell.date) ? .blue :
+                                (dayCell.isInCurrentMonth ? .primary : .gray)
+                            )
                         
                         if dayCell.isCompleted {
                             Image(systemName: "checkmark.circle.fill")

@@ -25,6 +25,7 @@ struct DayCell: Identifiable {
     let id = UUID()
     let date: Date
     let isCompleted: Bool
+    let isInCurrentMonth: Bool
 }
 
 //// 3. 관심 카테고리 비율

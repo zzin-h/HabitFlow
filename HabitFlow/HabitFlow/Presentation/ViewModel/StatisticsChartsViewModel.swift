@@ -22,6 +22,8 @@ final class StatisticsChartViewModel: ObservableObject {
     private let fetchTotalCompletedStatsUseCase: FetchTotalCompletedStatsUseCase
     private let fetchActiveDaysStatUseCase: FetchActiveDaysStatUseCase
     private let fetchCompletedDatesUseCase: FetchCompletedDatesUseCase
+    
+    private let calendar = Calendar.current
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Init
@@ -89,28 +91,33 @@ final class StatisticsChartViewModel: ObservableObject {
     
     func generateDays(for month: Date, completedDates: Set<Date>) {
         var days: [DayCell] = []
+        let calendar = Calendar.current
         
-        guard let monthInterval = Calendar.current.dateInterval(of: .month, for: month),
-              let firstWeekday = Calendar.current.dateComponents([.weekday], from: monthInterval.start).weekday else {
-            return
+        guard let monthInterval = calendar.dateInterval(of: .month, for: month),
+              let firstWeekday = calendar.dateComponents([.weekday], from: monthInterval.start).weekday else { return }
+        
+        let startOffset = (firstWeekday - calendar.firstWeekday + 7) % 7
+        var current = calendar.date(byAdding: .day, value: -startOffset, to: monthInterval.start)!
+        
+        while days.count < 42 {
+            let isCompleted = completedDates.contains(calendar.startOfDay(for: current))
+            let isInCurrentMonth = calendar.isDate(current, equalTo: month, toGranularity: .month)
+            
+            days.append(DayCell(
+                date: current,
+                isCompleted: isCompleted,
+                isInCurrentMonth: isInCurrentMonth
+            ))
+            
+            current = calendar.date(byAdding: .day, value: 1, to: current)!
         }
         
-        let prefixDays = firstWeekday - 1
-        for _ in 0..<prefixDays {
-            days.append(DayCell(date: Date(), isCompleted: false))
-        }
-        
-        var current = monthInterval.start
-        while current <= monthInterval.end {
-            let isCompleted = completedDates.contains(Calendar.current.startOfDay(for: current))
-            days.append(DayCell(date: current, isCompleted: isCompleted))
-            current = Calendar.current.date(byAdding: .day, value: 1, to: current)!
+        if days.suffix(7).allSatisfy({ !$0.isInCurrentMonth }) {
+            days.removeLast(7)
         }
         
         self.days = days
     }
-    
-    private let calendar = Calendar.current
     
     func previousMonth() {
         if let previous = calendar.date(byAdding: .month, value: -1, to: currentMonth) {
