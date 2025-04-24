@@ -14,6 +14,13 @@ struct TotalCompletedStat: Hashable {
     let count: Int
 }
 
+struct ChangeStat {
+    let isSame: Bool
+    let isIncreased: Bool
+    let difference: Int
+    let percentage: Double
+}
+
 struct ActiveDaysStat: Equatable {
     let totalDays: Int
     let streakDays: Int

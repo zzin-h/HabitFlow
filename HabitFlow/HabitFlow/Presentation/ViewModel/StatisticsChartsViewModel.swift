@@ -11,7 +11,7 @@ import Combine
 final class StatisticsChartViewModel: ObservableObject {
     // MARK: - Published Properties
     @Published var completedStats: [TotalCompletedStat] = []
-    @Published var selectedPeriod: Period = .weekly(Date())
+    @Published var selectedPeriod: Period = .range(start: Date(), end: Date())
     @Published var activeDaysStat: ActiveDaysStat?
     @Published var completedDates: [Date] = []
     @Published var currentMonth: Date = Date()
@@ -57,6 +57,55 @@ final class StatisticsChartViewModel: ObservableObject {
     func updatePeriod(_ period: Period) {
         selectedPeriod = period
         loadCompletedStats()
+    }
+    
+    func generateWeeklyAnalysis() -> [String] {
+        guard let weekly = weeklyChange else { return [] }
+        
+        if weekly.isSame {
+            return ["지난주와 똑같은 횟수로 루틴을 지켰어요.", "루틴이 안정적으로 유지되고 있어요 😊"]
+        } else if weekly.isIncreased {
+            if weekly.difference >= 5 {
+                return ["와! 지난주보다 \(weekly.difference)개나 더 완료했어요! 🔥",
+                        "\(String(format: "%.1f", weekly.percentage))% 상승했어요. 점점 좋아지고 있어요!"]
+            } else {
+                return ["조금씩 성장 중이에요 💪",
+                        "지난주보다 \(weekly.difference)개 더 했어요. 꾸준함이 중요하니까요!"]
+            }
+        } else {
+            if weekly.difference >= 5 {
+                return ["지난주보다 \(weekly.difference)개 줄었어요. 요즘 좀 바빴던 건 아닐까요?",
+                        "잠깐 쉬어가는 것도 괜찮아요. 다음 주엔 다시 도전해봐요 💛"]
+            } else {
+                return ["지난주보다 조금 줄었지만, 괜찮아요. 다시 리듬을 찾으면 돼요 🍀",
+                        "\(String(format: "%.1f", weekly.percentage))% 감소했어요."]
+            }
+        }
+    }
+    
+    func generateMonthlyAnalysis() -> [String] {
+        guard let monthly = monthlyChange else { return [] }
+
+        if monthly.isSame {
+            return ["지난달과 같은 루틴 수행량이에요.",
+                    "꾸준함이 가장 어려운데, 정말 잘하고 있어요! 👏"]
+        } else if monthly.isIncreased {
+            if monthly.difference >= 15 {
+                return ["지난달보다 \(monthly.difference)개 더 완료했어요! 😍",
+                        "\(String(format: "%.1f", monthly.percentage))% 상승했어요. 눈에 띄는 성장입니다!"]
+            } else {
+                return ["조금 더 노력한 한 달이었어요! 👍",
+                        "\(monthly.difference)개 늘었어요. 멋져요!"]
+            }
+        } else {
+            if monthly.difference >= 15 {
+                return ["지난달보다 \(monthly.difference)개 줄었어요.",
+                        "컨디션이 좋지 않았던 걸 수도 있어요. 다음 달엔 다시 회복할 수 있어요 💪"]
+            } else {
+                return ["루틴 수행이 살짝 줄었어요.",
+                        "\(String(format: "%.1f", monthly.percentage))% 감소했어요. 괜찮아요, 다시 시작해봐요! 🌱"]
+            }
+        }
     }
     
     // MARK: - ActiveDays
@@ -226,30 +275,40 @@ extension StatisticsChartViewModel {
         return Double(totalCount) / Double(activeDayCount)
     }
     
-    struct ChangeSummary {
-        let difference: Int
-        let percentage: Double
-        let isIncreased: Bool
-        let isSame: Bool
-    }
-    
-    var weeklyChange: ChangeSummary? {
-        calculateChange(
-            current: Period.weekly(Date()),
-            previous: Period.weekly(Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())!)
-        )
-    }
-    
-    var monthlyChange: ChangeSummary? {
+    var weeklyChange: ChangeStat? {
+        let calendar = Calendar.current
         let now = Date()
-        let thisMonth = Period.monthly(year: now.year, month: now.month)
-        let lastMonthDate = Calendar.current.date(byAdding: .month, value: -1, to: now)!
-        let lastMonth = Period.monthly(year: lastMonthDate.year, month: lastMonthDate.month)
         
-        return calculateChange(current: thisMonth, previous: lastMonth)
+        let startOfCurrentWeek = calendar.date(byAdding: .day, value: -6, to: now)!
+        let endOfCurrentWeek = now
+
+        let endOfLastWeek = calendar.date(byAdding: .day, value: -7, to: now)!
+        let startOfLastWeek = calendar.date(byAdding: .day, value: -13, to: now)!
+
+        let current = Period.range(start: startOfCurrentWeek, end: endOfCurrentWeek)
+        let previous = Period.range(start: startOfLastWeek, end: endOfLastWeek)
+
+        return calculateChange(current: current, previous: previous)
     }
     
-    private func calculateChange(current: Period, previous: Period) -> ChangeSummary? {
+    var monthlyChange: ChangeStat? {
+        let calendar = Calendar.current
+        let now = Date()
+
+        let startOfCurrentMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
+        let endOfCurrentMonth = now
+
+        let lastMonthDate = calendar.date(byAdding: .month, value: -1, to: now)!
+        let startOfLastMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: lastMonthDate))!
+        let endOfLastMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startOfLastMonth)!
+
+        let current = Period.range(start: startOfCurrentMonth, end: endOfCurrentMonth)
+        let previous = Period.range(start: startOfLastMonth, end: endOfLastMonth)
+
+        return calculateChange(current: current, previous: previous)
+    }
+    
+    private func calculateChange(current: Period, previous: Period) -> ChangeStat? {
         let currentStats = completedStats.filter { current.dateRange.contains($0.date) }
         let previousStats = completedStats.filter { previous.dateRange.contains($0.date) }
         
@@ -267,11 +326,11 @@ extension StatisticsChartViewModel {
             percentage = (Double(difference) / Double(previousCount)) * 100
         }
         
-        return ChangeSummary(
-            difference: abs(difference),
-            percentage: abs(percentage),
+        return ChangeStat(
+            isSame: isSame,
             isIncreased: isIncreased,
-            isSame: isSame
+            difference: Int(percentage),
+            percentage: abs(percentage)
         )
     }
 }
