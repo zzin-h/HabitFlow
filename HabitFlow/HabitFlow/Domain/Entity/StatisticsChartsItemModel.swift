@@ -13,6 +13,10 @@ struct TotalCompletedStat: Hashable {
     let title: String
     let category: HabitCategory
     let count: Int
+    
+    var color: Color {
+        return category.color
+    }
 }
 
 struct DateCategoryKey: Hashable {

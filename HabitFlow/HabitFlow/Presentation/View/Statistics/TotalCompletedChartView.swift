@@ -20,10 +20,6 @@ struct TotalCompletedChartView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("총 완료 통계")
-                    .font(.title2)
-                    .bold()
-                
                 Picker("기간", selection: $selectedPreset) {
                     ForEach(PeriodPreset.allCases) { preset in
                         Text(preset.rawValue).tag(preset)
@@ -60,15 +56,23 @@ struct TotalCompletedGraphView: View {
     @Binding var selectedPreset: PeriodPreset
     
     var body: some View {
+        
         Chart {
             ForEach(viewModel.completedStats, id: \.self) { stat in
                 BarMark(
                     x: .value("날짜", stat.date, unit: .day),
                     y: .value("완료 수", stat.count)
                 )
-                .foregroundStyle(by: .value("카테고리", stat.category.title))
+                .foregroundStyle(by: .value("카테고리", stat.title))
             }
         }
+        .chartForegroundStyleScale([
+            HabitCategory.healthyIt.title : HabitCategory.healthyIt.color,
+            HabitCategory.canDoIt.title : HabitCategory.canDoIt.color,
+            HabitCategory.moneyIt.title : HabitCategory.moneyIt.color,
+            HabitCategory.greenIt.title : HabitCategory.greenIt.color,
+            HabitCategory.myMindIt.title : HabitCategory.myMindIt.color
+        ])
         .frame(height: 300)
         .chartXAxis {
             switch selectedPreset {
