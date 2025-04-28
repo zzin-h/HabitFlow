@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct TotalCompletedStat: Hashable {
     let date: Date
@@ -40,13 +41,30 @@ struct DayCell: Identifiable {
     let isInCurrentMonth: Bool
 }
 
-//// 3. 관심 카테고리 비율
-//struct CategoryStat: Identifiable {
-//    let id = UUID()
-//    let category: HabitCategory
-//    let ratio: Double
-//}
-//
+struct CategoryStat: Identifiable {
+    let id = UUID()
+    let category: HabitCategory
+    let totalCount: Int
+    
+    var title: String {
+        return category.title
+    }
+    
+    var color: Color {
+        return category.color
+    }
+}
+
+struct PieSlice: Identifiable {
+    let id = UUID()
+    let startAngle: Angle
+    let endAngle: Angle
+    let color: Color
+    let title: String
+    let value: Double
+    let percentage: Double
+}
+
 //// 4. 베스트 습관
 //struct BestHabitStat: Identifiable {
 //    let id = UUID()

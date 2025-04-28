@@ -21,7 +21,6 @@ final class StatisticsChartsCoreDataStorage {
         
         let records = try context.fetch(fetchRequest)
         
-        // 날짜 기준으로 grouping
         let grouped = Dictionary(grouping: records) { record in
             let date = record.date ?? Date()
             return Calendar.current.startOfDay(for: date)
