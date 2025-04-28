@@ -42,7 +42,7 @@ struct TotalCompletedChartView: View {
                     TotalCompletedGraphView(viewModel: viewModel, selectedStat: $selectedStat, selectedPreset: $selectedPreset)
                 }
                 
-                AverageStatsView(weekly: viewModel.weeklyAverage, monthly: viewModel.monthlyAverage)
+                AverageStatsView(selectedPreset: $selectedPreset, weekly: viewModel.calculateAverage(for: .oneWeek), monthly: viewModel.calculateAverage(for: .oneMonth))
                 
                 ChangeStatsView(viewModel: viewModel, selectedPreset: $selectedPreset)
             }
@@ -97,6 +97,8 @@ struct TotalCompletedGraphView: View {
 }
 
 struct AverageStatsView: View {
+    @Binding var selectedPreset: PeriodPreset
+    
     let weekly: Double
     let monthly: Double
     
@@ -104,8 +106,13 @@ struct AverageStatsView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("📊 평균 완료 개수")
                 .font(.headline)
-            Text("이번 주: 하루 평균 \(String(format: "%.1f", weekly))회 완료했어요.")
-            Text("이번 달: 하루 평균 \(String(format: "%.1f", monthly))회 완료했어요.")
+            
+            switch selectedPreset {
+            case .oneWeek:
+                Text("이번 주 하루 평균 \(String(format: "%.1f", weekly))회 완료했어요.")
+            case .oneMonth:
+                Text("이번 달 하루 평균 \(String(format: "%.1f", monthly))회 완료했어요.")
+            }
         }
         .font(.subheadline)
     }
@@ -119,6 +126,7 @@ struct ChangeStatsView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("📈 수행 변화량")
                 .font(.headline)
+            
             switch selectedPreset {
             case .oneWeek:
                 ForEach(viewModel.generateWeeklyAnalysis(), id: \.self) { line in

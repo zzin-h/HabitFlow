@@ -25,7 +25,7 @@ enum PeriodPreset: String, CaseIterable, Identifiable {
             return .range(start: start, end: now)
 
         case .oneMonth:
-            let start = calendar.date(byAdding: .month, value: -1, to: now)!
+            let start = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
             return .range(start: start, end: now)
 
 //        case .threeMonths:

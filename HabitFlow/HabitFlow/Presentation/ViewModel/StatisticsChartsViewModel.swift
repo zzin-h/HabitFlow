@@ -13,10 +13,13 @@ final class StatisticsChartViewModel: ObservableObject {
     @Published var previousCompletedStats: [TotalCompletedStat] = []
     @Published var completedStats: [TotalCompletedStat] = []
     @Published var selectedPeriod: Period = .range(start: Date(), end: Date())
+    @Published var groupedCompletionSummary: [(HabitCategory, [TotalCompletedStat])] = []
+
     @Published var activeDaysStat: ActiveDaysStat?
     @Published var completedDates: [Date] = []
     @Published var currentMonth: Date = Date()
     @Published var days: [DayCell] = []
+    
     @Published var errorMessage: String?
     
     // MARK: - Use Cases
@@ -24,6 +27,13 @@ final class StatisticsChartViewModel: ObservableObject {
     private let fetchActiveDaysStatUseCase: FetchActiveDaysStatUseCase
     private let fetchCompletedDatesUseCase: FetchCompletedDatesUseCase
     
+    private let categoryDisplayOrder: [HabitCategory] = [
+        .healthyIt,
+        .canDoIt,
+        .moneyIt,
+        .greenIt,
+        .myMindIt
+    ]
     private let calendar = Calendar.current
     private var cancellables = Set<AnyCancellable>()
     
@@ -133,28 +143,28 @@ final class StatisticsChartViewModel: ObservableObject {
                         filledStats.append(stat)
                     }
                 }
+                
+                print(filledStats)
 
                 self.completedStats = filledStats
             }
             .store(in: &cancellables)
     }
-
-    private func generateDateList(from range: ClosedRange<Date>) -> [Date] {
-        var dates: [Date] = []
-        var current = calendar.startOfDay(for: range.lowerBound)
-        let end = calendar.startOfDay(for: range.upperBound)
-        
-        while current <= end {
-            dates.append(current)
-            current = calendar.date(byAdding: .day, value: 1, to: current)!
-        }
-        
-        return dates
-    }
     
     func updatePeriod(_ period: Period) {
         selectedPeriod = period
         loadCompletedStats()
+    }
+    
+    func calculateAverage(for preset: PeriodPreset) -> Double {
+        let range = preset.toPeriod().dateRange
+        let filtered = completedStats.filter { range.contains($0.date) }
+        let totalCount = filtered.map(\.count).reduce(0, +)
+        
+        let activeDays = Set(filtered.map { Calendar.current.startOfDay(for: $0.date) })
+        let activeDayCount = max(activeDays.count, 1)
+        
+        return Double(totalCount) / Double(activeDayCount)
     }
     
     func weeklyChangeDateRangeString() -> String {
@@ -397,51 +407,39 @@ extension StatisticsChartViewModel {
         return result
     }
     
-    var weeklyAverage: Double {
-        let range = Period.weekly(Date()).dateRange
+    private func generateDateList(from range: ClosedRange<Date>) -> [Date] {
+        var dates: [Date] = []
+        var current = calendar.startOfDay(for: range.lowerBound)
+        let end = calendar.startOfDay(for: range.upperBound)
         
-        let filtered = completedStats.filter { range.contains($0.date) }
-        let totalCount = filtered.map(\.count).reduce(0, +)
+        while current <= end {
+            dates.append(current)
+            current = calendar.date(byAdding: .day, value: 1, to: current)!
+        }
         
-        let activeDays = Set(filtered.map { Calendar.current.startOfDay(for: $0.date) })
-        let activeDayCount = max(activeDays.count, 1)
-        
-        return Double(totalCount) / Double(activeDayCount)
+        return dates
     }
     
-    var monthlyAverage: Double {
-        let now = Date()
-        let range = Period.monthly(year: now.year, month: now.month).dateRange
+    private func calculateChangeFromPrevious(current: [TotalCompletedStat], previous: [TotalCompletedStat]) -> ChangeStat {
+        let currentCount = current.map(\.count).reduce(0, +)
+        let previousCount = previous.map(\.count).reduce(0, +)
         
-        let filtered = completedStats.filter { range.contains($0.date) }
-        let totalCount = filtered.map(\.count).reduce(0, +)
+        let difference = currentCount - previousCount
+        let isSame = difference == 0
+        let isIncreased = difference > 0
         
-        let activeDays = Set(filtered.map { Calendar.current.startOfDay(for: $0.date) })
-        let activeDayCount = max(activeDays.count, 1)
+        let percentage: Double
+        if previousCount == 0 {
+            percentage = currentCount > 0 ? 100.0 : 0.0
+        } else {
+            percentage = (Double(difference) / Double(previousCount)) * 100
+        }
         
-        return Double(totalCount) / Double(activeDayCount)
+        return ChangeStat(
+            isSame: isSame,
+            isIncreased: isIncreased,
+            difference: difference,
+            percentage: abs(percentage)
+        )
     }
-}
-
-private func calculateChangeFromPrevious(current: [TotalCompletedStat], previous: [TotalCompletedStat]) -> ChangeStat {
-    let currentCount = current.map(\.count).reduce(0, +)
-    let previousCount = previous.map(\.count).reduce(0, +)
-    
-    let difference = currentCount - previousCount
-    let isSame = difference == 0
-    let isIncreased = difference > 0
-    
-    let percentage: Double
-    if previousCount == 0 {
-        percentage = currentCount > 0 ? 100.0 : 0.0
-    } else {
-        percentage = (Double(difference) / Double(previousCount)) * 100
-    }
-    
-    return ChangeStat(
-        isSame: isSame,
-        isIncreased: isIncreased,
-        difference: difference,
-        percentage: abs(percentage)
-    )
 }
