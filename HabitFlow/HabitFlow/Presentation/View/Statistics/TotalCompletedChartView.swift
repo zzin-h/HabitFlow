@@ -8,9 +8,6 @@
 import SwiftUI
 import Charts
 
-import SwiftUI
-import Charts
-
 struct TotalCompletedChartView: View {
     @StateObject private var viewModel: StatisticsChartViewModel
     @State private var selectedPreset: PeriodPreset = .oneWeek
@@ -43,10 +40,6 @@ struct TotalCompletedChartView: View {
                         .padding(.top, 40)
                 } else {
                     TotalCompletedGraphView(viewModel: viewModel, selectedStat: $selectedStat, selectedPreset: $selectedPreset)
-                }
-                
-                if !viewModel.todayCompletedByCategory.isEmpty {
-                    TodayCompletedHabitsView(todayCompletedByCategory: viewModel.todayCompletedByCategory)
                 }
                 
                 AverageStatsView(weekly: viewModel.weeklyAverage, monthly: viewModel.monthlyAverage)
@@ -103,29 +96,6 @@ struct TotalCompletedGraphView: View {
     }
 }
 
-struct TodayCompletedHabitsView: View {
-    let todayCompletedByCategory: [HabitCategory: [String]]
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("📌 오늘의 완료 습관")
-                .font(.headline)
-            
-            ForEach(Array(todayCompletedByCategory.keys), id: \.self) { category in
-                if let titles = todayCompletedByCategory[category] {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("• \(category.title)")
-                            .font(.subheadline).bold()
-                        Text(titles.joined(separator: ", "))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-            }
-        }
-    }
-}
-
 struct AverageStatsView: View {
     let weekly: Double
     let monthly: Double
@@ -154,10 +124,16 @@ struct ChangeStatsView: View {
                 ForEach(viewModel.generateWeeklyAnalysis(), id: \.self) { line in
                     Text(line)
                 }
+                .onAppear{
+                    viewModel.loadPreviousCompletedStats(for: .oneWeek)
+                }
                 
             case .oneMonth:
                 ForEach(viewModel.generateMonthlyAnalysis(), id: \.self) { line in
                     Text(line)
+                }
+                .onAppear{
+                    viewModel.loadPreviousCompletedStats(for: .oneMonth)
                 }
             }
             

@@ -10,6 +10,7 @@ import Combine
 
 final class StatisticsChartViewModel: ObservableObject {
     // MARK: - Published Properties
+    @Published var previousCompletedStats: [TotalCompletedStat] = []
     @Published var completedStats: [TotalCompletedStat] = []
     @Published var selectedPeriod: Period = .range(start: Date(), end: Date())
     @Published var activeDaysStat: ActiveDaysStat?
@@ -38,6 +39,65 @@ final class StatisticsChartViewModel: ObservableObject {
     }
     
     // MARK: - TotalCompleted
+    func loadPreviousCompletedStats(for periodType: PeriodType) {
+        fetchTotalCompletedStatsUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorMessage = error.localizedDescription
+                }
+            } receiveValue: { [weak self] stats in
+                guard let self = self else { return }
+                
+                let calendar = self.calendar
+                let now = Date()
+                var startDate: Date
+                var endDate: Date
+
+                switch periodType {
+                case .oneWeek:
+                    let endOfLastWeek = calendar.date(byAdding: .day, value: -7, to: now)!
+                    let startOfLastWeek = calendar.date(byAdding: .day, value: -13, to: now)!
+                    startDate = calendar.startOfDay(for: startOfLastWeek)
+                    endDate = calendar.startOfDay(for: endOfLastWeek)
+
+                case .oneMonth:
+                    let lastMonth = calendar.date(byAdding: .month, value: -1, to: now)!
+                    startDate = calendar.date(from: calendar.dateComponents([.year, .month], from: lastMonth))!
+                    endDate = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startDate)!
+                }
+
+                let dateList = self.generateDateList(from: startDate...endDate)
+
+                let statsByDateAndCategory = Dictionary(grouping: stats) { stat in
+                    DateCategoryKey(date: calendar.startOfDay(for: stat.date), category: stat.category)
+                }
+
+                var filledStats: [TotalCompletedStat] = []
+
+                for date in dateList {
+                    for category in HabitCategory.allCases {
+                        let key = DateCategoryKey(date: date, category: category)
+                        let items = statsByDateAndCategory[key] ?? []
+                        let count = items.reduce(0) { $0 + $1.count }
+                        let title = category.title
+
+                        let stat = TotalCompletedStat(
+                            date: date,
+                            title: title,
+                            category: category,
+                            count: count
+                        )
+
+                        filledStats.append(stat)
+                    }
+                }
+
+                self.previousCompletedStats = filledStats
+            }
+            .store(in: &cancellables)
+    }
+    
     func loadCompletedStats() {
         fetchTotalCompletedStatsUseCase.execute()
             .receive(on: DispatchQueue.main)
@@ -46,12 +106,50 @@ final class StatisticsChartViewModel: ObservableObject {
                     self?.errorMessage = error.localizedDescription
                 }
             } receiveValue: { [weak self] stats in
-                guard let self else { return }
+                guard let self = self else { return }
                 let range = self.selectedPeriod.dateRange
-                let filtered = stats.filter { range.contains($0.date) }
-                self.completedStats = filtered
+                let dateList = self.generateDateList(from: range)
+
+                let statsByDateAndCategory = Dictionary(grouping: stats) { stat in
+                    DateCategoryKey(date: self.calendar.startOfDay(for: stat.date), category: stat.category)
+                }
+
+                var filledStats: [TotalCompletedStat] = []
+
+                for date in dateList {
+                    for category in HabitCategory.allCases {
+                        let key = DateCategoryKey(date: date, category: category)
+                        let items = statsByDateAndCategory[key] ?? []
+                        let count = items.reduce(0) { $0 + $1.count }
+                        let title = category.title
+
+                        let stat = TotalCompletedStat(
+                            date: date,
+                            title: title,
+                            category: category,
+                            count: count
+                        )
+
+                        filledStats.append(stat)
+                    }
+                }
+
+                self.completedStats = filledStats
             }
             .store(in: &cancellables)
+    }
+
+    private func generateDateList(from range: ClosedRange<Date>) -> [Date] {
+        var dates: [Date] = []
+        var current = calendar.startOfDay(for: range.lowerBound)
+        let end = calendar.startOfDay(for: range.upperBound)
+        
+        while current <= end {
+            dates.append(current)
+            current = calendar.date(byAdding: .day, value: 1, to: current)!
+        }
+        
+        return dates
     }
     
     func updatePeriod(_ period: Period) {
@@ -59,53 +157,102 @@ final class StatisticsChartViewModel: ObservableObject {
         loadCompletedStats()
     }
     
+    func weeklyChangeDateRangeString() -> String {
+        let calendar = Calendar.current
+        let now = Date()
+
+        let startOfCurrentWeek = calendar.date(byAdding: .day, value: -6, to: now)!
+        let endOfCurrentWeek = now
+
+        let endOfLastWeek = calendar.date(byAdding: .day, value: -7, to: now)!
+        let startOfLastWeek = calendar.date(byAdding: .day, value: -13, to: now)!
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M/d"
+
+        let currentRange = "\(formatter.string(from: startOfCurrentWeek)) ~ \(formatter.string(from: endOfCurrentWeek))"
+        let lastRange = "\(formatter.string(from: startOfLastWeek)) ~ \(formatter.string(from: endOfLastWeek))"
+
+        return "이번 주: \(currentRange) | 지난 주: \(lastRange)"
+    }
+    
+    func monthlyChangeDateRangeString() -> String {
+        let calendar = Calendar.current
+        let now = Date()
+
+        let startOfThisMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
+        let lastMonth = calendar.date(byAdding: .month, value: -1, to: now)!
+        let startOfLastMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: lastMonth))!
+        let endOfLastMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startOfLastMonth)!
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M/d"
+
+        let thisMonthRange = "\(formatter.string(from: startOfThisMonth)) ~ \(formatter.string(from: now))"
+        let lastMonthRange = "\(formatter.string(from: startOfLastMonth)) ~ \(formatter.string(from: endOfLastMonth))"
+
+        return "이번 달: \(thisMonthRange) | 지난 달: \(lastMonthRange)"
+    }
+    
     func generateWeeklyAnalysis() -> [String] {
-        guard let weekly = weeklyChange else { return [] }
+        let weekly = calculateChangeFromPrevious(current: completedStats, previous: previousCompletedStats)
+        
+        let rangeInfo = weeklyChangeDateRangeString()
+        
+        var analysis: [String] = [rangeInfo]
         
         if weekly.isSame {
-            return ["지난주와 똑같은 횟수로 루틴을 지켰어요.", "루틴이 안정적으로 유지되고 있어요 😊"]
+            analysis += ["지난주와 똑같은 횟수로 루틴을 지켰어요.", "루틴이 안정적으로 유지되고 있어요 😊"]
         } else if weekly.isIncreased {
             if weekly.difference >= 5 {
-                return ["와! 지난주보다 \(weekly.difference)개나 더 완료했어요! 🔥",
-                        "\(String(format: "%.1f", weekly.percentage))% 상승했어요. 점점 좋아지고 있어요!"]
+                analysis += ["와! 지난주보다 \(weekly.difference)개나 더 완료했어요! 🔥",
+                             "\(String(format: "%.1f", weekly.percentage))% 상승했어요. 점점 좋아지고 있어요!"]
             } else {
-                return ["조금씩 성장 중이에요 💪",
-                        "지난주보다 \(weekly.difference)개 더 했어요. 꾸준함이 중요하니까요!"]
+                analysis += ["조금씩 성장 중이에요 💪",
+                             "지난주보다 \(weekly.difference)개 더 했어요. 꾸준함이 중요하니까요!"]
             }
         } else {
             if weekly.difference >= 5 {
-                return ["지난주보다 \(weekly.difference)개 줄었어요. 요즘 좀 바빴던 건 아닐까요?",
-                        "잠깐 쉬어가는 것도 괜찮아요. 다음 주엔 다시 도전해봐요 💛"]
+                analysis += ["지난주보다 \(weekly.difference)개 줄었어요. 요즘 좀 바빴던 건 아닐까요?",
+                             "잠깐 쉬어가는 것도 괜찮아요. 다음 주엔 다시 도전해봐요 💛"]
             } else {
-                return ["지난주보다 조금 줄었지만, 괜찮아요. 다시 리듬을 찾으면 돼요 🍀",
-                        "\(String(format: "%.1f", weekly.percentage))% 감소했어요."]
+                analysis += ["지난주보다 조금 줄었지만, 괜찮아요. 다시 리듬을 찾으면 돼요 🍀",
+                             "\(String(format: "%.1f", weekly.percentage))% 감소했어요."]
             }
         }
+
+        return analysis
     }
     
     func generateMonthlyAnalysis() -> [String] {
-        guard let monthly = monthlyChange else { return [] }
-
+        let monthly = calculateChangeFromPrevious(current: completedStats, previous: previousCompletedStats)
+        
+        let rangeInfo = monthlyChangeDateRangeString()
+        
+        var analysis: [String] = [rangeInfo]
+        
         if monthly.isSame {
-            return ["지난달과 같은 루틴 수행량이에요.",
-                    "꾸준함이 가장 어려운데, 정말 잘하고 있어요! 👏"]
+            analysis += ["지난달과 같은 루틴 수행량이에요.",
+                         "꾸준함이 가장 어려운데, 정말 잘하고 있어요! 👏"]
         } else if monthly.isIncreased {
             if monthly.difference >= 15 {
-                return ["지난달보다 \(monthly.difference)개 더 완료했어요! 😍",
-                        "\(String(format: "%.1f", monthly.percentage))% 상승했어요. 눈에 띄는 성장입니다!"]
+                analysis += ["지난달보다 \(monthly.difference)개 더 완료했어요! 😍",
+                             "\(String(format: "%.1f", monthly.percentage))% 상승했어요. 눈에 띄는 성장입니다!"]
             } else {
-                return ["조금 더 노력한 한 달이었어요! 👍",
-                        "\(monthly.difference)개 늘었어요. 멋져요!"]
+                analysis += ["조금 더 노력한 한 달이었어요! 👍",
+                             "\(monthly.difference)개 늘었어요. 멋져요!"]
             }
         } else {
             if monthly.difference >= 15 {
-                return ["지난달보다 \(monthly.difference)개 줄었어요.",
-                        "컨디션이 좋지 않았던 걸 수도 있어요. 다음 달엔 다시 회복할 수 있어요 💪"]
+                analysis += ["지난달보다 \(monthly.difference)개 줄었어요.",
+                             "컨디션이 좋지 않았던 걸 수도 있어요. 다음 달엔 다시 회복할 수 있어요 💪"]
             } else {
-                return ["루틴 수행이 살짝 줄었어요.",
-                        "\(String(format: "%.1f", monthly.percentage))% 감소했어요. 괜찮아요, 다시 시작해봐요! 🌱"]
+                analysis += ["루틴 수행이 \(monthly.difference)개 살짝 줄었어요.",
+                             "\(String(format: "%.1f", monthly.percentage))% 감소했어요. 괜찮아요, 다시 시작해봐요! 🌱"]
             }
         }
+
+        return analysis
     }
     
     // MARK: - ActiveDays
@@ -274,63 +421,27 @@ extension StatisticsChartViewModel {
         
         return Double(totalCount) / Double(activeDayCount)
     }
+}
+
+private func calculateChangeFromPrevious(current: [TotalCompletedStat], previous: [TotalCompletedStat]) -> ChangeStat {
+    let currentCount = current.map(\.count).reduce(0, +)
+    let previousCount = previous.map(\.count).reduce(0, +)
     
-    var weeklyChange: ChangeStat? {
-        let calendar = Calendar.current
-        let now = Date()
-        
-        let startOfCurrentWeek = calendar.date(byAdding: .day, value: -6, to: now)!
-        let endOfCurrentWeek = now
-
-        let endOfLastWeek = calendar.date(byAdding: .day, value: -7, to: now)!
-        let startOfLastWeek = calendar.date(byAdding: .day, value: -13, to: now)!
-
-        let current = Period.range(start: startOfCurrentWeek, end: endOfCurrentWeek)
-        let previous = Period.range(start: startOfLastWeek, end: endOfLastWeek)
-
-        return calculateChange(current: current, previous: previous)
+    let difference = currentCount - previousCount
+    let isSame = difference == 0
+    let isIncreased = difference > 0
+    
+    let percentage: Double
+    if previousCount == 0 {
+        percentage = currentCount > 0 ? 100.0 : 0.0
+    } else {
+        percentage = (Double(difference) / Double(previousCount)) * 100
     }
     
-    var monthlyChange: ChangeStat? {
-        let calendar = Calendar.current
-        let now = Date()
-
-        let startOfCurrentMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
-        let endOfCurrentMonth = now
-
-        let lastMonthDate = calendar.date(byAdding: .month, value: -1, to: now)!
-        let startOfLastMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: lastMonthDate))!
-        let endOfLastMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startOfLastMonth)!
-
-        let current = Period.range(start: startOfCurrentMonth, end: endOfCurrentMonth)
-        let previous = Period.range(start: startOfLastMonth, end: endOfLastMonth)
-
-        return calculateChange(current: current, previous: previous)
-    }
-    
-    private func calculateChange(current: Period, previous: Period) -> ChangeStat? {
-        let currentStats = completedStats.filter { current.dateRange.contains($0.date) }
-        let previousStats = completedStats.filter { previous.dateRange.contains($0.date) }
-        
-        let currentCount = currentStats.map(\.count).reduce(0, +)
-        let previousCount = previousStats.map(\.count).reduce(0, +)
-        
-        let difference = currentCount - previousCount
-        let isSame = difference == 0
-        let isIncreased = difference > 0
-        let percentage: Double
-        
-        if previousCount == 0 {
-            percentage = currentCount > 0 ? 100.0 : 0.0
-        } else {
-            percentage = (Double(difference) / Double(previousCount)) * 100
-        }
-        
-        return ChangeStat(
-            isSame: isSame,
-            isIncreased: isIncreased,
-            difference: Int(percentage),
-            percentage: abs(percentage)
-        )
-    }
+    return ChangeStat(
+        isSame: isSame,
+        isIncreased: isIncreased,
+        difference: difference,
+        percentage: abs(percentage)
+    )
 }

@@ -14,6 +14,11 @@ struct TotalCompletedStat: Hashable {
     let count: Int
 }
 
+struct DateCategoryKey: Hashable {
+    let date: Date
+    let category: HabitCategory
+}
+
 struct ChangeStat {
     let isSame: Bool
     let isIncreased: Bool
