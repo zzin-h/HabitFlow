@@ -34,6 +34,10 @@ final class StatisticsChartsDIContainer {
         DefaultFetchCompletedDatesUseCase(repository: statisticsChartsRepository)
     }
     
+    func makeFetchCategoryStatsUseCase() -> FetchCategoryStatsUseCase {
+        DefaultFetchCategoryStatsUseCase(repository: statisticsChartsRepository)
+    }
+    
     func makeFetchBestHabitsWithCategoryUseCase() -> FetchBestHabitsWithCategoryUseCase {
         DefaultFetchBestHabitsWithCategoryUseCase(repository: statisticsChartsRepository)
     }
@@ -44,6 +48,7 @@ final class StatisticsChartsDIContainer {
             fetchTotalCompletedStatsUseCase: makeFetchTotalCompletedStatsUseCase(),
             fetchActiveDaysStatUseCase: makeFetchActiveDaysStatUseCase(),
             fetchCompletedDatesUseCase: makeFetchCompletedDatesUseCase(),
+            fetchCategoryStatsUseCase: makeFetchCategoryStatsUseCase(),
             fetchBestHabitsWithCategoryUseCase: makeFetchBestHabitsWithCategoryUseCase()
         )
     }

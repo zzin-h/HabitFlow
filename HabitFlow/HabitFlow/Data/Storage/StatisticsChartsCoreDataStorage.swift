@@ -102,6 +102,24 @@ final class StatisticsChartsCoreDataStorage {
         return Array(uniqueDates)
     }
     
+    // MARK: - 관심 카테고리
+    func fetchCategoryStats() throws -> [CategoryStat] {
+        let request: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()
+        let result = try context.fetch(request)
+
+        let categoryCounts: [HabitCategory: Int] = result.reduce(into: [:]) { counts, entity in
+            if let category = entity.habit?.category {
+                counts[HabitCategory(rawValue: category)!, default: 0] += 1
+            }
+        }
+
+        let stats = categoryCounts.map { (category, count) in
+            CategoryStat(category: category, totalCount: count)
+        }
+
+        return stats.sorted { $0.totalCount > $1.totalCount }
+    }
+
     // MARK: - 베스트 습관
     func fetchBestHabitsWithCategory() throws -> [String: (count: Int, category: HabitCategory)] {
         let request: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()

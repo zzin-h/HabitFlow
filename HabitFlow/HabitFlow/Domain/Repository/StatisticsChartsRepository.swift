@@ -12,5 +12,6 @@ protocol StatisticsChartsRepository {
     func fetchTotalCompletedStats() -> AnyPublisher<[TotalCompletedStat], Error>
     func fetchActiveDaysStat() -> AnyPublisher<ActiveDaysStat, Error>
     func fetchCompletedDates() -> AnyPublisher<[Date], Error>
+    func fetchCategoryStats() -> AnyPublisher<[CategoryStat], Error>
     func fetchBestHabitsWithCategory() -> AnyPublisher<[String: (count: Int, category: HabitCategory)], Error>
 }

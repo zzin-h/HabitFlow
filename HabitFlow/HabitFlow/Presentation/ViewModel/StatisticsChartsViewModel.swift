@@ -33,6 +33,7 @@ final class StatisticsChartViewModel: ObservableObject {
     private let fetchTotalCompletedStatsUseCase: FetchTotalCompletedStatsUseCase
     private let fetchActiveDaysStatUseCase: FetchActiveDaysStatUseCase
     private let fetchCompletedDatesUseCase: FetchCompletedDatesUseCase
+    private let fetchCategoryStatsUseCase: FetchCategoryStatsUseCase
     private let fetchBestHabitsWithCategoryUseCase: FetchBestHabitsWithCategoryUseCase
     
     private let categoryDisplayOrder: [HabitCategory] = [
@@ -50,11 +51,13 @@ final class StatisticsChartViewModel: ObservableObject {
         fetchTotalCompletedStatsUseCase: FetchTotalCompletedStatsUseCase,
         fetchActiveDaysStatUseCase: FetchActiveDaysStatUseCase,
         fetchCompletedDatesUseCase: FetchCompletedDatesUseCase,
+        fetchCategoryStatsUseCase: FetchCategoryStatsUseCase,
         fetchBestHabitsWithCategoryUseCase: FetchBestHabitsWithCategoryUseCase
     ) {
         self.fetchTotalCompletedStatsUseCase = fetchTotalCompletedStatsUseCase
         self.fetchActiveDaysStatUseCase = fetchActiveDaysStatUseCase
         self.fetchCompletedDatesUseCase = fetchCompletedDatesUseCase
+        self.fetchCategoryStatsUseCase = fetchCategoryStatsUseCase
         self.fetchBestHabitsWithCategoryUseCase = fetchBestHabitsWithCategoryUseCase
     }
     
@@ -402,7 +405,7 @@ final class StatisticsChartViewModel: ObservableObject {
     
     // MARK: - FavoriteCategory
     func loadAllCategoryStats() {
-        fetchTotalCompletedStatsUseCase.execute()
+        fetchCategoryStatsUseCase.execute()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case let .failure(error) = completion {
@@ -410,24 +413,18 @@ final class StatisticsChartViewModel: ObservableObject {
                 }
             } receiveValue: { [weak self] stats in
                 guard let self = self else { return }
+
+                self.categoryStats = Dictionary(
+                    uniqueKeysWithValues: stats.map { ($0.category, $0.totalCount) }
+                )
                 
-                self.completedStats = stats
-                
-                var countByCategory: [HabitCategory: Int] = [:]
-                
-                for stat in stats {
-                    countByCategory[stat.category, default: 0] += stat.count
+                self.categoryStatList = self.categoryDisplayOrder.compactMap { category in
+                    guard let stat = stats.first(where: { $0.category == category }) else { return nil }
+                    return stat.totalCount > 0 ? stat : nil
                 }
                 
-                let orderedStats = categoryDisplayOrder.compactMap { category -> (HabitCategory, Int)? in
-                    guard let totalCount = countByCategory[category], totalCount > 0 else { return nil }
-                    return (category, totalCount)
-                }
-                
-                self.categoryStats = Dictionary(uniqueKeysWithValues: orderedStats)
-                self.categoryStatList = orderedStats.map { (category, totalCount) in
-                    CategoryStat(category: category, totalCount: totalCount)
-                }
+                print(categoryStats)
+                print(categoryStatList)
             }
             .store(in: &cancellables)
     }
@@ -477,9 +474,6 @@ final class StatisticsChartViewModel: ObservableObject {
                 
                 let allStats = stats
                 self.top3Habits = allStats.sorted { $0.count > $1.count }.prefix(3).map { $0 }
-                
-                print("그룹핑 결과:", groupedByCategory)
-                print("Top 3:", self.top3Habits)
             }
             .store(in: &cancellables)
     }
