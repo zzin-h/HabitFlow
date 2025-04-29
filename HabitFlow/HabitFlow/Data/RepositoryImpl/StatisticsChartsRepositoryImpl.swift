@@ -61,4 +61,17 @@ final class StatisticsChartsRepositoryImpl: StatisticsChartsRepository {
         }
         .eraseToAnyPublisher()
     }
+    
+    func fetchBestHabitsWithCategory() -> AnyPublisher<[String: (count: Int, category: HabitCategory)], Error> {
+        Future { [weak self] promise in
+            guard let self else { return }
+            do {
+                let habitCountDict = try self.storage.fetchBestHabitsWithCategory()
+                promise(.success(habitCountDict))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
 }

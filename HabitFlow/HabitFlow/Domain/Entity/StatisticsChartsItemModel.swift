@@ -69,6 +69,13 @@ struct PieSlice: Identifiable {
     let percentage: Double
 }
 
+struct BestHabitStat: Identifiable {
+    let id = UUID()
+    let title: String
+    let count: Int
+    let category: HabitCategory
+}
+
 //// 4. 베스트 습관
 //struct BestHabitStat: Identifiable {
 //    let id = UUID()

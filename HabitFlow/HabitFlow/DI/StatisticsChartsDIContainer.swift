@@ -34,12 +34,17 @@ final class StatisticsChartsDIContainer {
         DefaultFetchCompletedDatesUseCase(repository: statisticsChartsRepository)
     }
     
+    func makeFetchBestHabitsWithCategoryUseCase() -> FetchBestHabitsWithCategoryUseCase {
+        DefaultFetchBestHabitsWithCategoryUseCase(repository: statisticsChartsRepository)
+    }
+    
     // MARK: - ViewModel
     func makeStatisticsChartViewModel() -> StatisticsChartViewModel {
         return StatisticsChartViewModel(
             fetchTotalCompletedStatsUseCase: makeFetchTotalCompletedStatsUseCase(),
             fetchActiveDaysStatUseCase: makeFetchActiveDaysStatUseCase(),
-            fetchCompletedDatesUseCase: makeFetchCompletedDatesUseCase()
+            fetchCompletedDatesUseCase: makeFetchCompletedDatesUseCase(),
+            fetchBestHabitsWithCategoryUseCase: makeFetchBestHabitsWithCategoryUseCase()
         )
     }
 }

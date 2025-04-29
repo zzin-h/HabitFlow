@@ -46,13 +46,15 @@ final class StatisticsCoreDataStorage {
         return categoryCount.max { $0.value < $1.value }?.key ?? "No category"
     }
 
-    // MARK: - 베스트 습관 (시간 기준)
+    // MARK: - 베스트 습관
     func fetchBestHabit() throws -> String {
         let request: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()
         let result = try context.fetch(request)
 
-        let bestHabit = result.max { $0.duration < $1.duration }
-        return bestHabit?.habit?.title ?? "No habit"
+        let grouped = Dictionary(grouping: result.compactMap { $0.habit?.title }) { $0 }
+        let mostFrequentHabit = grouped.max { $0.value.count < $1.value.count }
+
+        return mostFrequentHabit?.key ?? "No habit"
     }
 
     // MARK: - 총 시간
@@ -75,7 +77,6 @@ final class StatisticsCoreDataStorage {
     }
 
     // MARK: - Private Helpers
-
     private func calculateStreak(from uniqueDays: Set<Date>) -> Int {
         guard !uniqueDays.isEmpty else { return 0 }
 

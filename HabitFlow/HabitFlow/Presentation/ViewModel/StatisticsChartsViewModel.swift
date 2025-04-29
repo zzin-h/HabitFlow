@@ -23,12 +23,17 @@ final class StatisticsChartViewModel: ObservableObject {
     @Published var categoryStats: [HabitCategory: Int] = [:]
     @Published var categoryStatList: [CategoryStat] = []
     
+    @Published var selectedCategory: HabitCategory = .healthyIt
+    @Published var bestHabitStatsByCategory: [HabitCategory: [BestHabitStat]] = [:]
+    @Published var top3Habits: [BestHabitStat] = []
+    
     @Published var errorMessage: String?
     
     // MARK: - Use Cases
     private let fetchTotalCompletedStatsUseCase: FetchTotalCompletedStatsUseCase
     private let fetchActiveDaysStatUseCase: FetchActiveDaysStatUseCase
     private let fetchCompletedDatesUseCase: FetchCompletedDatesUseCase
+    private let fetchBestHabitsWithCategoryUseCase: FetchBestHabitsWithCategoryUseCase
     
     private let categoryDisplayOrder: [HabitCategory] = [
         .healthyIt,
@@ -44,11 +49,13 @@ final class StatisticsChartViewModel: ObservableObject {
     init(
         fetchTotalCompletedStatsUseCase: FetchTotalCompletedStatsUseCase,
         fetchActiveDaysStatUseCase: FetchActiveDaysStatUseCase,
-        fetchCompletedDatesUseCase: FetchCompletedDatesUseCase
+        fetchCompletedDatesUseCase: FetchCompletedDatesUseCase,
+        fetchBestHabitsWithCategoryUseCase: FetchBestHabitsWithCategoryUseCase
     ) {
         self.fetchTotalCompletedStatsUseCase = fetchTotalCompletedStatsUseCase
         self.fetchActiveDaysStatUseCase = fetchActiveDaysStatUseCase
         self.fetchCompletedDatesUseCase = fetchCompletedDatesUseCase
+        self.fetchBestHabitsWithCategoryUseCase = fetchBestHabitsWithCategoryUseCase
     }
     
     // MARK: - TotalCompleted
@@ -403,7 +410,7 @@ final class StatisticsChartViewModel: ObservableObject {
                 }
             } receiveValue: { [weak self] stats in
                 guard let self = self else { return }
-
+                
                 self.completedStats = stats
                 
                 var countByCategory: [HabitCategory: Int] = [:]
@@ -426,31 +433,57 @@ final class StatisticsChartViewModel: ObservableObject {
     }
     
     func makePieSlices() -> [PieSlice] {
-            let total = categoryStatList.map { $0.totalCount }.reduce(0, +)
-            var slices: [PieSlice] = []
-            var startAngle = 0.0
-
-            for stat in categoryStatList {
-                let percentage = Double(stat.totalCount) / Double(total)
-                let endAngle = startAngle + percentage * 360
-
-                let slice = PieSlice(
-                    startAngle: .degrees(startAngle),
-                    endAngle: .degrees(endAngle),
-                    color: stat.color,
-                    title: stat.title,
-                    value: Double(stat.totalCount),
-                    percentage: percentage
-                )
-
-                slices.append(slice)
-                startAngle = endAngle
-            }
-
-            return slices
+        let total = categoryStatList.map { $0.totalCount }.reduce(0, +)
+        var slices: [PieSlice] = []
+        var startAngle = 0.0
+        
+        for stat in categoryStatList {
+            let percentage = Double(stat.totalCount) / Double(total)
+            let endAngle = startAngle + percentage * 360
+            
+            let slice = PieSlice(
+                startAngle: .degrees(startAngle),
+                endAngle: .degrees(endAngle),
+                color: stat.color,
+                title: stat.title,
+                value: Double(stat.totalCount),
+                percentage: percentage
+            )
+            
+            slices.append(slice)
+            startAngle = endAngle
         }
+        
+        return slices
+    }
+    
+    // MARK: - BestHabit
+    func loadAllBestHabits() {
+        fetchBestHabitsWithCategoryUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorMessage = error.localizedDescription
+                }
+            } receiveValue: { [weak self] habitDict in
+                guard let self = self else { return }
+                
+                let stats: [BestHabitStat] = habitDict.map { title, value in
+                    BestHabitStat(title: title, count: value.count, category: value.category)
+                }
+                
+                let groupedByCategory = Dictionary(grouping: stats, by: \.category)
+                self.bestHabitStatsByCategory = groupedByCategory
+                
+                let allStats = stats
+                self.top3Habits = allStats.sorted { $0.count > $1.count }.prefix(3).map { $0 }
+                
+                print("그룹핑 결과:", groupedByCategory)
+                print("Top 3:", self.top3Habits)
+            }
+            .store(in: &cancellables)
+    }
 }
-
 // MARK: - extension
 extension StatisticsChartViewModel {
     var todayCompletedByCategory: [HabitCategory: [String]] {
@@ -463,6 +496,10 @@ extension StatisticsChartViewModel {
             result[stat.category, default: []].append(stat.title)
         }
         return result
+    }
+    
+    var filteredHabits: [BestHabitStat] {
+        bestHabitStatsByCategory[selectedCategory] ?? []
     }
     
     private func generateDateList(from range: ClosedRange<Date>) -> [Date] {

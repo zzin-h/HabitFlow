@@ -101,4 +101,37 @@ final class StatisticsChartsCoreDataStorage {
         let uniqueDates = Set(dates.map { Calendar.current.startOfDay(for: $0) })
         return Array(uniqueDates)
     }
+    
+    // MARK: - 베스트 습관
+    func fetchBestHabitsWithCategory() throws -> [String: (count: Int, category: HabitCategory)] {
+        let request: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()
+        let result = try context.fetch(request)
+        
+        var habitCountDict: [String: (count: Int, category: HabitCategory)] = [:]
+        
+        for record in result {
+            guard let title = record.habit?.title,
+                  let categoryString = record.habit?.category,
+                  let category = HabitCategory(rawValue: categoryString) else {
+                continue
+            }
+            
+            if let existing = habitCountDict[title] {
+                habitCountDict[title] = (existing.count + 1, category)
+            } else {
+                habitCountDict[title] = (1, category)
+            }
+        }
+        
+        return habitCountDict
+    }
+    
+    // MARK: - 타이머 습관
+//    func fetchDurationHabit() throws -> String {
+//        let request: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()
+//        let result = try context.fetch(request)
+//
+//        let bestHabit = result.max { $0.duration < $1.duration }
+//        return bestHabit?.habit?.title ?? "No habit"
+//    }
 }
