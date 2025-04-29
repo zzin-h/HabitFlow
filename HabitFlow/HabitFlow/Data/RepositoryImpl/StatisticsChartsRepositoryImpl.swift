@@ -61,4 +61,56 @@ final class StatisticsChartsRepositoryImpl: StatisticsChartsRepository {
         }
         .eraseToAnyPublisher()
     }
+    
+    func fetchCategoryStats() -> AnyPublisher<[CategoryStat], Error> {
+        Future { [weak self] promise in
+            guard let self else { return }
+            do {
+                let categoryStat = try self.storage.fetchCategoryStats()
+                promise(.success(categoryStat))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    func fetchBestHabitsWithCategory() -> AnyPublisher<[String: (count: Int, category: HabitCategory)], Error> {
+        Future { [weak self] promise in
+            guard let self else { return }
+            do {
+                let habitCountDict = try self.storage.fetchBestHabitsWithCategory()
+                promise(.success(habitCountDict))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    func fetchTotalTimeStat() -> AnyPublisher<[TotalTimeStat], Error> {
+        Future { [weak self] promise in
+            guard let self else { return }
+            do {
+                let totalTimeStat = try self.storage.fetchTotalTimeStat()
+                promise(.success(totalTimeStat))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    func fetchTimePatternStat() -> AnyPublisher<TimePatternStat, Error> {
+        Future { [weak self] promise in
+            guard let self else { return }
+            do {
+                let timePatternStat = try self.storage.fetchTimePatternStat()
+                promise(.success(timePatternStat))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
 }

@@ -34,12 +34,32 @@ final class StatisticsChartsDIContainer {
         DefaultFetchCompletedDatesUseCase(repository: statisticsChartsRepository)
     }
     
+    func makeFetchCategoryStatsUseCase() -> FetchCategoryStatsUseCase {
+        DefaultFetchCategoryStatsUseCase(repository: statisticsChartsRepository)
+    }
+    
+    func makeFetchBestHabitsWithCategoryUseCase() -> FetchBestHabitsWithCategoryUseCase {
+        DefaultFetchBestHabitsWithCategoryUseCase(repository: statisticsChartsRepository)
+    }
+    
+    func makeFetchTotalTimeStatUseCase() -> FetchTotalTimeStatUseCase {
+        DefaultFetchTotalTimeStatUseCase(repository: statisticsChartsRepository)
+    }
+    
+    func makeFetchTimePatternStatUseCase() -> FetchTimePatternStatUseCase {
+        DefaultFetchTimePatternStatUseCase(repository: statisticsChartsRepository)
+    }
+    
     // MARK: - ViewModel
     func makeStatisticsChartViewModel() -> StatisticsChartViewModel {
         return StatisticsChartViewModel(
             fetchTotalCompletedStatsUseCase: makeFetchTotalCompletedStatsUseCase(),
             fetchActiveDaysStatUseCase: makeFetchActiveDaysStatUseCase(),
-            fetchCompletedDatesUseCase: makeFetchCompletedDatesUseCase()
+            fetchCompletedDatesUseCase: makeFetchCompletedDatesUseCase(),
+            fetchCategoryStatsUseCase: makeFetchCategoryStatsUseCase(),
+            fetchBestHabitsWithCategoryUseCase: makeFetchBestHabitsWithCategoryUseCase(),
+            fetchTotalTimeStatUseCase: makeFetchTotalTimeStatUseCase(),
+            fetchTimePatternStatUseCase: makeFetchTimePatternStatUseCase()
         )
     }
 }

@@ -27,6 +27,22 @@ struct StatisticsOverviewView: View {
                         Text("ActiveDays")
                     }
                     
+                    NavigationLink(destination: FavoriteCategoryChartView()) {
+                        Text("FavoriteCategory")
+                    }
+                    
+                    NavigationLink(destination: BestHabitChartView()) {
+                        Text("BestHabit")
+                    }
+                    
+                    NavigationLink(destination: TotalTimeChartView()) {
+                        Text("TotalTime")
+                    }
+                    
+                    NavigationLink(destination: MostFrequentChartView()) {
+                        Text("MostFrequent")
+                    }
+                    
                     StatisticsCardView(
                         title: "완료한 습관",
                         icon: "checkmark.circle.fill",

@@ -14,11 +14,26 @@ final class StatisticsChartViewModel: ObservableObject {
     @Published var completedStats: [TotalCompletedStat] = []
     @Published var selectedPeriod: Period = .range(start: Date(), end: Date())
     @Published var groupedCompletionSummary: [(HabitCategory, [TotalCompletedStat])] = []
-
+    
     @Published var activeDaysStat: ActiveDaysStat?
     @Published var completedDates: [Date] = []
     @Published var currentMonth: Date = Date()
     @Published var days: [DayCell] = []
+    
+    @Published var categoryStats: [HabitCategory: Int] = [:]
+    @Published var categoryStatList: [CategoryStat] = []
+    
+    @Published var selectedCategory: HabitCategory = .healthyIt
+    @Published var bestHabitStatsByCategory: [HabitCategory: [BestHabitStat]] = [:]
+    @Published var top3Habits: [BestHabitStat] = []
+    
+    @Published var totalTimeStats: [TotalTimeStat] = []
+    @Published var top3DurationHabits: [TotalTimeStat] = []
+    
+    @Published var weekdayStats: [WeekdayStat] = []
+    @Published var timeSlotStats: [TimeSlotStat] = []
+    @Published var top3Weekdays: [WeekdayStat] = []
+    @Published var top3TimeSlots: [TimeSlotStat] = []
     
     @Published var errorMessage: String?
     
@@ -26,6 +41,10 @@ final class StatisticsChartViewModel: ObservableObject {
     private let fetchTotalCompletedStatsUseCase: FetchTotalCompletedStatsUseCase
     private let fetchActiveDaysStatUseCase: FetchActiveDaysStatUseCase
     private let fetchCompletedDatesUseCase: FetchCompletedDatesUseCase
+    private let fetchCategoryStatsUseCase: FetchCategoryStatsUseCase
+    private let fetchBestHabitsWithCategoryUseCase: FetchBestHabitsWithCategoryUseCase
+    private let fetchTotalTimeStatUseCase: FetchTotalTimeStatUseCase
+    private let fetchTimePatternStatUseCase: FetchTimePatternStatUseCase
     
     private let categoryDisplayOrder: [HabitCategory] = [
         .healthyIt,
@@ -41,11 +60,19 @@ final class StatisticsChartViewModel: ObservableObject {
     init(
         fetchTotalCompletedStatsUseCase: FetchTotalCompletedStatsUseCase,
         fetchActiveDaysStatUseCase: FetchActiveDaysStatUseCase,
-        fetchCompletedDatesUseCase: FetchCompletedDatesUseCase
+        fetchCompletedDatesUseCase: FetchCompletedDatesUseCase,
+        fetchCategoryStatsUseCase: FetchCategoryStatsUseCase,
+        fetchBestHabitsWithCategoryUseCase: FetchBestHabitsWithCategoryUseCase,
+        fetchTotalTimeStatUseCase: FetchTotalTimeStatUseCase,
+        fetchTimePatternStatUseCase: FetchTimePatternStatUseCase
     ) {
         self.fetchTotalCompletedStatsUseCase = fetchTotalCompletedStatsUseCase
         self.fetchActiveDaysStatUseCase = fetchActiveDaysStatUseCase
         self.fetchCompletedDatesUseCase = fetchCompletedDatesUseCase
+        self.fetchCategoryStatsUseCase = fetchCategoryStatsUseCase
+        self.fetchBestHabitsWithCategoryUseCase = fetchBestHabitsWithCategoryUseCase
+        self.fetchTotalTimeStatUseCase = fetchTotalTimeStatUseCase
+        self.fetchTimePatternStatUseCase = fetchTimePatternStatUseCase
     }
     
     // MARK: - TotalCompleted
@@ -63,46 +90,46 @@ final class StatisticsChartViewModel: ObservableObject {
                 let now = Date()
                 var startDate: Date
                 var endDate: Date
-
+                
                 switch periodType {
                 case .oneWeek:
                     let endOfLastWeek = calendar.date(byAdding: .day, value: -7, to: now)!
                     let startOfLastWeek = calendar.date(byAdding: .day, value: -13, to: now)!
                     startDate = calendar.startOfDay(for: startOfLastWeek)
                     endDate = calendar.startOfDay(for: endOfLastWeek)
-
+                    
                 case .oneMonth:
                     let lastMonth = calendar.date(byAdding: .month, value: -1, to: now)!
                     startDate = calendar.date(from: calendar.dateComponents([.year, .month], from: lastMonth))!
                     endDate = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startDate)!
                 }
-
+                
                 let dateList = self.generateDateList(from: startDate...endDate)
-
+                
                 let statsByDateAndCategory = Dictionary(grouping: stats) { stat in
                     DateCategoryKey(date: calendar.startOfDay(for: stat.date), category: stat.category)
                 }
-
+                
                 var filledStats: [TotalCompletedStat] = []
-
+                
                 for date in dateList {
                     for category in HabitCategory.allCases {
                         let key = DateCategoryKey(date: date, category: category)
                         let items = statsByDateAndCategory[key] ?? []
                         let count = items.reduce(0) { $0 + $1.count }
                         let title = category.title
-
+                        
                         let stat = TotalCompletedStat(
                             date: date,
                             title: title,
                             category: category,
                             count: count
                         )
-
+                        
                         filledStats.append(stat)
                     }
                 }
-
+                
                 self.previousCompletedStats = filledStats
             }
             .store(in: &cancellables)
@@ -119,33 +146,31 @@ final class StatisticsChartViewModel: ObservableObject {
                 guard let self = self else { return }
                 let range = self.selectedPeriod.dateRange
                 let dateList = self.generateDateList(from: range)
-
+                
                 let statsByDateAndCategory = Dictionary(grouping: stats) { stat in
                     DateCategoryKey(date: self.calendar.startOfDay(for: stat.date), category: stat.category)
                 }
-
+                
                 var filledStats: [TotalCompletedStat] = []
-
+                
                 for date in dateList {
                     for category in HabitCategory.allCases {
                         let key = DateCategoryKey(date: date, category: category)
                         let items = statsByDateAndCategory[key] ?? []
                         let count = items.reduce(0) { $0 + $1.count }
                         let title = category.title
-
+                        
                         let stat = TotalCompletedStat(
                             date: date,
                             title: title,
                             category: category,
                             count: count
                         )
-
+                        
                         filledStats.append(stat)
                     }
                 }
                 
-                print(filledStats)
-
                 self.completedStats = filledStats
             }
             .store(in: &cancellables)
@@ -170,37 +195,37 @@ final class StatisticsChartViewModel: ObservableObject {
     func weeklyChangeDateRangeString() -> String {
         let calendar = Calendar.current
         let now = Date()
-
+        
         let startOfCurrentWeek = calendar.date(byAdding: .day, value: -6, to: now)!
         let endOfCurrentWeek = now
-
+        
         let endOfLastWeek = calendar.date(byAdding: .day, value: -7, to: now)!
         let startOfLastWeek = calendar.date(byAdding: .day, value: -13, to: now)!
-
+        
         let formatter = DateFormatter()
         formatter.dateFormat = "M/d"
-
+        
         let currentRange = "\(formatter.string(from: startOfCurrentWeek)) ~ \(formatter.string(from: endOfCurrentWeek))"
         let lastRange = "\(formatter.string(from: startOfLastWeek)) ~ \(formatter.string(from: endOfLastWeek))"
-
+        
         return "이번 주: \(currentRange) | 지난 주: \(lastRange)"
     }
     
     func monthlyChangeDateRangeString() -> String {
         let calendar = Calendar.current
         let now = Date()
-
+        
         let startOfThisMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
         let lastMonth = calendar.date(byAdding: .month, value: -1, to: now)!
         let startOfLastMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: lastMonth))!
         let endOfLastMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startOfLastMonth)!
-
+        
         let formatter = DateFormatter()
         formatter.dateFormat = "M/d"
-
+        
         let thisMonthRange = "\(formatter.string(from: startOfThisMonth)) ~ \(formatter.string(from: now))"
         let lastMonthRange = "\(formatter.string(from: startOfLastMonth)) ~ \(formatter.string(from: endOfLastMonth))"
-
+        
         return "이번 달: \(thisMonthRange) | 지난 달: \(lastMonthRange)"
     }
     
@@ -230,7 +255,7 @@ final class StatisticsChartViewModel: ObservableObject {
                              "\(String(format: "%.1f", weekly.percentage))% 감소했어요."]
             }
         }
-
+        
         return analysis
     }
     
@@ -261,7 +286,7 @@ final class StatisticsChartViewModel: ObservableObject {
                              "\(String(format: "%.1f", monthly.percentage))% 감소했어요. 괜찮아요, 다시 시작해봐요! 🌱"]
             }
         }
-
+        
         return analysis
     }
     
@@ -353,7 +378,7 @@ final class StatisticsChartViewModel: ObservableObject {
             }
             .store(in: &cancellables)
     }
-
+    
     func calculateMonthlyAchievement(from dates: [Date]) -> Int {
         let calendar = Calendar.current
         let components = calendar.dateComponents([.year, .month], from: Date())
@@ -370,29 +395,153 @@ final class StatisticsChartViewModel: ObservableObject {
     func longestBreakGap(from dates: [Date]) -> (start: Date, end: Date, days: Int)? {
         let calendar = Calendar.current
         let sortedDates = Set(dates.map { calendar.startOfDay(for: $0) }).sorted()
-
+        
         guard sortedDates.count >= 2 else { return nil }
-
+        
         var maxGap = 0
         var gapStartDate: Date = sortedDates[0]
         var gapEndDate: Date = sortedDates[1]
-
+        
         for i in 0..<sortedDates.count - 1 {
             let current = sortedDates[i]
             let next = sortedDates[i + 1]
             let gap = calendar.dateComponents([.day], from: current, to: next).day ?? 0
-
+            
             if gap > maxGap {
                 maxGap = gap
                 gapStartDate = current
                 gapEndDate = next
             }
         }
-
+        
         return (gapStartDate, gapEndDate, maxGap - 1)
     }
+    
+    // MARK: - FavoriteCategory
+    func loadAllCategoryStats() {
+        fetchCategoryStatsUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorMessage = error.localizedDescription
+                }
+            } receiveValue: { [weak self] stats in
+                guard let self = self else { return }
+                
+                self.categoryStats = Dictionary(
+                    uniqueKeysWithValues: stats.map { ($0.category, $0.totalCount) }
+                )
+                
+                self.categoryStatList = self.categoryDisplayOrder.compactMap { category in
+                    guard let stat = stats.first(where: { $0.category == category }) else { return nil }
+                    return stat.totalCount > 0 ? stat : nil
+                }
+                
+                print(categoryStats)
+                print(categoryStatList)
+            }
+            .store(in: &cancellables)
+    }
+    
+    func makePieSlices() -> [PieSlice] {
+        let total = categoryStatList.map { $0.totalCount }.reduce(0, +)
+        var slices: [PieSlice] = []
+        var startAngle = 0.0
+        
+        for stat in categoryStatList {
+            let percentage = Double(stat.totalCount) / Double(total)
+            let endAngle = startAngle + percentage * 360
+            
+            let slice = PieSlice(
+                startAngle: .degrees(startAngle),
+                endAngle: .degrees(endAngle),
+                color: stat.color,
+                title: stat.title,
+                value: Double(stat.totalCount),
+                percentage: percentage
+            )
+            
+            slices.append(slice)
+            startAngle = endAngle
+        }
+        
+        return slices
+    }
+    
+    // MARK: - BestHabit
+    func loadAllBestHabits() {
+        fetchBestHabitsWithCategoryUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorMessage = error.localizedDescription
+                }
+            } receiveValue: { [weak self] habitDict in
+                guard let self = self else { return }
+                
+                let stats: [BestHabitStat] = habitDict.map { title, value in
+                    BestHabitStat(title: title, count: value.count, category: value.category)
+                }
+                
+                let groupedByCategory = Dictionary(grouping: stats, by: \.category)
+                self.bestHabitStatsByCategory = groupedByCategory
+                
+                let allStats = stats
+                self.top3Habits = allStats.sorted { $0.count > $1.count }.prefix(3).map { $0 }
+            }
+            .store(in: &cancellables)
+    }
+    
+    // MARK: - TotalTime
+    func loadTotalTimeStats() {
+        fetchTotalTimeStatUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorMessage = error.localizedDescription
+                }
+            } receiveValue: { [weak self] stats in
+                guard let self = self else { return }
+                
+                self.totalTimeStats = stats.filter { $0.duration > 0 }
+                
+                self.top3DurationHabits = self.totalTimeStats
+                    .sorted { $0.duration > $1.duration }
+                    .prefix(3)
+                    .map { $0 }
+                
+                print(totalTimeStats)
+                print(top3DurationHabits)
+            }
+            .store(in: &cancellables)
+    }
+    
+    // MARK: - TimePattern
+    func loadTimePatternStats() {
+        fetchTimePatternStatUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorMessage = error.localizedDescription
+                }
+            } receiveValue: { [weak self] stats in
+                guard let self = self else { return }
+                
+                self.weekdayStats = stats.weekdayStats
+                self.timeSlotStats = stats.timeSlotStats
+                
+                self.top3Weekdays = self.weekdayStats
+                    .sorted { $0.count > $1.count }
+                    .prefix(3)
+                    .map { $0 }
+                self.top3TimeSlots = self.timeSlotStats
+                    .sorted { $0.count > $1.count }
+                    .prefix(3)
+                    .map { $0 }
+            }
+            .store(in: &cancellables)
+    }
 }
-
 // MARK: - extension
 extension StatisticsChartViewModel {
     var todayCompletedByCategory: [HabitCategory: [String]] {
@@ -405,6 +554,14 @@ extension StatisticsChartViewModel {
             result[stat.category, default: []].append(stat.title)
         }
         return result
+    }
+    
+    var filteredHabits: [BestHabitStat] {
+        bestHabitStatsByCategory[selectedCategory] ?? []
+    }
+    
+    var filteredTotalTimeStats: [TotalTimeStat] {
+        totalTimeStats.filter { $0.category == selectedCategory }
     }
     
     private func generateDateList(from range: ClosedRange<Date>) -> [Date] {

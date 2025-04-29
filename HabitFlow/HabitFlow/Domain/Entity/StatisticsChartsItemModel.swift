@@ -6,12 +6,17 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct TotalCompletedStat: Hashable {
     let date: Date
     let title: String
     let category: HabitCategory
     let count: Int
+    
+    var color: Color {
+        return category.color
+    }
 }
 
 struct DateCategoryKey: Hashable {
@@ -40,33 +45,60 @@ struct DayCell: Identifiable {
     let isInCurrentMonth: Bool
 }
 
-//// 3. 관심 카테고리 비율
-//struct CategoryStat: Identifiable {
-//    let id = UUID()
-//    let category: HabitCategory
-//    let ratio: Double
-//}
-//
-//// 4. 베스트 습관
-//struct BestHabitStat: Identifiable {
-//    let id = UUID()
-//    let habit: HabitModel
-//    let count: Int
-//}
-//
-//// 5. 총 시간
-//struct TotalTimeStat: Identifiable {
-//    let id = UUID()
-//    let habit: HabitModel
-//    let duration: TimeInterval
-//}
-//
-//// 6. 날짜 기반 통계
-//struct TimePatternStat {
-//    let weekdayStats: [(weekday: Weekdays, count: Int)]
-//    let timeSlotStats: [(slot: String, count: Int)]
-//}
-//
+struct CategoryStat: Identifiable {
+    let id = UUID()
+    let category: HabitCategory
+    let totalCount: Int
+    
+    var title: String {
+        return category.title
+    }
+    
+    var color: Color {
+        return category.color
+    }
+}
+
+struct PieSlice: Identifiable {
+    let id = UUID()
+    let startAngle: Angle
+    let endAngle: Angle
+    let color: Color
+    let title: String
+    let value: Double
+    let percentage: Double
+}
+
+struct BestHabitStat: Identifiable {
+    let id = UUID()
+    let title: String
+    let count: Int
+    let category: HabitCategory
+}
+
+struct TotalTimeStat: Identifiable {
+    let id = UUID()
+    let title: String
+    let duration: Int
+    let category: HabitCategory
+}
+
+struct WeekdayStat: Identifiable {
+    let id = UUID()
+    let weekday: Weekdays
+    let count: Int
+}
+
+struct TimeSlotStat: Identifiable {
+    let id = UUID()
+    let slot: TimeSlot
+    let count: Int
+}
+
+struct TimePatternStat {
+    let weekdayStats: [WeekdayStat]
+    let timeSlotStats: [TimeSlotStat]
+}
 //// 7. 통계 요약 카드
 //struct SummaryReport {
 //    let totalCompleted: Int
