@@ -112,7 +112,3 @@ private struct HabitRowView: View {
         }
     }
 }
-
-#Preview {
-    HabitListView()
-}
