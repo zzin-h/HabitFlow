@@ -76,20 +76,13 @@ struct BestHabitStat: Identifiable {
     let category: HabitCategory
 }
 
-//// 4. 베스트 습관
-//struct BestHabitStat: Identifiable {
-//    let id = UUID()
-//    let habit: HabitModel
-//    let count: Int
-//}
-//
-//// 5. 총 시간
-//struct TotalTimeStat: Identifiable {
-//    let id = UUID()
-//    let habit: HabitModel
-//    let duration: TimeInterval
-//}
-//
+struct TotalTimeStat: Identifiable {
+    let id = UUID()
+    let title: String
+    let duration: Int
+    let category: HabitCategory
+}
+
 //// 6. 날짜 기반 통계
 //struct TimePatternStat {
 //    let weekdayStats: [(weekday: Weekdays, count: Int)]

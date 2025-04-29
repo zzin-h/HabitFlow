@@ -106,20 +106,20 @@ final class StatisticsChartsCoreDataStorage {
     func fetchCategoryStats() throws -> [CategoryStat] {
         let request: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()
         let result = try context.fetch(request)
-
+        
         let categoryCounts: [HabitCategory: Int] = result.reduce(into: [:]) { counts, entity in
             if let category = entity.habit?.category {
                 counts[HabitCategory(rawValue: category)!, default: 0] += 1
             }
         }
-
+        
         let stats = categoryCounts.map { (category, count) in
             CategoryStat(category: category, totalCount: count)
         }
-
+        
         return stats.sorted { $0.totalCount > $1.totalCount }
     }
-
+    
     // MARK: - 베스트 습관
     func fetchBestHabitsWithCategory() throws -> [String: (count: Int, category: HabitCategory)] {
         let request: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()
@@ -145,11 +145,38 @@ final class StatisticsChartsCoreDataStorage {
     }
     
     // MARK: - 타이머 습관
-//    func fetchDurationHabit() throws -> String {
-//        let request: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()
-//        let result = try context.fetch(request)
-//
-//        let bestHabit = result.max { $0.duration < $1.duration }
-//        return bestHabit?.habit?.title ?? "No habit"
-//    }
+    func fetchTotalTimeStat() throws -> [TotalTimeStat] {
+        let request: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()
+        let result = try context.fetch(request)
+        
+        var totalTimeDict: [String: (duration: Int, category: HabitCategory)] = [:]
+        
+        for record in result {
+            guard let title = record.habit?.title,
+                  let categoryString = record.habit?.category,
+                  let category = HabitCategory(rawValue: categoryString) else {
+                continue
+            }
+            
+            let duration = Int(record.duration)
+            
+            guard duration > 0 else { continue }
+            
+            if let existing = totalTimeDict[title] {
+                totalTimeDict[title] = (existing.duration + duration, category)
+            } else {
+                totalTimeDict[title] = (duration, category)
+            }
+        }
+        
+        let stats = totalTimeDict.map { title, data in
+            TotalTimeStat(
+                title: title,
+                duration: Int(data.duration),
+                category: data.category
+            )
+        }
+        
+        return stats
+    }
 }

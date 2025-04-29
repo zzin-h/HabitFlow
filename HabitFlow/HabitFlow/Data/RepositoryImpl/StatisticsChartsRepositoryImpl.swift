@@ -87,4 +87,17 @@ final class StatisticsChartsRepositoryImpl: StatisticsChartsRepository {
         }
         .eraseToAnyPublisher()
     }
+    
+    func fetchTotalTimeStat() -> AnyPublisher<[TotalTimeStat], Error> {
+        Future { [weak self] promise in
+            guard let self else { return }
+            do {
+                let totalTimeStat = try self.storage.fetchTotalTimeStat()
+                promise(.success(totalTimeStat))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
 }

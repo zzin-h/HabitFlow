@@ -27,6 +27,9 @@ final class StatisticsChartViewModel: ObservableObject {
     @Published var bestHabitStatsByCategory: [HabitCategory: [BestHabitStat]] = [:]
     @Published var top3Habits: [BestHabitStat] = []
     
+    @Published var totalTimeStats: [TotalTimeStat] = []
+    @Published var top3DurationHabits: [TotalTimeStat] = []
+    
     @Published var errorMessage: String?
     
     // MARK: - Use Cases
@@ -35,6 +38,7 @@ final class StatisticsChartViewModel: ObservableObject {
     private let fetchCompletedDatesUseCase: FetchCompletedDatesUseCase
     private let fetchCategoryStatsUseCase: FetchCategoryStatsUseCase
     private let fetchBestHabitsWithCategoryUseCase: FetchBestHabitsWithCategoryUseCase
+    private let fetchTotalTimeStatUseCase: FetchTotalTimeStatUseCase
     
     private let categoryDisplayOrder: [HabitCategory] = [
         .healthyIt,
@@ -52,13 +56,15 @@ final class StatisticsChartViewModel: ObservableObject {
         fetchActiveDaysStatUseCase: FetchActiveDaysStatUseCase,
         fetchCompletedDatesUseCase: FetchCompletedDatesUseCase,
         fetchCategoryStatsUseCase: FetchCategoryStatsUseCase,
-        fetchBestHabitsWithCategoryUseCase: FetchBestHabitsWithCategoryUseCase
+        fetchBestHabitsWithCategoryUseCase: FetchBestHabitsWithCategoryUseCase,
+        fetchTotalTimeStatUseCase: FetchTotalTimeStatUseCase
     ) {
         self.fetchTotalCompletedStatsUseCase = fetchTotalCompletedStatsUseCase
         self.fetchActiveDaysStatUseCase = fetchActiveDaysStatUseCase
         self.fetchCompletedDatesUseCase = fetchCompletedDatesUseCase
         self.fetchCategoryStatsUseCase = fetchCategoryStatsUseCase
         self.fetchBestHabitsWithCategoryUseCase = fetchBestHabitsWithCategoryUseCase
+        self.fetchTotalTimeStatUseCase = fetchTotalTimeStatUseCase
     }
     
     // MARK: - TotalCompleted
@@ -413,7 +419,7 @@ final class StatisticsChartViewModel: ObservableObject {
                 }
             } receiveValue: { [weak self] stats in
                 guard let self = self else { return }
-
+                
                 self.categoryStats = Dictionary(
                     uniqueKeysWithValues: stats.map { ($0.category, $0.totalCount) }
                 )
@@ -477,6 +483,30 @@ final class StatisticsChartViewModel: ObservableObject {
             }
             .store(in: &cancellables)
     }
+    
+    // MARK: - TotalTime
+    func loadTotalTimeStats() {
+        fetchTotalTimeStatUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorMessage = error.localizedDescription
+                }
+            } receiveValue: { [weak self] stats in
+                guard let self = self else { return }
+                
+                self.totalTimeStats = stats.filter { $0.duration > 0 }
+                
+                self.top3DurationHabits = self.totalTimeStats
+                    .sorted { $0.duration > $1.duration }
+                    .prefix(3)
+                    .map { $0 }
+                
+                print(totalTimeStats)
+                print(top3DurationHabits)
+            }
+            .store(in: &cancellables)
+    }
 }
 // MARK: - extension
 extension StatisticsChartViewModel {
@@ -494,6 +524,10 @@ extension StatisticsChartViewModel {
     
     var filteredHabits: [BestHabitStat] {
         bestHabitStatsByCategory[selectedCategory] ?? []
+    }
+    
+    var filteredTotalTimeStats: [TotalTimeStat] {
+        totalTimeStats.filter { $0.category == selectedCategory }
     }
     
     private func generateDateList(from range: ClosedRange<Date>) -> [Date] {

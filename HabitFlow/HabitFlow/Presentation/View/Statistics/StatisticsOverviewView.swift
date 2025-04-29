@@ -35,6 +35,10 @@ struct StatisticsOverviewView: View {
                         Text("BestHabit")
                     }
                     
+                    NavigationLink(destination: TotalTimeChartView()) {
+                        Text("TotalTime")
+                    }
+                    
                     StatisticsCardView(
                         title: "완료한 습관",
                         icon: "checkmark.circle.fill",
