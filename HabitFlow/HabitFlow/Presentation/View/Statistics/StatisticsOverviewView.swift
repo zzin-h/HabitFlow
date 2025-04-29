@@ -39,6 +39,10 @@ struct StatisticsOverviewView: View {
                         Text("TotalTime")
                     }
                     
+                    NavigationLink(destination: MostFrequentChartView()) {
+                        Text("MostFrequent")
+                    }
+                    
                     StatisticsCardView(
                         title: "완료한 습관",
                         icon: "checkmark.circle.fill",

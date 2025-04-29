@@ -30,6 +30,11 @@ final class StatisticsChartViewModel: ObservableObject {
     @Published var totalTimeStats: [TotalTimeStat] = []
     @Published var top3DurationHabits: [TotalTimeStat] = []
     
+    @Published var weekdayStats: [WeekdayStat] = []
+    @Published var timeSlotStats: [TimeSlotStat] = []
+    @Published var top3Weekdays: [WeekdayStat] = []
+    @Published var top3TimeSlots: [TimeSlotStat] = []
+    
     @Published var errorMessage: String?
     
     // MARK: - Use Cases
@@ -39,6 +44,7 @@ final class StatisticsChartViewModel: ObservableObject {
     private let fetchCategoryStatsUseCase: FetchCategoryStatsUseCase
     private let fetchBestHabitsWithCategoryUseCase: FetchBestHabitsWithCategoryUseCase
     private let fetchTotalTimeStatUseCase: FetchTotalTimeStatUseCase
+    private let fetchTimePatternStatUseCase: FetchTimePatternStatUseCase
     
     private let categoryDisplayOrder: [HabitCategory] = [
         .healthyIt,
@@ -57,7 +63,8 @@ final class StatisticsChartViewModel: ObservableObject {
         fetchCompletedDatesUseCase: FetchCompletedDatesUseCase,
         fetchCategoryStatsUseCase: FetchCategoryStatsUseCase,
         fetchBestHabitsWithCategoryUseCase: FetchBestHabitsWithCategoryUseCase,
-        fetchTotalTimeStatUseCase: FetchTotalTimeStatUseCase
+        fetchTotalTimeStatUseCase: FetchTotalTimeStatUseCase,
+        fetchTimePatternStatUseCase: FetchTimePatternStatUseCase
     ) {
         self.fetchTotalCompletedStatsUseCase = fetchTotalCompletedStatsUseCase
         self.fetchActiveDaysStatUseCase = fetchActiveDaysStatUseCase
@@ -65,6 +72,7 @@ final class StatisticsChartViewModel: ObservableObject {
         self.fetchCategoryStatsUseCase = fetchCategoryStatsUseCase
         self.fetchBestHabitsWithCategoryUseCase = fetchBestHabitsWithCategoryUseCase
         self.fetchTotalTimeStatUseCase = fetchTotalTimeStatUseCase
+        self.fetchTimePatternStatUseCase = fetchTimePatternStatUseCase
     }
     
     // MARK: - TotalCompleted
@@ -504,6 +512,32 @@ final class StatisticsChartViewModel: ObservableObject {
                 
                 print(totalTimeStats)
                 print(top3DurationHabits)
+            }
+            .store(in: &cancellables)
+    }
+    
+    // MARK: - TimePattern
+    func loadTimePatternStats() {
+        fetchTimePatternStatUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorMessage = error.localizedDescription
+                }
+            } receiveValue: { [weak self] stats in
+                guard let self = self else { return }
+                
+                self.weekdayStats = stats.weekdayStats
+                self.timeSlotStats = stats.timeSlotStats
+                
+                self.top3Weekdays = self.weekdayStats
+                    .sorted { $0.count > $1.count }
+                    .prefix(3)
+                    .map { $0 }
+                self.top3TimeSlots = self.timeSlotStats
+                    .sorted { $0.count > $1.count }
+                    .prefix(3)
+                    .map { $0 }
             }
             .store(in: &cancellables)
     }

@@ -179,4 +179,41 @@ final class StatisticsChartsCoreDataStorage {
         
         return stats
     }
+    
+    // MARK: - 날짜 기반 통계
+    func fetchTimePatternStat() throws -> TimePatternStat {
+        let request: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()
+        let records = try context.fetch(request)
+
+        let calendar = Calendar.current
+
+        var weekdayCount: [Weekdays: Int] = [:]
+        var timeSlotCount: [TimeSlot: Int] = [:]
+
+        for record in records {
+            guard let date = record.date else { continue }
+
+            if let weekday = Weekdays.from(date: date) {
+                weekdayCount[weekday, default: 0] += 1
+            }
+
+            let hour = calendar.component(.hour, from: date)
+            if let slot = TimeSlot.slot(for: hour) {
+                timeSlotCount[slot, default: 0] += 1
+            }
+        }
+
+        let weekdayStats = Weekdays.allCases.map {
+            WeekdayStat(weekday: $0, count: weekdayCount[$0, default: 0])
+        }
+
+        let timeSlotStats = TimeSlot.allCases.map {
+            TimeSlotStat(slot: $0, count: timeSlotCount[$0, default: 0])
+        }
+
+        return TimePatternStat(
+            weekdayStats: weekdayStats,
+            timeSlotStats: timeSlotStats
+        )
+    }
 }

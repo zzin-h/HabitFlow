@@ -100,4 +100,17 @@ final class StatisticsChartsRepositoryImpl: StatisticsChartsRepository {
         }
         .eraseToAnyPublisher()
     }
+    
+    func fetchTimePatternStat() -> AnyPublisher<TimePatternStat, Error> {
+        Future { [weak self] promise in
+            guard let self else { return }
+            do {
+                let timePatternStat = try self.storage.fetchTimePatternStat()
+                promise(.success(timePatternStat))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
 }

@@ -83,12 +83,22 @@ struct TotalTimeStat: Identifiable {
     let category: HabitCategory
 }
 
-//// 6. 날짜 기반 통계
-//struct TimePatternStat {
-//    let weekdayStats: [(weekday: Weekdays, count: Int)]
-//    let timeSlotStats: [(slot: String, count: Int)]
-//}
-//
+struct WeekdayStat: Identifiable {
+    let id = UUID()
+    let weekday: Weekdays
+    let count: Int
+}
+
+struct TimeSlotStat: Identifiable {
+    let id = UUID()
+    let slot: TimeSlot
+    let count: Int
+}
+
+struct TimePatternStat {
+    let weekdayStats: [WeekdayStat]
+    let timeSlotStats: [TimeSlotStat]
+}
 //// 7. 통계 요약 카드
 //struct SummaryReport {
 //    let totalCompleted: Int
