@@ -30,17 +30,38 @@ struct TodayHabitView: View {
                     
                     WeeklyCalendarView(viewModel: viewModel, selectedDate: $selectedDate)
                     
+                    if !helperMessage.isEmpty {
+                        Text(helperMessage)
+                            .font(.footnote)
+                            .foregroundColor(.primary)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color(.systemGray6))
+                                    .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
+                            .padding(.top, 5)
+                    }
+                    
                     List {
                         Section(header: Text("📋 해야 할 습관")) {
                             ForEach(viewModel.todos) { habit in
                                 if let goal = habit.goalMinutes {
+                                    let isToday = Calendar.current.isDateInToday(selectedDate)
                                     
                                     Button {
-                                        if goal != 0 {
-                                            selectedHabit = habit
-                                            showingTimer = true
-                                        } else {
-                                            viewModel.markHabitCompleted(habit)
+                                        if isToday {
+                                            if goal != 0 {
+                                                selectedHabit = habit
+                                                showingTimer = true
+                                            } else {
+                                                viewModel.markHabitCompleted(habit)
+                                            }
                                         }
                                     } label: {
                                         HStack {
@@ -52,7 +73,9 @@ struct TodayHabitView: View {
                                                     .foregroundColor(.gray)
                                             }
                                         }
+                                        .opacity(isToday ? 1 : 0.7)
                                     }
+                                    .disabled(!isToday)
                                 }
                             }
                         }
@@ -125,6 +148,17 @@ struct TodayHabitView: View {
                     )
                 }
             }
+        }
+    }
+    
+    private var helperMessage: String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(selectedDate) {
+            return ""
+        } else if selectedDate < calendar.startOfDay(for: Date()) {
+            return "오늘의 습관만 완료할 수 있어요 \n 지난 날의 습관이에요"
+        } else {
+            return "오늘의 습관만 완료할 수 있어요 \n 앞으로 해야할 습관이에요"
         }
     }
 }
