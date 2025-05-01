@@ -35,6 +35,9 @@ final class StatisticsChartViewModel: ObservableObject {
     @Published var top3Weekdays: [WeekdayStat] = []
     @Published var top3TimeSlots: [TimeSlotStat] = []
     
+    @Published var routineSummary: RoutineSummary?
+    @Published var isTodayMonday: Bool = false
+    
     @Published var errorMessage: String?
     
     // MARK: - Use Cases
@@ -45,6 +48,7 @@ final class StatisticsChartViewModel: ObservableObject {
     private let fetchBestHabitsWithCategoryUseCase: FetchBestHabitsWithCategoryUseCase
     private let fetchTotalTimeStatUseCase: FetchTotalTimeStatUseCase
     private let fetchTimePatternStatUseCase: FetchTimePatternStatUseCase
+    private let fetchSummaryUseCase: FetchSummaryUseCase
     
     private let categoryDisplayOrder: [HabitCategory] = [
         .healthyIt,
@@ -64,7 +68,8 @@ final class StatisticsChartViewModel: ObservableObject {
         fetchCategoryStatsUseCase: FetchCategoryStatsUseCase,
         fetchBestHabitsWithCategoryUseCase: FetchBestHabitsWithCategoryUseCase,
         fetchTotalTimeStatUseCase: FetchTotalTimeStatUseCase,
-        fetchTimePatternStatUseCase: FetchTimePatternStatUseCase
+        fetchTimePatternStatUseCase: FetchTimePatternStatUseCase,
+        fetchSummaryUseCase: FetchSummaryUseCase
     ) {
         self.fetchTotalCompletedStatsUseCase = fetchTotalCompletedStatsUseCase
         self.fetchActiveDaysStatUseCase = fetchActiveDaysStatUseCase
@@ -73,6 +78,7 @@ final class StatisticsChartViewModel: ObservableObject {
         self.fetchBestHabitsWithCategoryUseCase = fetchBestHabitsWithCategoryUseCase
         self.fetchTotalTimeStatUseCase = fetchTotalTimeStatUseCase
         self.fetchTimePatternStatUseCase = fetchTimePatternStatUseCase
+        self.fetchSummaryUseCase = fetchSummaryUseCase
     }
     
     // MARK: - TotalCompleted
@@ -509,9 +515,6 @@ final class StatisticsChartViewModel: ObservableObject {
                     .sorted { $0.duration > $1.duration }
                     .prefix(3)
                     .map { $0 }
-                
-                print(totalTimeStats)
-                print(top3DurationHabits)
             }
             .store(in: &cancellables)
     }
@@ -541,7 +544,29 @@ final class StatisticsChartViewModel: ObservableObject {
             }
             .store(in: &cancellables)
     }
+    
+    // MARK: - Summary
+    func loadSummary(for period: Period) {
+        fetchSummaryUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorMessage = error.localizedDescription
+                }
+            } receiveValue: { [weak self] summaryTexts in
+                guard let self = self else { return }
+                
+                self.routineSummary = summaryTexts
+            }
+            .store(in: &cancellables)
+    }
+    
+    func checkIfTodayIsWeeklySummaryDay() {
+        let today = Date()
+        isTodayMonday = calendar.component(.weekday, from: today) == 2
+    }
 }
+
 // MARK: - extension
 extension StatisticsChartViewModel {
     var todayCompletedByCategory: [HabitCategory: [String]] {

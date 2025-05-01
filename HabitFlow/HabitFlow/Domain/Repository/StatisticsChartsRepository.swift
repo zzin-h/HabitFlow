@@ -16,4 +16,5 @@ protocol StatisticsChartsRepository {
     func fetchBestHabitsWithCategory() -> AnyPublisher<[String: (count: Int, category: HabitCategory)], Error>
     func fetchTotalTimeStat() -> AnyPublisher<[TotalTimeStat], Error>
     func fetchTimePatternStat() -> AnyPublisher<TimePatternStat, Error>
+    func fetchSummary() -> AnyPublisher<RoutineSummary, Error>
 }

@@ -113,4 +113,17 @@ final class StatisticsChartsRepositoryImpl: StatisticsChartsRepository {
         }
         .eraseToAnyPublisher()
     }
+    
+    func fetchSummary() -> AnyPublisher<RoutineSummary, Error> {
+        Future { [weak self] promise in
+            guard let self else { return }
+            do {
+                let summary = try self.storage.fetchSummary(for: Period.weekly(Date()))
+                promise(.success(summary))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
 }

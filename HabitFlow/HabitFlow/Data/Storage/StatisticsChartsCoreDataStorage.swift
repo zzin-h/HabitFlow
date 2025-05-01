@@ -216,4 +216,64 @@ final class StatisticsChartsCoreDataStorage {
             timeSlotStats: timeSlotStats
         )
     }
+    
+    // MARK: - 통계 요약 카드
+    func fetchSummary(for period: Period) throws -> RoutineSummary {
+        let dateRange = period.dateRange
+
+        let request: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()
+        request.predicate = NSPredicate(
+            format: "date >= %@ AND date < %@",
+            dateRange.lowerBound as NSDate,
+            dateRange.upperBound as NSDate
+        )
+
+        let records = try context.fetch(request)
+
+        var routineIdSet: Set<UUID> = []
+        var routineFreq: [String: Int] = [:]
+        var weekdayFreq: [Weekdays: Int] = [:]
+        var timeSlotFreq: [TimeSlot: Int] = [:]
+        var totalDuration: TimeInterval = 0
+
+        for record in records {
+            if let id = record.habit?.id {
+                routineIdSet.insert(id)
+            }
+
+            if let name = record.habit?.title {
+                routineFreq[name, default: 0] += 1
+            }
+
+            if let date = record.date {
+                if let weekday = Weekdays.from(date: date) {
+                    weekdayFreq[weekday, default: 0] += 1
+                }
+
+                let hour = Calendar.current.component(.hour, from: date)
+                if let slot = TimeSlot.slot(for: hour) {
+                    timeSlotFreq[slot, default: 0] += 1
+                }
+            }
+
+            totalDuration += Double(record.duration)
+        }
+        
+        let maxRoutineCount = routineFreq.values.max() ?? 0
+        let topRoutineNames = routineFreq
+            .filter { $0.value == maxRoutineCount }
+            .map { $0.key }
+
+        let topWeekday = weekdayFreq.max { $0.value < $1.value }?.key
+        let topTimeSlot = timeSlotFreq.max { $0.value < $1.value }?.key
+
+        return RoutineSummary(
+            routineCount: routineIdSet.count,
+            totalCount: records.count,
+            topRoutineName: topRoutineNames,
+            topWeekday: topWeekday,
+            topTimeSlot: topTimeSlot,
+            totalDuration: Int(totalDuration)
+        )
+    }
 }

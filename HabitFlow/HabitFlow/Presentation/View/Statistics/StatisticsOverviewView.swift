@@ -9,16 +9,27 @@ import SwiftUI
 
 struct StatisticsOverviewView: View {
     @StateObject private var viewModel: StatisticsViewModel
+    @StateObject private var chartViewModel: StatisticsChartViewModel
     @State private var selectedDetailType: StatisticsDetailType?
     
-    init(viewModel: StatisticsViewModel = StatisticsDIContainer().makeStatisticsViewModel()) {
+    init(viewModel: StatisticsViewModel = StatisticsDIContainer().makeStatisticsViewModel(),
+         chartViewModel: StatisticsChartViewModel = StatisticsChartsDIContainer().makeStatisticsChartViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        _chartViewModel = StateObject(wrappedValue: chartViewModel)
     }
     
     var body: some View {
         NavigationStack {
             ScrollView {
                 LazyVStack(spacing: 16) {
+                    if chartViewModel.isTodayMonday {
+                        RoutineSummaryView()
+                    } else {
+                        NavigationLink(destination: RoutineSummaryView()) {
+                            Text("RoutineSummary")
+                        }
+                    }
+                    
                     NavigationLink(destination: TotalCompletedChartView()) {
                         Text("total completed")
                     }
@@ -105,6 +116,8 @@ struct StatisticsOverviewView: View {
             //            }
             .onAppear {
                 viewModel.loadStatistics()
+                checkIfTodayNeedsSummaryUpdate()
+                
             }
         }
     }
@@ -123,6 +136,19 @@ struct StatisticsOverviewView: View {
             return "내맘잇"
         default:
             return "없음"
+        }
+    }
+    
+    private func checkIfTodayNeedsSummaryUpdate() {
+        let today = Date()
+        let calendar = Calendar.current
+        
+        let isMonday = calendar.component(.weekday, from: today) == 2
+
+        if isMonday {
+            let lastWeek = calendar.date(byAdding: .weekOfYear, value: -1, to: today)!
+            let period = Period.weekly(lastWeek)
+            chartViewModel.loadSummary(for: period)
         }
     }
 }

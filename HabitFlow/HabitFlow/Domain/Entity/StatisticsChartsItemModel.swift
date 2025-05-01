@@ -99,11 +99,12 @@ struct TimePatternStat {
     let weekdayStats: [WeekdayStat]
     let timeSlotStats: [TimeSlotStat]
 }
-//// 7. 통계 요약 카드
-//struct SummaryReport {
-//    let totalCompleted: Int
-//    let totalTime: TimeInterval
-//    let bestHabit: String
-//    let frequentDay: String
-//    let frequentTimeSlot: String
-//}
+
+struct RoutineSummary {
+    let routineCount: Int
+    let totalCount: Int
+    let topRoutineName: [String]
+    let topWeekday: Weekdays?
+    let topTimeSlot: TimeSlot?
+    let totalDuration: Int
+}
