@@ -50,6 +50,10 @@ final class StatisticsChartsDIContainer {
         DefaultFetchTimePatternStatUseCase(repository: statisticsChartsRepository)
     }
     
+    func makeFetchSummaryUseCase() -> FetchSummaryUseCase {
+        DefaultFetchSummaryUseCase(repository: statisticsChartsRepository)
+    }
+    
     // MARK: - ViewModel
     func makeStatisticsChartViewModel() -> StatisticsChartViewModel {
         return StatisticsChartViewModel(
@@ -59,7 +63,8 @@ final class StatisticsChartsDIContainer {
             fetchCategoryStatsUseCase: makeFetchCategoryStatsUseCase(),
             fetchBestHabitsWithCategoryUseCase: makeFetchBestHabitsWithCategoryUseCase(),
             fetchTotalTimeStatUseCase: makeFetchTotalTimeStatUseCase(),
-            fetchTimePatternStatUseCase: makeFetchTimePatternStatUseCase()
+            fetchTimePatternStatUseCase: makeFetchTimePatternStatUseCase(),
+            fetchSummaryUseCase: makeFetchSummaryUseCase()
         )
     }
 }

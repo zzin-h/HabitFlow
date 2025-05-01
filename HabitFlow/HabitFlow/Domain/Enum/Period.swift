@@ -19,16 +19,20 @@ enum Period: Hashable {
             return calendar.startOfDay(for: start)...calendar.startOfDay(for: end)
             
         case .weekly(let date):
-            let weekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: date))!
-            let weekEnd = calendar.date(byAdding: .day, value: 7, to: weekStart)!
-            return weekStart...weekEnd
+            let weekday = calendar.component(.weekday, from: date)
+            let daysToSubtract = weekday == 1 ? 7 : weekday - 1
+            let thisWeekStart = calendar.date(byAdding: .day, value: -daysToSubtract, to: calendar.startOfDay(for: date))!
+            let lastWeekStart = calendar.date(byAdding: .day, value: -7, to: thisWeekStart)!
+            let lastWeekEnd = calendar.date(byAdding: .day, value: 7, to: lastWeekStart)!
+            return lastWeekStart...lastWeekEnd
             
         case .monthly(let year, let month):
-            var components = DateComponents(year: year, month: month)
-            let start = calendar.date(from: components)!
-            components.month! += 1
-            let end = calendar.date(from: components)!
-            return start...end
+            var currentMonthComponents = DateComponents(year: year, month: month)
+            let thisMonthStart = calendar.date(from: currentMonthComponents)!
+            let lastMonthEnd = thisMonthStart
+            currentMonthComponents.month! -= 1
+            let lastMonthStart = calendar.date(from: currentMonthComponents)!
+            return lastMonthStart...lastMonthEnd
         }
     }
 }

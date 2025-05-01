@@ -21,6 +21,8 @@ struct HabitAddEditView: View {
     @State private var intervalDays: String = "1"
     @State private var goalMinutes: String = "10"
     @State private var hasGoal: Bool = true
+    
+    var onSave: (() -> Void)?
 
     var body: some View {
         NavigationStack {
@@ -84,6 +86,7 @@ struct HabitAddEditView: View {
                                 updateHabit(habit)
                             } else {
                                 addHabit()
+                                onSave?()
                             }
                             dismiss()
                         }

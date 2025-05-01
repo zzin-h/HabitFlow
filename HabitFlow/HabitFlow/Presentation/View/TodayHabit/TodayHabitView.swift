@@ -9,14 +9,18 @@ import SwiftUI
 
 struct TodayHabitView: View {
     @StateObject private var viewModel: TodayHabitViewModel
+    @StateObject private var habitListViewModel: HabitListViewModel
     
-    init(viewModel: TodayHabitViewModel = TodayHabitDIContainer().makeTodayHabitViewModel()) {
+    init(viewModel: TodayHabitViewModel = TodayHabitDIContainer().makeTodayHabitViewModel(),
+         habitListViewModel: HabitListViewModel = HabitListDIContainer().makeHabitListViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        _habitListViewModel = StateObject(wrappedValue: habitListViewModel)
     }
     
     @State private var selectedDate: Date = Date()
     @State private var showingTimer = false
     @State private var selectedHabit: HabitModel?
+    @State private var isSheetPresented: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -73,12 +77,35 @@ struct TodayHabitView: View {
                         }
                     }
                     .listStyle(.insetGrouped)
+                    
+                    Button(action: {
+                        isSheetPresented = true
+                    }) {
+                        Circle()
+                            .frame(width: 50, height: 50)
+                            .foregroundStyle(.blue)
+                            .overlay {
+                                Image(systemName: "plus")
+                                    .foregroundColor(.white)
+                            }
+                    }
                 }
                 .onAppear {
+                    habitListViewModel.fetchHabits()
                     viewModel.loadHabits(for: selectedDate)
                 }
                 .onChange(of: selectedDate) { newDate in
                     viewModel.loadHabits(for: newDate)
+                    habitListViewModel.fetchHabits()
+                }
+                .sheet(isPresented: $isSheetPresented) {
+                    HabitAddEditView(
+                        viewModel: habitListViewModel,
+                        onSave: {
+                            isSheetPresented = false
+                            viewModel.loadHabits(for: selectedDate)
+                        }
+                    )
                 }
             }
             .animation(.easeInOut(duration: 0.3), value: showingTimer)
