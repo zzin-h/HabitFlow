@@ -12,7 +12,7 @@ struct WeeklyCalendarView: View {
     @Binding var selectedDate: Date
     
     private let calendar = Calendar.current
-    private let totalDays = 35
+    private let totalDays = 21
     private var centerIndex: Int { totalDays / 2 }
     
     private var dateRange: [Date] {
@@ -27,8 +27,11 @@ struct WeeklyCalendarView: View {
     var body: some View {
         VStack(alignment: .center, spacing: 10) {
             Text(formattedToday)
-                .font(.headline)
+                .font(.subheadline)
+                .bold()
+                .foregroundStyle(.textPrimary)
                 .padding(.horizontal)
+                .padding(.bottom, 6)
             
             ScrollViewReader { scrollProxy in
                 GeometryReader { geometry in
@@ -40,24 +43,31 @@ struct WeeklyCalendarView: View {
                                 VStack {
                                     Text(date.weekdayShortSymbol())
                                         .font(.caption)
-                                        .foregroundColor(.gray)
+                                        .foregroundColor(
+                                            calendar.isDate(selectedDate, inSameDayAs: date)
+                                            ? .white
+                                            : .textPrimary
+                                        )
                                     
                                     Text("\(calendar.component(.day, from: date))")
                                         .fontWeight(.semibold)
-                                        .frame(width: 36, height: 36)
-                                        .background(
+                                        .frame(width: 40, height: 24)
+                                        .foregroundColor(
+                                            calendar.isDate(selectedDate, inSameDayAs: date)
+                                            ? .white
+                                            : .textPrimary
+                                        )
+                                }
+                                .padding(.vertical, 8)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(
                                             calendar.isDate(selectedDate, inSameDayAs: date)
                                             ? Color.accentColor
                                             : Color.gray.opacity(0.2)
                                         )
-                                        .foregroundColor(
-                                            calendar.isDate(selectedDate, inSameDayAs: date)
-                                            ? .white
-                                            : .primary
-                                        )
-                                        .clipShape(Circle())
-                                }
-                                .frame(width: itemWidth)
+                                        .frame(width: itemWidth)
+                                )
                                 .onTapGesture {
                                     selectedDate = date
                                 }
@@ -73,10 +83,6 @@ struct WeeklyCalendarView: View {
                 .frame(height: 60)
             }
         }
-        .padding(.vertical)
-        .background(Color.white)
-        .cornerRadius(12)
-        .shadow(radius: 3)
     }
     
     private var formattedToday: String {

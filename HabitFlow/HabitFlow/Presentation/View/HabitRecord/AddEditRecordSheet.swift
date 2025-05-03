@@ -36,10 +36,22 @@ struct AddEditRecordSheet: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
-                Section(header: Text("완료 시각")) {
-                    DatePicker("날짜 및 시간", selection: $selectedDate, displayedComponents: [.date, .hourAndMinute])
+                Section(header: Text("완료일")) {
+                    DatePicker(
+                        "날짜",
+                        selection: $selectedDate,
+                        in: ...Date(),
+                        displayedComponents: .date
+                    )
+                    .padding(.vertical, 2)
+                    
+                    DatePicker(
+                        "시각",
+                        selection: $selectedDate,
+                        displayedComponents: .hourAndMinute
+                    )
                 }
 
                 if habit.goalMinutes! > 0 {
@@ -49,7 +61,7 @@ struct AddEditRecordSheet: View {
                     }
                 }
             }
-            .navigationTitle(existingRecord != nil ? "기록 수정" : "기록 추가")
+            .navigationTitle(existingRecord != nil ? "기록" : "새로운 기록")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -59,7 +71,7 @@ struct AddEditRecordSheet: View {
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("저장") {
+                    Button(existingRecord != nil ? "수정" : "추가") {
                         saveRecord()
                     }
                     .disabled(!isValid)
@@ -69,7 +81,7 @@ struct AddEditRecordSheet: View {
     }
 
     private var isValid: Bool {
-        if habit.goalMinutes != nil {
+        if habit.goalMinutes ?? 0 > 0 {
             return Int(durationMinutes) != nil
         }
         return true

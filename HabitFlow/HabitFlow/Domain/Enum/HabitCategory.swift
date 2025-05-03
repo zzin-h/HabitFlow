@@ -22,11 +22,11 @@ enum HabitCategory: String, Codable, CaseIterable {
 
     var color: Color {
         switch self {
-        case .healthyIt: return .green
-        case .canDoIt: return .blue
-        case .moneyIt: return .yellow
-        case .greenIt: return .mint
-        case .myMindIt: return .pink
+        case .healthyIt: return Color(red: 116/255, green: 178/255, blue: 183/255)
+        case .canDoIt: return Color(red: 234/255, green: 140/255, blue: 47/255)
+        case .moneyIt: return Color(red: 255/255, green: 186/255, blue: 73/255)
+        case .greenIt: return Color(red: 98/255, green: 168/255, blue: 124/255)
+        case .myMindIt: return Color(red: 201/255, green: 79/255, blue: 83/255)
         }
     }
 }

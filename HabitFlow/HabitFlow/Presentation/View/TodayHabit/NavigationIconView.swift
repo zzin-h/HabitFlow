@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NavigationIconView: View {
     var body: some View {
-        HStack(spacing: 30) {
+        HStack(spacing: 20) {
             Spacer()
             
             NavigationLink(destination: HabitListView()) {
@@ -23,12 +23,7 @@ struct NavigationIconView: View {
             NavigationLink(destination: HabitListView()) {
                 Image(systemName: "gearshape")
             }
-            
-            Spacer()
         }
         .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
-        .padding(.horizontal)
     }
 }
