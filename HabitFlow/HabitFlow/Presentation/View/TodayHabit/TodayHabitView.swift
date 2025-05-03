@@ -166,7 +166,8 @@ struct TodayHabitView: View {
                             }
                         ),
                         showingTimer: $showingTimer,
-                        habitTitle: habit.title
+                        habitTitle: habit.title,
+                        category: habit.category
                     )
                 }
             }

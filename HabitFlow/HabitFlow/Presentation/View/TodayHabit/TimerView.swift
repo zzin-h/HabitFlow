@@ -14,19 +14,28 @@ struct TimerView: View {
     @Binding var showingTimer: Bool
     
     let habitTitle: String
+    let category: HabitCategory
     
     var body: some View {
         VStack {
             Text(habitTitle)
-                .font(.title)
-                .padding()
+                .font(.title.bold())
+                .foregroundStyle(Color.textPrimary)
+                .padding(.top, 32)
+            
+            Text("집중해서 완료해봐요!")
+                .font(.subheadline)
+                .foregroundStyle(Color.textSecondary)
+                .padding(.top, 16)
+            
+            Spacer()
             
             ZStack {
                 ProgressTrack()
                 
-                ProgressBar(counter: viewModel.remainingTime, countTo: viewModel.totalTime)
+                ProgressBar(counter: viewModel.remainingTime, countTo: viewModel.totalTime, category: category)
                 
-                Clock(counter: $viewModel.remainingTime, countTo: viewModel.totalTime) // 바인딩만 넘겨줌
+                Clock(counter: $viewModel.remainingTime, countTo: viewModel.totalTime, category: category)
             }
             .onTapGesture {
                 if viewModel.isRunning {
@@ -46,8 +55,10 @@ struct TimerView: View {
                 }) {
                     Image(systemName: viewModel.isRunning ? "pause.circle" : "play.circle")
                         .resizable()
-                        .frame(width: 50, height: 50)
+                        .frame(width: 70, height: 70)
                 }
+                
+                Spacer()
                 
                 Button(action: {
                     viewModel.reset()
@@ -55,10 +66,14 @@ struct TimerView: View {
                 }) {
                     Image(systemName: "xmark.circle")
                         .resizable()
-                        .frame(width: 50, height: 50)
+                        .frame(width: 70, height: 70)
                 }
             }
-            .padding()
+            .foregroundStyle(Color.textPrimary)
+            .padding(.horizontal, 48)
+            .padding(.bottom, 32)
+            
+            Spacer()
         }
         .alert(isPresented: $showAlert) {
             Alert(
@@ -79,9 +94,9 @@ private struct ProgressTrack: View {
     var body: some View {
         Circle()
             .fill(Color.clear)
-            .frame(width: 250, height: 250)
+            .frame(width: 300, height: 300)
             .overlay(
-                Circle().stroke(Color.black, lineWidth: 15)
+                Circle().stroke(Color.textPrimary, lineWidth: 15)
             )
     }
 }
@@ -89,11 +104,12 @@ private struct ProgressTrack: View {
 private struct ProgressBar: View {
     var counter: Int
     var countTo: Int
+    let category: HabitCategory
     
     var body: some View {
         Circle()
             .fill(Color.clear)
-            .frame(width: 250, height: 250)
+            .frame(width: 300, height: 300)
             .overlay(
                 Circle().trim(from: 0, to: progress())
                     .stroke(
@@ -103,7 +119,7 @@ private struct ProgressBar: View {
                             lineJoin: .round
                         )
                     )
-                    .foregroundColor(completed() ? Color.green : Color.orange)
+                    .foregroundColor(completed() ? Color.green : category.color)
                     .rotationEffect(.degrees(-90))
                     .animation(.linear(duration: 1))
             )
@@ -120,13 +136,15 @@ private struct ProgressBar: View {
 
 private struct Clock: View {
     @Binding var counter: Int
+    
     var countTo: Int
+    let category: HabitCategory
     
     var body: some View {
         VStack {
             Text(counterToMinutes())
-                .font(.custom("Avenir Next", size: 60))
-                .fontWeight(.black)
+                .font(.system(size: 65, weight: .bold, design: .rounded))
+                .foregroundStyle(category.color)
         }
     }
     
