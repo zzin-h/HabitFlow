@@ -103,7 +103,6 @@ struct TodayHabitView: View {
                                     Text("완료한 습관 (\(viewModel.completed.count))")
                                         .foregroundStyle(Color.textPrimary)
                                     Image(systemName: isDoneList ? "chevron.up" : "chevron.down")
-                                        .foregroundStyle(Color.primaryColor)
                                 }
                                 .font(.subheadline.bold())
                                 .padding()
@@ -134,7 +133,6 @@ struct TodayHabitView: View {
                 }) {
                     Circle()
                         .frame(width: 50, height: 50)
-                        .foregroundStyle(Color.primaryColor)
                         .overlay {
                             Image(systemName: "plus")
                                 .font(.title2.bold())
@@ -210,7 +208,11 @@ private struct HabitCardView: View {
                 Spacer()
                 
                 if let goal = habit.goalMinutes, goal > 0 {
-                    Text("\(goal)분 ⏰")
+                    HStack {
+                        Text("\(goal)분")
+                        Image(systemName: "clock.fill")
+                            .padding(-4)
+                    }
                         .font(.caption)
                         .foregroundStyle(Color.textSecondary)
                 }

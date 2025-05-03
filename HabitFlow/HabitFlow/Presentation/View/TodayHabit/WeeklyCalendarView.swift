@@ -63,7 +63,7 @@ struct WeeklyCalendarView: View {
                                     RoundedRectangle(cornerRadius: 10)
                                         .fill(
                                             calendar.isDate(selectedDate, inSameDayAs: date)
-                                            ? Color.primaryColor
+                                            ? Color.accentColor
                                             : Color.gray.opacity(0.2)
                                         )
                                         .frame(width: itemWidth)

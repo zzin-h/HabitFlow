@@ -24,7 +24,6 @@ struct NavigationIconView: View {
                 Image(systemName: "gearshape")
             }
         }
-        .foregroundStyle(Color.primaryColor)
         .padding()
     }
 }

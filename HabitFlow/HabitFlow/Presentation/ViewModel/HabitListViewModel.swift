@@ -92,4 +92,8 @@ final class HabitListViewModel: ObservableObject {
             } receiveValue: { _ in }
             .store(in: &cancellables)
     }
+    
+    var groupedHabitsByRoutine: [RoutineType: [HabitModel]] {
+        Dictionary(grouping: habits, by: { $0.routineType })
+    }
 }

@@ -29,7 +29,7 @@ struct HabitAddEditView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section(footer: Text("제목을 입력해주세요.").foregroundStyle(isEmptyTitle ? Color.accent : .clear)) {
+                Section(footer: Text("제목을 입력해주세요.").foregroundStyle(isEmptyTitle ? Color.primaryColor : .clear)) {
                     TextField("제목", text: $title)
                 }
                 
@@ -41,7 +41,7 @@ struct HabitAddEditView: View {
                     }
                 }
                 
-                Section(footer: Text("반복 주기를 입력해주세요").foregroundStyle(isEmptyRoutine ? Color.accent : .clear)) {
+                Section(footer: Text("반복 주기를 입력해주세요").foregroundStyle(isEmptyRoutine ? Color.primaryColor : .clear)) {
                     Picker("반복", selection: $routineType) {
                         ForEach(RoutineType.allCases, id: \.self) { type in
                             Text(type.title).tag(type)
@@ -64,7 +64,7 @@ struct HabitAddEditView: View {
                     MultipleDayPicker(selectedDays: $selectedDays)
                 }
                 
-                Section(footer: Text("목표 시간을 입력해주세요").foregroundStyle(isEmptyRoutine ? Color.accent : .clear)) {
+                Section(footer: Text("목표 시간을 입력해주세요").foregroundStyle(isEmptyRoutine ? Color.primaryColor : .clear)) {
                     Toggle("목표 시간", isOn: $hasGoal)
                     if hasGoal {
                         HStack {
@@ -90,7 +90,6 @@ struct HabitAddEditView: View {
                             dismiss()
                         }
                     }
-                    .foregroundStyle(Color.primaryColor)
                 }
                 
                 ToolbarItem(placement: .principal) {
@@ -102,7 +101,6 @@ struct HabitAddEditView: View {
                     Button("취소") {
                         dismiss()
                     }
-                    .foregroundStyle(Color.primaryColor)
                 }
             }
             .onAppear {
@@ -190,7 +188,7 @@ private struct MultipleDayPicker: View {
                         
                         Image(systemName: "checkmark")
                             .bold()
-                            .foregroundStyle(selectedDays.contains(day) ? Color.primaryColor : .clear)
+                            .foregroundStyle(selectedDays.contains(day) ? Color.accentColor : .clear)
                     }
                 }
             }
