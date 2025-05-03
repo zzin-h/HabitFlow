@@ -77,6 +77,8 @@ struct HabitAddEditView: View {
                     }
                 }
             }
+            .navigationTitle(editingHabit != nil ? "습관" : "새로운 습관")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(editingHabit != nil ? "수정" : "추가") {
@@ -90,11 +92,6 @@ struct HabitAddEditView: View {
                             dismiss()
                         }
                     }
-                }
-                
-                ToolbarItem(placement: .principal) {
-                    Text(editingHabit != nil ? "습관" : "새로운 습관")
-                        .bold()
                 }
                 
                 ToolbarItem(placement: .cancellationAction) {
