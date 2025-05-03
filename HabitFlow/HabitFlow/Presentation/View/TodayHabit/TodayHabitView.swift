@@ -144,6 +144,8 @@ struct TodayHabitView: View {
                 }
                 .offset(x: UIScreen.main.bounds.width / 2 - 60, y: UIScreen.main.bounds.height / 2 - 80)
             }
+            .navigationTitle("오늘의 습관")
+            .navigationBarHidden(true)
             .animation(.easeInOut(duration: 0.3), value: showingTimer)
             .sheet(isPresented: $isSheetPresented) {
                 HabitAddEditView(
