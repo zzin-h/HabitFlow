@@ -442,9 +442,6 @@ final class StatisticsChartViewModel: ObservableObject {
                     guard let stat = stats.first(where: { $0.category == category }) else { return nil }
                     return stat.totalCount > 0 ? stat : nil
                 }
-                
-                print(categoryStats)
-                print(categoryStatList)
             }
             .store(in: &cancellables)
     }
