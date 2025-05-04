@@ -21,97 +21,96 @@ struct StatisticsOverviewView: View {
     let columns = Array(repeating: GridItem(.flexible(minimum: 100, maximum: 200)), count: 2)
     
     var body: some View {
-            ScrollView {
+        ScrollView {
+            if chartViewModel.isTodayMonday {
+                RoutineSummaryView(lastweek: lastWeekDateRange)
+            }
+            
+            LazyVGrid(columns: columns, spacing: 8) {
+                StatisticsCardView(
+                    title: "완료한 습관",
+                    icon: "checkmark.circle.fill",
+                    value: ["총 \(viewModel.totalCompletedCount)회"],
+                    color: HabitCategory.healthyIt.color,
+                    actionView: .totalCompleted
+                )
                 
-//                if chartViewModel.isTodayMonday {
-//                    RoutineSummaryView()
-//                }
+                StatisticsCardView(
+                    title: "함께한 일수",
+                    icon: "calendar.circle.fill",
+                    value: ["총 \(viewModel.activeDays)일", "연속 \(viewModel.streakDays)일"],
+                    color: HabitCategory.canDoIt.color,
+                    actionView: .totalCompleted
+                )
                 
-                LazyVGrid(columns: columns, spacing: 8) {
-                    StatisticsCardView(
-                        title: "완료한 습관",
-                        icon: "checkmark.circle.fill",
-                        value: ["총 \(viewModel.totalCompletedCount)회"],
-                        color: HabitCategory.healthyIt.color,
-                        actionView: .totalCompleted
-                    )
-                    
-                    StatisticsCardView(
-                        title: "함께한 일수",
-                        icon: "calendar.circle.fill",
-                        value: ["총 \(viewModel.activeDays)일", "연속 \(viewModel.streakDays)일"],
-                        color: HabitCategory.canDoIt.color,
-                        actionView: .totalCompleted
-                    )
-                    
-                    StatisticsCardView(
-                        title: "관심 카테고리",
-                        icon: "tag.circle.fill",
-                        value: [convertToKorean(category: viewModel.favoriteCategory)],
-                        color: HabitCategory.moneyIt.color,
-                        actionView: .totalCompleted
-                    )
-                    
-                    StatisticsCardView(
-                        title: "베스트 습관",
-                        icon: "star.circle.fill",
-                        value: [viewModel.bestHabitTitle],
-                        color: HabitCategory.greenIt.color,
-                        actionView: .totalCompleted
-                    )
-                    
-                    StatisticsCardView(
-                        title: "함께한 시간",
-                        icon: "clock.fill",
-                        value: ["총 \(viewModel.totalTimeSpent / 60)시간 \(viewModel.totalTimeSpent % 60)분"],
-                        color: HabitCategory.myMindIt.color,
-                        actionView: .totalCompleted
-                    )
-                    
-                    StatisticsCardView(
-                        title: "최다 요일 및 시간대",
-                        icon: "hand.thumbsup.circle.fill",
-                        value: ["\(viewModel.mostFrequentDay)", "\(viewModel.mostFrequentTime)"],
-                        color: .indigo,
-                        actionView: .totalCompleted
-                    )
-                }
-                .padding()
+                StatisticsCardView(
+                    title: "관심 카테고리",
+                    icon: "tag.circle.fill",
+                    value: [convertToKorean(category: viewModel.favoriteCategory)],
+                    color: HabitCategory.moneyIt.color,
+                    actionView: .totalCompleted
+                )
                 
-                if !chartViewModel.isTodayMonday {
-                    NavigationLink(destination: RoutineSummaryView()) {
-                        HStack(alignment: .center) {
-                            Image(systemName: "lightbulb.circle.fill")
-                                .foregroundStyle(Color(red: 239/255, green: 136/255, blue: 173/255))
-                                .font(.largeTitle)
+                StatisticsCardView(
+                    title: "베스트 습관",
+                    icon: "star.circle.fill",
+                    value: [viewModel.bestHabitTitle],
+                    color: HabitCategory.greenIt.color,
+                    actionView: .totalCompleted
+                )
+                
+                StatisticsCardView(
+                    title: "함께한 시간",
+                    icon: "clock.fill",
+                    value: ["총 \(viewModel.totalTimeSpent / 60)시간 \(viewModel.totalTimeSpent % 60)분"],
+                    color: HabitCategory.myMindIt.color,
+                    actionView: .totalCompleted
+                )
+                
+                StatisticsCardView(
+                    title: "최다 요일 및 시간대",
+                    icon: "hand.thumbsup.circle.fill",
+                    value: ["\(viewModel.mostFrequentDay)", "\(viewModel.mostFrequentTime)"],
+                    color: .indigo,
+                    actionView: .totalCompleted
+                )
+            }
+            .padding()
+            
+            if !chartViewModel.isTodayMonday {
+                NavigationLink(destination: RoutineSummaryView(lastweek: lastWeekDateRange)) {
+                    HStack(alignment: .center) {
+                        Image(systemName: "lightbulb.circle.fill")
+                            .foregroundStyle(Color(red: 239/255, green: 136/255, blue: 173/255))
+                            .font(.largeTitle)
+                        
+                        VStack(alignment: .leading) {
+                            Text("주간 리포트")
+                                .font(.headline)
+                                .foregroundStyle(Color.textPrimary)
                             
-                            VStack(alignment: .leading) {
-                                Text("주간 리포트")
-                                    .font(.headline)
-                                    .foregroundStyle(Color.textPrimary)
-                                
-                                Text(lastWeekDateRange)
-                                    .font(.caption)
-                                    .foregroundStyle(Color.textSecondary)
-                            }
+                            Text(lastWeekDateRange)
+                                .font(.caption)
+                                .foregroundStyle(Color.textSecondary)
                         }
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.cardBg)
-                        .cornerRadius(12)
                     }
                     .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.cardBg)
+                    .cornerRadius(12)
                 }
-                
+                .padding()
             }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("습관 요약")
-            .navigationBarTitleDisplayMode(.inline)
-            .onAppear {
-                viewModel.loadStatistics()
-                checkIfTodayNeedsSummaryUpdate()
-                
-            }
+            
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("습관 요약")
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            viewModel.loadStatistics()
+            checkIfTodayNeedsSummaryUpdate()
+            
+        }
     }
     
     private func convertToKorean(category: String) -> String {
@@ -136,7 +135,7 @@ struct StatisticsOverviewView: View {
         let calendar = Calendar.current
         
         let isMonday = calendar.component(.weekday, from: today) == 2
-
+        
         if isMonday {
             let lastWeek = calendar.date(byAdding: .weekOfYear, value: -1, to: today)!
             let period = Period.weekly(lastWeek)

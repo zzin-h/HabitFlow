@@ -11,31 +11,137 @@ struct RoutineSummaryView: View {
     @StateObject private var viewModel: StatisticsChartViewModel
     @State private var period: Period = .weekly(Date())
     
-    init(viewModel: StatisticsChartViewModel = StatisticsChartsDIContainer().makeStatisticsChartViewModel()) {
+    let lastweek: String
+    
+    init(viewModel: StatisticsChartViewModel = StatisticsChartsDIContainer().makeStatisticsChartViewModel(),
+         lastweek: String) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.lastweek = lastweek
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack {
             if let summary = viewModel.routineSummary {
-                Text("\(period.labelText) \(summary.routineCount)개의 루틴을 \(summary.totalCount)회 실천했어요!")
-                
-                let name = summary.topRoutineName.joined(separator: ", ")
-                Text("가장 많이 실천한 습관은 \(name) 💪")
-                
-                if let weekday = summary.topWeekday, let time = summary.topTimeSlot {
-                    Text("주로 \(weekday.koreanTitle) \(time.title)에 활발했어요!")
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(alignment: .center) {
+                        Image(systemName: "pin.fill")
+                            .font(.title3)
+                            .foregroundStyle(Color.primaryColor)
+                            .rotationEffect(.degrees(320))
+                        
+                        Text("지난주 리포트")
+                        
+                        Spacer()
+                        
+                        Text(lastweek)
+                            .font(.subheadline)
+                            .foregroundStyle(Color.textSecondary)
+                    }
+                    .font(.title2.bold())
+                    .foregroundStyle(Color.textPrimary)
+                    
+                    HStack(alignment: .center) {
+                        Spacer()
+                        
+                        Text("매주 월요일마다 리포트가 갱신됩니다")
+                            .font(.caption)
+                            .foregroundStyle(Color(.systemGray2))
+                        
+                        Spacer()
+                    }
+                    .padding(.vertical, 8)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(alignment: .center, spacing: 0) {
+                            Image(systemName: "lightbulb.max.fill")
+                                .font(.caption)
+                                .foregroundStyle(Color.secondaryColor)
+                                .padding(.trailing, 8)
+                            
+                            Text("한 주간 ")
+                            Text("\(summary.routineCount)개")
+                                .bold()
+                            Text("의 습관을 ")
+                            Text("\(summary.totalCount)회 ")
+                                .bold()
+                            Text("실천했어요.")
+                        }
+                        
+                        HStack(alignment: .center, spacing: 0) {
+                            Image(systemName: "lightbulb.max.fill")
+                                .font(.caption)
+                                .foregroundStyle(Color.secondaryColor)
+                                .padding(.trailing, 8)
+                            
+                            Text("가장 많이 실천한 습관은")
+                        }
+                        
+                        let titles = summary.topRoutineName
+                        VStack(alignment: .leading, spacing: 8) {
+                            ForEach(0..<min(titles.count, 2), id: \.self) { index in
+                                HStack {
+                                    Circle()
+                                        .frame(width: 6, height: 6)
+                                        .foregroundStyle(Color.accentColor)
+                                    Text(titles[index])
+                                        .bold()
+                                }
+                            }
+                        }
+                        .padding(.leading, 24)
+                        .padding(.vertical, 6)
+                        
+                        if let weekday = summary.topWeekday, let time = summary.topTimeSlot {
+                            HStack(alignment: .center, spacing: 0) {
+                                Image(systemName: "lightbulb.max.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(Color.secondaryColor)
+                                    .padding(.trailing, 8)
+                                
+                                Text("주로 ")
+                                Text("\(weekday.koreanTitle)요일, \(time.title)")
+                                    .bold()
+                                Text("에 수행했어요.")
+                            }
+                        }
+                        
+                        if formatHour(summary.totalDuration) > 0 {
+                            HStack(alignment: .center, spacing: 0) {
+                                Image(systemName: "lightbulb.max.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(Color.secondaryColor)
+                                    .padding(.trailing, 8)
+                                
+                                Text("총 ")
+                                Text("\(formatHour(summary.totalDuration))시간 \(formatMin(summary.totalDuration))분")
+                                    .bold()
+                                Text(" 동안 나를 위한 시간을 가졌어요.")
+                            }
+                        }
+                    }
+                    .padding(.vertical, 8)
                 }
-                
-                if formatHour(summary.totalDuration) > 0 {
-                    Text("총 \(formatHour(summary.totalDuration))시간 \(formatMin(summary.totalDuration))분 동안 자신을 위해 썼어요.")
-                } else {
-                    Text("총 \(formatMin(summary.totalDuration))분 동안 자신을 위해 썼어요.")
-                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.cardBg)
+                .cornerRadius(16)
             } else {
-                Text("충분한 데이터가 없어요!")
+                HStack(alignment: .center) {
+                    Spacer()
+                    
+                    Text("충분한 데이터가 없습니다")
+                        .bold()
+                        .foregroundStyle(Color.textSecondary)
+                    
+                    Spacer()
+                }
             }
+            
+            Spacer()
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color(.systemGroupedBackground))
         .onAppear{
             viewModel.loadSummary(for: period)
         }
