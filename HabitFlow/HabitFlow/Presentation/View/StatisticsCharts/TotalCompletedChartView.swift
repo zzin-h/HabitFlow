@@ -117,7 +117,7 @@ private struct ChangeStatsView: View {
         let monthlyAnalysis = viewModel.generateMonthlyAnalysis()
         
         VStack(alignment: .leading, spacing: 4) {
-            if viewModel.previousCompletedStats.isEmpty {
+            if viewModel.completedStats.isEmpty {
                 Text("아직 충분한 기록이 없어요")
                     .foregroundStyle(Color.textSecondary)
             } else {

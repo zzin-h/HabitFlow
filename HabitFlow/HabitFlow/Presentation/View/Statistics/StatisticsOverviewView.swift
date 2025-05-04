@@ -108,6 +108,7 @@ struct StatisticsOverviewView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             viewModel.loadStatistics()
+            chartViewModel.checkIfTodayIsWeeklySummaryDay()
             checkIfTodayNeedsSummaryUpdate()
             
         }
@@ -147,14 +148,15 @@ struct StatisticsOverviewView: View {
         let calendar = Calendar.current
         let now = Date()
         
-        let endOfLastWeek = calendar.date(byAdding: .weekOfYear, value: -1, to: now)!
-        let startOfLastWeek = calendar.date(byAdding: .weekOfYear, value: -2, to: now)!
+        let weekday = calendar.component(.weekday, from: now)
+        let daysSinceMonday = (weekday + 5) % 7
+        let thisMonday = calendar.date(byAdding: .day, value: -daysSinceMonday, to: calendar.startOfDay(for: now))!
+        let lastMonday = calendar.date(byAdding: .day, value: -7, to: thisMonday)!
+        let lastSunday = calendar.date(byAdding: .day, value: 6, to: lastMonday)!
         
         let formatter = DateFormatter()
         formatter.dateFormat = "M월 d일"
         
-        let lastRange = "\(formatter.string(from: startOfLastWeek)) ~ \(formatter.string(from: endOfLastWeek))"
-        
-        return lastRange
+        return "\(formatter.string(from: lastMonday)) ~ \(formatter.string(from: lastSunday))"
     }
 }
