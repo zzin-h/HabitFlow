@@ -105,10 +105,18 @@ final class StatisticsChartViewModel: ObservableObject {
                     endDate = calendar.startOfDay(for: endOfLastWeek)
                     
                 case .oneMonth:
-                    let lastMonth = calendar.date(byAdding: .month, value: -1, to: now)!
-                    startDate = calendar.date(from: calendar.dateComponents([.year, .month], from: lastMonth))!
-                    endDate = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startDate)!
+                    let today = calendar.startOfDay(for: now)
+                    let endOfLast30Days = calendar.date(byAdding: .day, value: -30, to: today)!
+                    let startOfLast30Days = calendar.date(byAdding: .day, value: -59, to: today)!
+
+                    startDate = startOfLast30Days
+                    endDate = endOfLast30Days
                 }
+//                case .oneMonth:
+//                    let lastMonth = calendar.date(byAdding: .month, value: -1, to: now)!
+//                    startDate = calendar.date(from: calendar.dateComponents([.year, .month], from: lastMonth))!
+//                    endDate = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startDate)!
+//                }
                 
                 let dateList = self.generateDateList(from: startDate...endDate)
                 
@@ -217,24 +225,6 @@ final class StatisticsChartViewModel: ObservableObject {
         return "이번 주: \(currentRange) | 지난 주: \(lastRange)"
     }
     
-    func monthlyChangeDateRangeString() -> String {
-        let calendar = Calendar.current
-        let now = Date()
-        
-        let startOfThisMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
-        let lastMonth = calendar.date(byAdding: .month, value: -1, to: now)!
-        let startOfLastMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: lastMonth))!
-        let endOfLastMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startOfLastMonth)!
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "M/d"
-        
-        let thisMonthRange = "\(formatter.string(from: startOfThisMonth)) ~ \(formatter.string(from: now))"
-        let lastMonthRange = "\(formatter.string(from: startOfLastMonth)) ~ \(formatter.string(from: endOfLastMonth))"
-        
-        return "이번 달: \(thisMonthRange) | 지난 달: \(lastMonthRange)"
-    }
-    
     func generateWeeklyAnalysis() -> [String] {
         let weekly = calculateChangeFromPrevious(current: completedStats, previous: previousCompletedStats)
         
@@ -263,6 +253,41 @@ final class StatisticsChartViewModel: ObservableObject {
         }
         
         return analysis
+    }
+    
+//    func monthlyChangeDateRangeString() -> String {
+//        let calendar = Calendar.current
+//        let now = Date()
+//        
+//        let startOfThisMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
+//        let lastMonth = calendar.date(byAdding: .month, value: -1, to: now)!
+//        let startOfLastMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: lastMonth))!
+//        let endOfLastMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startOfLastMonth)!
+//        
+//        let formatter = DateFormatter()
+//        formatter.dateFormat = "M/d"
+//        
+//        let thisMonthRange = "\(formatter.string(from: startOfThisMonth)) ~ \(formatter.string(from: now))"
+//        let lastMonthRange = "\(formatter.string(from: startOfLastMonth)) ~ \(formatter.string(from: endOfLastMonth))"
+//        
+//        return "이번 달: \(thisMonthRange) | 지난 달: \(lastMonthRange)"
+//    }
+    func monthlyChangeDateRangeString() -> String {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+
+        let endOfLast30Days = calendar.date(byAdding: .day, value: -30, to: today)!
+        let startOfLast30Days = calendar.date(byAdding: .day, value: -59, to: today)!
+
+        let startOfThis30Days = calendar.date(byAdding: .day, value: -29, to: today)!
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M/d"
+
+        let thisMonthRange = "\(formatter.string(from: startOfThis30Days)) ~ \(formatter.string(from: today))"
+        let lastMonthRange = "\(formatter.string(from: startOfLast30Days)) ~ \(formatter.string(from: endOfLast30Days))"
+
+        return "최근 30일: \(thisMonthRange) | 그 전 30일: \(lastMonthRange)"
     }
     
     func generateMonthlyAnalysis() -> [String] {

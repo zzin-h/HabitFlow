@@ -92,18 +92,20 @@ struct TodayHabitView: View {
                         }
                     }
                     
-                    Button(action: {
-                        withAnimation {
-                            isDoneList.toggle()
+                    if !viewModel.completed.isEmpty {
+                        Button(action: {
+                            withAnimation {
+                                isDoneList.toggle()
+                            }
+                        }) {
+                            HStack {
+                                Text("완료한 습관 (\(viewModel.completed.count))")
+                                    .foregroundStyle(Color.textPrimary)
+                                Image(systemName: isDoneList ? "chevron.down" : "chevron.up")
+                            }
+                            .font(.subheadline.bold())
+                            .padding()
                         }
-                    }) {
-                        HStack {
-                            Text("완료한 습관 (\(viewModel.completed.count))")
-                                .foregroundStyle(Color.textPrimary)
-                            Image(systemName: isDoneList ? "chevron.down" : "chevron.up")
-                        }
-                        .font(.subheadline.bold())
-                        .padding()
                     }
                 }
                 .onAppear {

@@ -19,7 +19,7 @@ enum StatisticsDetailType: Hashable {
         case .favoriteCategory:
             return AnyView(FavoriteCategoryChartView())
         case .timeBasedStats:
-            return AnyView(TotalTimeChartView())
+            return AnyView(MostFrequentChartView())
         case .bestHabits:
             return AnyView(BestHabitChartView())
         case .totalTime:

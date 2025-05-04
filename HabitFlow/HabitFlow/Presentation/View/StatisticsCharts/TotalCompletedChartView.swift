@@ -44,13 +44,14 @@ struct TotalCompletedChartView: View {
             }
             .padding()
         }
+        .navigationTitle("완료한 습관")
         .onAppear {
             viewModel.loadCompletedStats()
         }
     }
 }
 
-struct TotalCompletedGraphView: View {
+private struct TotalCompletedGraphView: View {
     @ObservedObject var viewModel: StatisticsChartViewModel
     @Binding var selectedStat: TotalCompletedStat?
     @Binding var selectedPreset: PeriodPreset
@@ -100,7 +101,7 @@ struct TotalCompletedGraphView: View {
     }
 }
 
-struct AverageStatsView: View {
+private struct AverageStatsView: View {
     @Binding var selectedPreset: PeriodPreset
     
     let weekly: Double
@@ -122,7 +123,7 @@ struct AverageStatsView: View {
     }
 }
 
-struct ChangeStatsView: View {
+private struct ChangeStatsView: View {
     @ObservedObject var viewModel: StatisticsChartViewModel
     @Binding var selectedPreset: PeriodPreset
     

@@ -27,12 +27,17 @@ enum Period: Hashable {
             return lastWeekStart...lastWeekEnd
             
         case .monthly(let year, let month):
-            var currentMonthComponents = DateComponents(year: year, month: month)
-            let thisMonthStart = calendar.date(from: currentMonthComponents)!
-            let lastMonthEnd = thisMonthStart
-            currentMonthComponents.month! -= 1
-            let lastMonthStart = calendar.date(from: currentMonthComponents)!
-            return lastMonthStart...lastMonthEnd
+            let now = Date()
+            let day = Calendar.current.component(.day, from: now)
+            let currentMonthComponents = DateComponents(year: year, month: month, day: day)
+            
+            let calendar = Calendar.current
+            let thisMonthToday = calendar.date(from: currentMonthComponents) ?? calendar.date(from: DateComponents(year: year, month: month + 1, day: 0))!
+            
+            let endDate = calendar.startOfDay(for: thisMonthToday)
+            let startDate = calendar.date(byAdding: .day, value: -29, to: endDate)!
+            
+            return startDate...endDate
         }
     }
 }

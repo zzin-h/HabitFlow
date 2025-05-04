@@ -40,7 +40,7 @@ struct StatisticsOverviewView: View {
                     icon: "calendar.circle.fill",
                     value: ["총 \(viewModel.activeDays)일", "연속 \(viewModel.streakDays)일"],
                     color: HabitCategory.canDoIt.color,
-                    actionView: .totalCompleted
+                    actionView: .activeDays
                 )
                 
                 StatisticsCardView(
@@ -48,7 +48,7 @@ struct StatisticsOverviewView: View {
                     icon: "tag.circle.fill",
                     value: [convertToKorean(category: viewModel.favoriteCategory)],
                     color: HabitCategory.moneyIt.color,
-                    actionView: .totalCompleted
+                    actionView: .favoriteCategory
                 )
                 
                 StatisticsCardView(
@@ -56,7 +56,7 @@ struct StatisticsOverviewView: View {
                     icon: "star.circle.fill",
                     value: [viewModel.bestHabitTitle],
                     color: HabitCategory.greenIt.color,
-                    actionView: .totalCompleted
+                    actionView: .bestHabits
                 )
                 
                 StatisticsCardView(
@@ -64,7 +64,7 @@ struct StatisticsOverviewView: View {
                     icon: "clock.fill",
                     value: ["총 \(viewModel.totalTimeSpent / 60)시간 \(viewModel.totalTimeSpent % 60)분"],
                     color: HabitCategory.myMindIt.color,
-                    actionView: .totalCompleted
+                    actionView: .totalTime
                 )
                 
                 StatisticsCardView(
@@ -72,7 +72,7 @@ struct StatisticsOverviewView: View {
                     icon: "hand.thumbsup.circle.fill",
                     value: ["\(viewModel.mostFrequentDay)", "\(viewModel.mostFrequentTime)"],
                     color: .indigo,
-                    actionView: .totalCompleted
+                    actionView: .timeBasedStats
                 )
             }
             .padding()

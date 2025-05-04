@@ -25,7 +25,6 @@ struct RoutineSummaryView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(alignment: .center) {
                         Image(systemName: "pin.fill")
-                            .font(.title3)
                             .foregroundStyle(Color.primaryColor)
                             .rotationEffect(.degrees(320))
                         
@@ -37,19 +36,11 @@ struct RoutineSummaryView: View {
                             .font(.subheadline)
                             .foregroundStyle(Color.textSecondary)
                     }
-                    .font(.title2.bold())
+                    .font(.headline.bold())
                     .foregroundStyle(Color.textPrimary)
                     
-                    HStack(alignment: .center) {
-                        Spacer()
-                        
-                        Text("매주 월요일마다 리포트가 갱신됩니다")
-                            .font(.caption)
-                            .foregroundStyle(Color(.systemGray2))
-                        
-                        Spacer()
-                    }
-                    .padding(.vertical, 8)
+                    Divider()
+                        .padding(.vertical, 4)
                     
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(alignment: .center, spacing: 0) {
@@ -125,6 +116,18 @@ struct RoutineSummaryView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color.cardBg)
                 .cornerRadius(16)
+                
+                HStack(alignment: .center) {
+                    Spacer()
+                    
+                    Text("매주 월요일마다 리포트가 갱신됩니다")
+                        .font(.caption)
+                        .foregroundStyle(Color(.systemGray2))
+                    
+                    Spacer()
+                }
+                .padding(.vertical, 4)
+                
             } else {
                 HStack(alignment: .center) {
                     Spacer()
