@@ -22,6 +22,7 @@ struct TodayHabitView: View {
     @State private var selectedHabit: HabitModel?
     @State private var isSheetPresented: Bool = false
     @State private var isDoneList: Bool = false
+    @State private var dragOffset: CGFloat = 0
     
     var body: some View {
         NavigationStack {
@@ -35,10 +36,8 @@ struct TodayHabitView: View {
                     if !helperMessage.isEmpty {
                         HStack {
                             Spacer()
-                            
                             VStack(alignment: .center) {
-                                Text(helperMessage[1])
-                                    .bold()
+                                Text(helperMessage[1]).bold()
                                 Text(helperMessage[0])
                             }
                             .font(.footnote)
@@ -47,15 +46,14 @@ struct TodayHabitView: View {
                             .padding(.vertical, 8)
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color(.systemGray6))
+                                    .fill(Color.cardBg.opacity(0.1))
                                     .shadow(color: Color.textPrimary.opacity(0.05), radius: 4, x: 0, y: 2)
                             )
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Color.textSecondary.opacity(0.3), lineWidth: 1)
                             )
-                            .padding(.top, 5)
-                            
+                            .padding(.top, 8)
                             Spacer()
                         }
                     }
@@ -84,9 +82,7 @@ struct TodayHabitView: View {
                             if viewModel.todos.isEmpty {
                                 HStack {
                                     Spacer()
-                                    
                                     Text("해야 할 습관이 없어요")
-                                    
                                     Spacer()
                                 }
                                 .padding(.top, 16)
@@ -94,29 +90,20 @@ struct TodayHabitView: View {
                                 .foregroundStyle(Color(.systemGray4))
                             }
                         }
-                        
-                        if !viewModel.completed.isEmpty {
-                            Button(action: {
-                                isDoneList.toggle()
-                            }) {
-                                HStack {
-                                    Text("완료한 습관 (\(viewModel.completed.count))")
-                                        .foregroundStyle(Color.textPrimary)
-                                    Image(systemName: isDoneList ? "chevron.up" : "chevron.down")
-                                }
-                                .font(.subheadline.bold())
-                                .padding()
-                            }
-                            
-                            ScrollView {
-                                if isDoneList {
-                                    ForEach(viewModel.completed) { habit in
-                                        HabitCardView(habit: habit, isCompleted: true)
-                                            .padding(.horizontal)
-                                    }
-                                }
-                            }
+                    }
+                    
+                    Button(action: {
+                        withAnimation {
+                            isDoneList.toggle()
                         }
+                    }) {
+                        HStack {
+                            Text("완료한 습관 (\(viewModel.completed.count))")
+                                .foregroundStyle(Color.textPrimary)
+                            Image(systemName: isDoneList ? "chevron.down" : "chevron.up")
+                        }
+                        .font(.subheadline.bold())
+                        .padding()
                     }
                 }
                 .onAppear {
@@ -126,6 +113,15 @@ struct TodayHabitView: View {
                 .onChange(of: selectedDate) { newDate in
                     viewModel.loadHabits(for: newDate)
                     habitListViewModel.fetchHabits()
+                }
+                
+                if !viewModel.completed.isEmpty {
+                    CompletionListView(
+                        isShown: $isDoneList,
+                        dragOffset: $dragOffset,
+                        completedHabits: viewModel.completed
+                    )
+                    .zIndex(1)
                 }
                 
                 Button(action: {
@@ -171,6 +167,7 @@ struct TodayHabitView: View {
                     )
                 }
             }
+            .background(Color(.systemGroupedBackground))
         }
     }
     
@@ -213,18 +210,82 @@ private struct HabitCardView: View {
                         Image(systemName: "clock.fill")
                             .padding(-4)
                     }
-                        .font(.caption)
-                        .foregroundStyle(Color.textSecondary)
+                    .font(.caption)
+                    .foregroundStyle(Color.textSecondary)
                 }
             }
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(isCompleted ? Color(.systemGray4) : Color(.systemGray6))
+                    .fill(isCompleted ? Color(.systemGray5) : Color.cardBg)
             )
             .opacity(isToday || isCompleted ? 1 : 0.5)
         }
         .disabled(isCompleted || !isToday)
         .animation(.easeInOut(duration: 0.2), value: isCompleted)
+    }
+}
+
+private struct CompletionListView: View {
+    @Binding var isShown: Bool
+    @Binding var dragOffset: CGFloat
+    let completedHabits: [HabitModel]
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            Capsule()
+                .frame(width: 80, height: 6)
+                .foregroundColor(.gray.opacity(0.3))
+                .padding(.top, 8)
+            
+            HStack {
+                Text("완료한 습관 (\(completedHabits.count))")
+                    .font(.subheadline.bold())
+                
+                Spacer()
+                
+                Button(action: {
+                    withAnimation {
+                        isShown = false
+                    }
+                }) {
+                    Image(systemName: "xmark")
+                }
+            }
+            .foregroundStyle(Color.textPrimary)
+            .padding()
+            
+            Divider()
+            
+            ScrollView {
+                ForEach(completedHabits) { habit in
+                    HabitCardView(habit: habit, isCompleted: true)
+                        .padding(.horizontal)
+                        .padding(.top, 4)
+                }
+            }
+            .padding(.top, 16)
+        }
+        .frame(maxHeight: UIScreen.main.bounds.height)
+        .background(Color(.systemGroupedBackground))
+        .cornerRadius(16)
+        .shadow(radius: 5)
+        .offset(y: isShown ? UIScreen.main.bounds.height * 0.2 : UIScreen.main.bounds.height)
+        .gesture(
+            DragGesture()
+                .onChanged { value in
+                    dragOffset = value.translation.height
+                }
+                .onEnded { value in
+                    withAnimation {
+                        if value.translation.height > 100 {
+                            isShown = false
+                        }
+                        dragOffset = 0
+                    }
+                }
+        )
+        .animation(.easeInOut(duration: 0.3), value: dragOffset)
+        .edgesIgnoringSafeArea(.bottom)
     }
 }
