@@ -43,28 +43,33 @@ struct RoutineSummaryView: View {
                         .padding(.vertical, 4)
                     
                     VStack(alignment: .leading, spacing: 8) {
-                        HStack(alignment: .center, spacing: 0) {
-                            Image(systemName: "lightbulb.max.fill")
-                                .font(.caption)
-                                .foregroundStyle(Color.secondaryColor)
-                                .padding(.trailing, 8)
+                        if summary.routineCount > 0 {
+                            HStack(alignment: .center, spacing: 0) {
+                                Image(systemName: "lightbulb.max.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(Color.secondaryColor)
+                                    .padding(.trailing, 8)
+                                
+                                Text("한 주간 ")
+                                Text("\(summary.routineCount)개")
+                                    .bold()
+                                Text("의 습관을 ")
+                                Text("\(summary.totalCount)회 ")
+                                    .bold()
+                                Text("실천했어요.")
+                            }
                             
-                            Text("한 주간 ")
-                            Text("\(summary.routineCount)개")
-                                .bold()
-                            Text("의 습관을 ")
-                            Text("\(summary.totalCount)회 ")
-                                .bold()
-                            Text("실천했어요.")
-                        }
-                        
-                        HStack(alignment: .center, spacing: 0) {
-                            Image(systemName: "lightbulb.max.fill")
-                                .font(.caption)
-                                .foregroundStyle(Color.secondaryColor)
-                                .padding(.trailing, 8)
-                            
-                            Text("가장 많이 실천한 습관은")
+                            HStack(alignment: .center, spacing: 0) {
+                                Image(systemName: "lightbulb.max.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(Color.secondaryColor)
+                                    .padding(.trailing, 8)
+                                
+                                Text("가장 많이 실천한 습관은")
+                            }
+                        } else {
+                            Text("아직 충분한 기록이 없어요")
+                                .foregroundStyle(Color.textSecondary)
                         }
                         
                         let titles = summary.topRoutineName
