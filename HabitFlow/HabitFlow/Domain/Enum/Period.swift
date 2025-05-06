@@ -20,19 +20,24 @@ enum Period: Hashable {
             
         case .weekly(let date):
             let weekday = calendar.component(.weekday, from: date)
-            let daysToSubtract = weekday == 1 ? 7 : weekday - 1
-            let thisWeekStart = calendar.date(byAdding: .day, value: -daysToSubtract, to: calendar.startOfDay(for: date))!
-            let lastWeekStart = calendar.date(byAdding: .day, value: -7, to: thisWeekStart)!
-            let lastWeekEnd = calendar.date(byAdding: .day, value: 7, to: lastWeekStart)!
-            return lastWeekStart...lastWeekEnd
+            let daysSinceMonday = (weekday + 5) % 7
+            let thisMonday = calendar.date(byAdding: .day, value: -daysSinceMonday, to: calendar.startOfDay(for: date))!
+            let lastMonday = calendar.date(byAdding: .day, value: -7, to: thisMonday)!
+            let lastSunday = calendar.date(byAdding: .day, value: 6, to: lastMonday)!
+            return lastMonday...lastSunday
             
         case .monthly(let year, let month):
-            var currentMonthComponents = DateComponents(year: year, month: month)
-            let thisMonthStart = calendar.date(from: currentMonthComponents)!
-            let lastMonthEnd = thisMonthStart
-            currentMonthComponents.month! -= 1
-            let lastMonthStart = calendar.date(from: currentMonthComponents)!
-            return lastMonthStart...lastMonthEnd
+            let now = Date()
+            let day = Calendar.current.component(.day, from: now)
+            let currentMonthComponents = DateComponents(year: year, month: month, day: day)
+            
+            let calendar = Calendar.current
+            let thisMonthToday = calendar.date(from: currentMonthComponents) ?? calendar.date(from: DateComponents(year: year, month: month + 1, day: 0))!
+            
+            let endDate = calendar.startOfDay(for: thisMonthToday)
+            let startDate = calendar.date(byAdding: .day, value: -29, to: endDate)!
+            
+            return startDate...endDate
         }
     }
 }

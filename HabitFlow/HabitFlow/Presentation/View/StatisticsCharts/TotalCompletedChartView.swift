@@ -11,7 +11,6 @@ import Charts
 struct TotalCompletedChartView: View {
     @StateObject private var viewModel: StatisticsChartViewModel
     @State private var selectedPreset: PeriodPreset = .oneWeek
-    @State private var selectedStat: TotalCompletedStat?
     
     init(viewModel: StatisticsChartViewModel = StatisticsChartsDIContainer().makeStatisticsChartViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -25,38 +24,45 @@ struct TotalCompletedChartView: View {
                         Text(preset.rawValue).tag(preset)
                     }
                 }
+                .padding()
                 .pickerStyle(.segmented)
                 .onChange(of: selectedPreset) { newValue in
                     viewModel.updatePeriod(newValue.toPeriod())
                 }
                 
-                if viewModel.completedStats.isEmpty {
-                    Text("데이터가 없습니다.")
-                        .foregroundColor(.secondary)
-                        .padding(.top, 40)
-                } else {
-                    TotalCompletedGraphView(viewModel: viewModel, selectedStat: $selectedStat, selectedPreset: $selectedPreset)
+                TotalCompletedGraphView(viewModel: viewModel, selectedPreset: $selectedPreset)
+                    .padding()
+                
+                VStack {
+                    VStack(alignment: .leading) {
+                        ChangeStatsView(viewModel: viewModel, selectedPreset: $selectedPreset)
+                        
+                        AverageStatsView(selectedPreset: $selectedPreset, weekly: viewModel.calculateAverage(for: .oneWeek), monthly: viewModel.calculateAverage(for: .oneMonth))
+                    }
+                    .frame(width: UIScreen.main.bounds.width * 0.85, height: UIScreen.main.bounds.height * 0.2)
+                    .background(Color.cardBg)
+                    .cornerRadius(16)
+                    .padding()
+                    
+                    Spacer()
                 }
-                
-                AverageStatsView(selectedPreset: $selectedPreset, weekly: viewModel.calculateAverage(for: .oneWeek), monthly: viewModel.calculateAverage(for: .oneMonth))
-                
-                ChangeStatsView(viewModel: viewModel, selectedPreset: $selectedPreset)
+                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.5)
+                .background(Color(.systemGroupedBackground))
             }
             .padding()
         }
+        .navigationTitle("완료한 습관")
         .onAppear {
             viewModel.loadCompletedStats()
         }
     }
 }
 
-struct TotalCompletedGraphView: View {
+private struct TotalCompletedGraphView: View {
     @ObservedObject var viewModel: StatisticsChartViewModel
-    @Binding var selectedStat: TotalCompletedStat?
     @Binding var selectedPreset: PeriodPreset
     
     var body: some View {
-        
         Chart {
             ForEach(viewModel.completedStats, id: \.self) { stat in
                 BarMark(
@@ -100,7 +106,76 @@ struct TotalCompletedGraphView: View {
     }
 }
 
-struct AverageStatsView: View {
+private struct ChangeStatsView: View {
+    @ObservedObject var viewModel: StatisticsChartViewModel
+    @Binding var selectedPreset: PeriodPreset
+    
+    var body: some View {
+        let weeklyAnalysis = viewModel.generateWeeklyAnalysis()
+        let monthlyAnalysis = viewModel.generateMonthlyAnalysis()
+        
+        VStack(alignment: .leading, spacing: 4) {
+            if viewModel.calculateAverage(for: .oneWeek) == 0 {
+                Text("아직 충분한 기록이 없어요")
+                    .foregroundStyle(Color.textSecondary)
+            } else {
+                Text("\(selectedPreset.rawValue) 동안의 변화를 분석했어요")
+                    .font(.headline)
+                
+                switch selectedPreset {
+                case .oneWeek:
+                    VStack(alignment: .leading) {
+                        HStack(alignment: .center, spacing: 0) {
+                            Text("지난 ")
+                            Text(weeklyAnalysis[1])
+                            Text("의 기록 대비 변화량입니다")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(Color.textSecondary)
+                        
+                        Text(weeklyAnalysis[2])
+                            .padding(.vertical, 4)
+                        
+                        Text(weeklyAnalysis[3])
+                            .padding(.bottom, 4)
+                        
+                    }
+                    .onAppear{
+                        viewModel.loadCompletedStats()
+                        viewModel.loadPreviousCompletedStats(for: .oneWeek)
+                    }
+                    
+                case .oneMonth:
+                    VStack(alignment: .leading) {
+                        HStack(alignment: .center, spacing: 0) {
+                            Text("지난 ")
+                            Text(monthlyAnalysis[1])
+                            Text("의 기록 대비 변화량입니다")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(Color.textSecondary)
+                        
+                        Text(monthlyAnalysis[2])
+                            .padding(.vertical, 4)
+                        
+                        Text(monthlyAnalysis[3])
+                            .padding(.bottom, 4)
+                        
+                    }
+                    .onAppear{
+                        viewModel.loadPreviousCompletedStats(for: .oneMonth)
+                    }
+                }
+            }
+        }
+        .font(.subheadline)
+        .foregroundStyle(Color.textPrimary)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.leading, 16)
+    }
+}
+
+private struct AverageStatsView: View {
     @Binding var selectedPreset: PeriodPreset
     
     let weekly: Double
@@ -108,49 +183,18 @@ struct AverageStatsView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("📊 평균 완료 개수")
-                .font(.headline)
-            
-            switch selectedPreset {
-            case .oneWeek:
-                Text("이번 주 하루 평균 \(String(format: "%.1f", weekly))회 완료했어요.")
-            case .oneMonth:
-                Text("이번 달 하루 평균 \(String(format: "%.1f", monthly))회 완료했어요.")
+            if weekly != 0 || monthly != 0 {
+                switch selectedPreset {
+                case .oneWeek:
+                    Text("이번주 하루 평균 \(String(format: "%.1f", weekly))회 완료했어요")
+                case .oneMonth:
+                    Text("이번 달 하루 평균 \(String(format: "%.1f", monthly))회 완료했어요.")
+                }
             }
         }
         .font(.subheadline)
+        .foregroundStyle(Color.textPrimary)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.leading, 16)
     }
 }
-
-struct ChangeStatsView: View {
-    @ObservedObject var viewModel: StatisticsChartViewModel
-    @Binding var selectedPreset: PeriodPreset
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("📈 수행 변화량")
-                .font(.headline)
-            
-            switch selectedPreset {
-            case .oneWeek:
-                ForEach(viewModel.generateWeeklyAnalysis(), id: \.self) { line in
-                    Text(line)
-                }
-                .onAppear{
-                    viewModel.loadPreviousCompletedStats(for: .oneWeek)
-                }
-                
-            case .oneMonth:
-                ForEach(viewModel.generateMonthlyAnalysis(), id: \.self) { line in
-                    Text(line)
-                }
-                .onAppear{
-                    viewModel.loadPreviousCompletedStats(for: .oneMonth)
-                }
-            }
-            
-        }
-        .font(.subheadline)
-    }
-}
-

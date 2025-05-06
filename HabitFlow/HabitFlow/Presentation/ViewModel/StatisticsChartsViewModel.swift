@@ -105,9 +105,12 @@ final class StatisticsChartViewModel: ObservableObject {
                     endDate = calendar.startOfDay(for: endOfLastWeek)
                     
                 case .oneMonth:
-                    let lastMonth = calendar.date(byAdding: .month, value: -1, to: now)!
-                    startDate = calendar.date(from: calendar.dateComponents([.year, .month], from: lastMonth))!
-                    endDate = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startDate)!
+                    let today = calendar.startOfDay(for: now)
+                    let endOfLast30Days = calendar.date(byAdding: .day, value: -30, to: today)!
+                    let startOfLast30Days = calendar.date(byAdding: .day, value: -59, to: today)!
+
+                    startDate = startOfLast30Days
+                    endDate = endOfLast30Days
                 }
                 
                 let dateList = self.generateDateList(from: startDate...endDate)
@@ -198,7 +201,7 @@ final class StatisticsChartViewModel: ObservableObject {
         return Double(totalCount) / Double(activeDayCount)
     }
     
-    func weeklyChangeDateRangeString() -> String {
+    func weeklyChangeDateRangeString() -> [String] {
         let calendar = Calendar.current
         let now = Date()
         
@@ -209,30 +212,12 @@ final class StatisticsChartViewModel: ObservableObject {
         let startOfLastWeek = calendar.date(byAdding: .day, value: -13, to: now)!
         
         let formatter = DateFormatter()
-        formatter.dateFormat = "M/d"
+        formatter.dateFormat = "M월 d일"
         
         let currentRange = "\(formatter.string(from: startOfCurrentWeek)) ~ \(formatter.string(from: endOfCurrentWeek))"
         let lastRange = "\(formatter.string(from: startOfLastWeek)) ~ \(formatter.string(from: endOfLastWeek))"
         
-        return "이번 주: \(currentRange) | 지난 주: \(lastRange)"
-    }
-    
-    func monthlyChangeDateRangeString() -> String {
-        let calendar = Calendar.current
-        let now = Date()
-        
-        let startOfThisMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
-        let lastMonth = calendar.date(byAdding: .month, value: -1, to: now)!
-        let startOfLastMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: lastMonth))!
-        let endOfLastMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startOfLastMonth)!
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "M/d"
-        
-        let thisMonthRange = "\(formatter.string(from: startOfThisMonth)) ~ \(formatter.string(from: now))"
-        let lastMonthRange = "\(formatter.string(from: startOfLastMonth)) ~ \(formatter.string(from: endOfLastMonth))"
-        
-        return "이번 달: \(thisMonthRange) | 지난 달: \(lastMonthRange)"
+        return ["\(currentRange)", "\(lastRange)"]
     }
     
     func generateWeeklyAnalysis() -> [String] {
@@ -240,29 +225,47 @@ final class StatisticsChartViewModel: ObservableObject {
         
         let rangeInfo = weeklyChangeDateRangeString()
         
-        var analysis: [String] = [rangeInfo]
+        var analysis: [String] = rangeInfo
         
         if weekly.isSame {
-            analysis += ["지난주와 똑같은 횟수로 루틴을 지켰어요.", "루틴이 안정적으로 유지되고 있어요 😊"]
+            analysis += ["지난주와 똑같은 횟수로 루틴을 지켰어요", "안정적으로 유지되고 있어요😊"]
         } else if weekly.isIncreased {
             if weekly.difference >= 5 {
-                analysis += ["와! 지난주보다 \(weekly.difference)개나 더 완료했어요! 🔥",
-                             "\(String(format: "%.1f", weekly.percentage))% 상승했어요. 점점 좋아지고 있어요!"]
+                analysis += ["지난주보다 \(weekly.difference)개나 더 완료했어요🔥",
+                             "수행률이 \(Int(weekly.percentage))% 상승했어요. 점점 좋아지고 있어요!"]
             } else {
-                analysis += ["조금씩 성장 중이에요 💪",
+                analysis += ["조금씩 성장 중이에요💪",
                              "지난주보다 \(weekly.difference)개 더 했어요. 꾸준함이 중요하니까요!"]
             }
         } else {
             if weekly.difference >= 5 {
                 analysis += ["지난주보다 \(weekly.difference)개 줄었어요. 요즘 좀 바빴던 건 아닐까요?",
-                             "잠깐 쉬어가는 것도 괜찮아요. 다음 주엔 다시 도전해봐요 💛"]
+                             "내일부터 다시 도전해봐요💛"]
             } else {
-                analysis += ["지난주보다 조금 줄었지만, 괜찮아요. 다시 리듬을 찾으면 돼요 🍀",
-                             "\(String(format: "%.1f", weekly.percentage))% 감소했어요."]
+                analysis += ["지난주보다 조금 줄었지만 괜찮아요. 다시 리듬을 찾으면 돼요🍀",
+                             "수행률이 \(Int(weekly.percentage))% 감소했어요"]
             }
         }
         
         return analysis
+    }
+    
+    func monthlyChangeDateRangeString() -> [String] {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+
+        let endOfLast30Days = calendar.date(byAdding: .day, value: -30, to: today)!
+        let startOfLast30Days = calendar.date(byAdding: .day, value: -59, to: today)!
+
+        let startOfThis30Days = calendar.date(byAdding: .day, value: -29, to: today)!
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M월 d일"
+
+        let thisMonthRange = "\(formatter.string(from: startOfThis30Days)) ~ \(formatter.string(from: today))"
+        let lastMonthRange = "\(formatter.string(from: startOfLast30Days)) ~ \(formatter.string(from: endOfLast30Days))"
+
+        return ["\(thisMonthRange)", "\(lastMonthRange)"]
     }
     
     func generateMonthlyAnalysis() -> [String] {
@@ -270,26 +273,26 @@ final class StatisticsChartViewModel: ObservableObject {
         
         let rangeInfo = monthlyChangeDateRangeString()
         
-        var analysis: [String] = [rangeInfo]
+        var analysis: [String] = rangeInfo
         
         if monthly.isSame {
-            analysis += ["지난달과 같은 루틴 수행량이에요.",
-                         "꾸준함이 가장 어려운데, 정말 잘하고 있어요! 👏"]
+            analysis += ["지난달과 같은 루틴 수행량이에요",
+                         "꾸준함이 가장 어려운데 정말 잘하고 있어요👏"]
         } else if monthly.isIncreased {
             if monthly.difference >= 15 {
-                analysis += ["지난달보다 \(monthly.difference)개 더 완료했어요! 😍",
-                             "\(String(format: "%.1f", monthly.percentage))% 상승했어요. 눈에 띄는 성장입니다!"]
+                analysis += ["지난달보다 \(monthly.difference)개 더 완료했어요😍",
+                             "\(Int(monthly.percentage))% 상승했어요. 눈에 띄는 성장입니다!"]
             } else {
-                analysis += ["조금 더 노력한 한 달이었어요! 👍",
+                analysis += ["조금 더 노력한 한 달이었어요👍",
                              "\(monthly.difference)개 늘었어요. 멋져요!"]
             }
         } else {
             if monthly.difference >= 15 {
-                analysis += ["지난달보다 \(monthly.difference)개 줄었어요.",
-                             "컨디션이 좋지 않았던 걸 수도 있어요. 다음 달엔 다시 회복할 수 있어요 💪"]
+                analysis += ["지난달보다 \(monthly.difference)개 줄었어요",
+                             "컨디션이 좋지 않았던 걸 수도 있어요. 다시 회복할 수 있어요💪"]
             } else {
-                analysis += ["루틴 수행이 \(monthly.difference)개 살짝 줄었어요.",
-                             "\(String(format: "%.1f", monthly.percentage))% 감소했어요. 괜찮아요, 다시 시작해봐요! 🌱"]
+                analysis += ["루틴 수행이 살짝 줄었어요. 괜찮아요! 다시 시작해봐요🌱",
+                             "\(Int(monthly.percentage))% 감소했어요"]
             }
         }
         
@@ -442,9 +445,6 @@ final class StatisticsChartViewModel: ObservableObject {
                     guard let stat = stats.first(where: { $0.category == category }) else { return nil }
                     return stat.totalCount > 0 ? stat : nil
                 }
-                
-                print(categoryStats)
-                print(categoryStatList)
             }
             .store(in: &cancellables)
     }

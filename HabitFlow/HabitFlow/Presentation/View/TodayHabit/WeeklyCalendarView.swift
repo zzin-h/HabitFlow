@@ -38,7 +38,7 @@ struct WeeklyCalendarView: View {
                     let itemWidth = geometry.size.width / 10
                     
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12) {
+                        HStack(spacing: 16) {
                             ForEach(Array(dateRange.enumerated()), id: \.1) { index, date in
                                 VStack {
                                     Text(date.weekdayShortSymbol())
@@ -64,9 +64,9 @@ struct WeeklyCalendarView: View {
                                         .fill(
                                             calendar.isDate(selectedDate, inSameDayAs: date)
                                             ? Color.accentColor
-                                            : Color.gray.opacity(0.2)
+                                            : Color.cardBg
                                         )
-                                        .frame(width: itemWidth)
+                                        .frame(width: itemWidth + 8)
                                 )
                                 .onTapGesture {
                                     selectedDate = date

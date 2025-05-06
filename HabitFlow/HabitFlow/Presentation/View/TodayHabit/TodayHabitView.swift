@@ -10,6 +10,7 @@ import SwiftUI
 struct TodayHabitView: View {
     @StateObject private var viewModel: TodayHabitViewModel
     @StateObject private var habitListViewModel: HabitListViewModel
+    @StateObject private var colorSchemeManager = ColorSchemeManager()
     
     init(viewModel: TodayHabitViewModel = TodayHabitDIContainer().makeTodayHabitViewModel(),
          habitListViewModel: HabitListViewModel = HabitListDIContainer().makeHabitListViewModel()) {
@@ -22,6 +23,7 @@ struct TodayHabitView: View {
     @State private var selectedHabit: HabitModel?
     @State private var isSheetPresented: Bool = false
     @State private var isDoneList: Bool = false
+    @State private var dragOffset: CGFloat = 0
     
     var body: some View {
         NavigationStack {
@@ -33,89 +35,28 @@ struct TodayHabitView: View {
                         .padding(.bottom, 8)
                     
                     if !helperMessage.isEmpty {
-                        HStack {
-                            Spacer()
-                            
-                            VStack(alignment: .center) {
-                                Text(helperMessage[1])
-                                    .bold()
-                                Text(helperMessage[0])
-                            }
-                            .font(.footnote)
-                            .foregroundColor(Color.textPrimary)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color(.systemGray6))
-                                    .shadow(color: Color.textPrimary.opacity(0.05), radius: 4, x: 0, y: 2)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.textSecondary.opacity(0.3), lineWidth: 1)
-                            )
-                            .padding(.top, 5)
-                            
-                            Spacer()
-                        }
+                        HelperCardView(
+                            text1: helperMessage[0],
+                            text2: helperMessage[1]
+                        )
                     }
                     
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("해야 할 습관 (\(viewModel.todos.count))")
-                            .foregroundStyle(Color.textPrimary)
-                            .font(.subheadline.bold())
-                            .padding()
-                        
-                        ScrollView {
-                            ForEach(viewModel.todos) { habit in
-                                HabitCardView(habit: habit, isToday: Calendar.current.isDateInToday(selectedDate)) {
-                                    if Calendar.current.isDateInToday(selectedDate) {
-                                        if habit.goalMinutes != 0 {
-                                            selectedHabit = habit
-                                            showingTimer = true
-                                        } else {
-                                            viewModel.markHabitCompleted(habit)
-                                        }
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                            
-                            if viewModel.todos.isEmpty {
-                                HStack {
-                                    Spacer()
-                                    
-                                    Text("해야 할 습관이 없어요")
-                                    
-                                    Spacer()
-                                }
-                                .padding(.top, 16)
-                                .font(.title3.bold())
-                                .foregroundStyle(Color(.systemGray4))
-                            }
-                        }
-                        
-                        if !viewModel.completed.isEmpty {
-                            Button(action: {
+                    ToDoListView(viewModel: viewModel, selectedDate: $selectedDate, selectedHabit: $selectedHabit, showingTimer: $showingTimer
+                    )
+                    
+                    if !viewModel.completed.isEmpty {
+                        Button(action: {
+                            withAnimation {
                                 isDoneList.toggle()
-                            }) {
-                                HStack {
-                                    Text("완료한 습관 (\(viewModel.completed.count))")
-                                        .foregroundStyle(Color.textPrimary)
-                                    Image(systemName: isDoneList ? "chevron.up" : "chevron.down")
-                                }
-                                .font(.subheadline.bold())
-                                .padding()
                             }
-                            
-                            ScrollView {
-                                if isDoneList {
-                                    ForEach(viewModel.completed) { habit in
-                                        HabitCardView(habit: habit, isCompleted: true)
-                                            .padding(.horizontal)
-                                    }
-                                }
+                        }) {
+                            HStack {
+                                Text("완료한 습관 (\(viewModel.completed.count))")
+                                    .foregroundStyle(Color.textPrimary)
+                                Image(systemName: "chevron.up")
                             }
+                            .font(.subheadline.bold())
+                            .padding(.horizontal)
                         }
                     }
                 }
@@ -128,11 +69,20 @@ struct TodayHabitView: View {
                     habitListViewModel.fetchHabits()
                 }
                 
+                if !viewModel.completed.isEmpty {
+                    CompletionListView(
+                        isShown: $isDoneList,
+                        dragOffset: $dragOffset,
+                        completedHabits: viewModel.completed
+                    )
+                    .zIndex(1)
+                }
+                
                 Button(action: {
                     isSheetPresented = true
                 }) {
                     Circle()
-                        .frame(width: 50, height: 50)
+                        .frame(width: 60, height: 60)
                         .overlay {
                             Image(systemName: "plus")
                                 .font(.title2.bold())
@@ -171,7 +121,10 @@ struct TodayHabitView: View {
                     )
                 }
             }
+            .background(Color(.systemGroupedBackground))
         }
+        .environmentObject(colorSchemeManager)
+        .preferredColorScheme(colorSchemeManager.currentScheme)
     }
     
     private var helperMessage: [String] {
@@ -183,6 +136,114 @@ struct TodayHabitView: View {
         } else {
             return ["오늘의 습관만 완료할 수 있어요", "앞으로 해야할 습관이에요"]
         }
+    }
+}
+
+private struct ToDoListView: View {
+    @ObservedObject var viewModel: TodayHabitViewModel
+    @Binding var selectedDate: Date
+    @Binding var selectedHabit: HabitModel?
+    @Binding var showingTimer: Bool
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("해야 할 습관 (\(viewModel.todos.count))")
+                .foregroundStyle(Color.textPrimary)
+                .font(.subheadline.bold())
+                .padding()
+            
+            ScrollView {
+                ForEach(viewModel.todos) { habit in
+                    HabitCardView(habit: habit, isToday: Calendar.current.isDateInToday(selectedDate)) {
+                        if Calendar.current.isDateInToday(selectedDate) {
+                            if habit.goalMinutes != 0 {
+                                selectedHabit = habit
+                                showingTimer = true
+                            } else {
+                                viewModel.markHabitCompleted(habit)
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal)
+                
+                if viewModel.todos.isEmpty {
+                    HStack {
+                        Spacer()
+                        Text("해야 할 습관이 없어요")
+                        Spacer()
+                    }
+                    .padding(.top, 16)
+                    .font(.title3.bold())
+                    .foregroundStyle(Color(.systemGray4))
+                }
+            }
+        }
+    }
+}
+
+private struct CompletionListView: View {
+    @Binding var isShown: Bool
+    @Binding var dragOffset: CGFloat
+    let completedHabits: [HabitModel]
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            Capsule()
+                .frame(width: 80, height: 6)
+                .foregroundColor(.gray.opacity(0.3))
+                .padding(.top, 8)
+            
+            HStack {
+                Text("완료한 습관 (\(completedHabits.count))")
+                
+                Spacer()
+                
+                Button(action: {
+                    withAnimation {
+                        isShown = false
+                    }
+                }) {
+                    Image(systemName: "chevron.down")
+                        .foregroundStyle(Color.accentColor)
+                }
+            }
+            .font(.subheadline.bold())
+            .foregroundStyle(Color.textPrimary)
+            .padding()
+            
+            Divider()
+            
+            ScrollView {
+                ForEach(completedHabits) { habit in
+                    HabitCardView(habit: habit, isCompleted: true)
+                        .padding(.horizontal)
+                        .padding(.top, 4)
+                }
+            }
+            .padding(.vertical, 16)
+        }
+        .frame(maxHeight: UIScreen.main.bounds.height * 0.73)
+        .background(Color(.systemGroupedBackground))
+        .cornerRadius(16)
+        .shadow(radius: 3, y: -4)
+        .offset(y: isShown ? UIScreen.main.bounds.height * 0.11 : UIScreen.main.bounds.height )
+        .gesture(
+            DragGesture()
+                .onChanged { value in
+                    dragOffset = value.translation.height
+                }
+                .onEnded { value in
+                    withAnimation {
+                        if value.translation.height > 100 {
+                            isShown = false
+                        }
+                        dragOffset = 0
+                    }
+                }
+        )
+        .animation(.easeInOut(duration: 0.3), value: dragOffset)
+        .edgesIgnoringSafeArea(.bottom)
     }
 }
 
@@ -213,18 +274,50 @@ private struct HabitCardView: View {
                         Image(systemName: "clock.fill")
                             .padding(-4)
                     }
-                        .font(.caption)
-                        .foregroundStyle(Color.textSecondary)
+                    .font(.caption)
+                    .foregroundStyle(Color.textSecondary)
                 }
             }
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(isCompleted ? Color(.systemGray4) : Color(.systemGray6))
+                    .fill(isCompleted ? Color(.systemGray5) : Color.cardBg)
             )
             .opacity(isToday || isCompleted ? 1 : 0.5)
         }
         .disabled(isCompleted || !isToday)
         .animation(.easeInOut(duration: 0.2), value: isCompleted)
+    }
+}
+
+private struct HelperCardView: View {
+    let text1: String
+    let text2: String
+    
+    var body: some View {
+        HStack {
+            Spacer()
+            VStack(alignment: .center) {
+                Text(text1)
+                    .bold()
+                
+                Text(text2)
+            }
+            .font(.footnote)
+            .foregroundColor(Color.textPrimary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.cardBg.opacity(0.1))
+                    .shadow(color: Color.textPrimary.opacity(0.05), radius: 4, x: 0, y: 2)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.textSecondary.opacity(0.3), lineWidth: 1)
+            )
+            .padding(.top, 8)
+            Spacer()
+        }
     }
 }

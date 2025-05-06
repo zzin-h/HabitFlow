@@ -10,8 +10,6 @@ import SwiftUI
 enum PeriodPreset: String, CaseIterable, Identifiable {
     case oneWeek = "1주"
     case oneMonth = "1개월"
-//    case threeMonths = "3개월"
-//    case oneYear = "1년"
 
     var id: String { rawValue }
 
@@ -25,16 +23,8 @@ enum PeriodPreset: String, CaseIterable, Identifiable {
             return .range(start: start, end: now)
 
         case .oneMonth:
-            let start = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
+            let start = calendar.date(byAdding: .day, value: -29, to: now)!
             return .range(start: start, end: now)
-
-//        case .threeMonths:
-//            let start = calendar.date(byAdding: .month, value: -3, to: now)!
-//            return .range(start: start, end: now)
-//
-//        case .oneYear:
-//            let start = calendar.date(byAdding: .year, value: -1, to: now)!
-//            return .range(start: start, end: now)
         }
     }
 }

@@ -20,7 +20,7 @@ struct NavigationIconView: View {
                 Image(systemName: "chart.bar.xaxis")
             }
             
-            NavigationLink(destination: HabitListView()) {
+            NavigationLink(destination: SettingsView()) {
                 Image(systemName: "gearshape")
             }
         }

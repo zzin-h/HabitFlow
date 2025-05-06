@@ -27,19 +27,20 @@ struct TotalTimeChartView: View {
             .padding(.horizontal)
             
             if viewModel.filteredTotalTimeStats.isEmpty {
-                Text("데이터가 없습니다")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                Text("충분한 데이터가 없습니다")
+                    .foregroundStyle(Color.gray)
+                    .padding(.top, 32)
+                    .frame(height: UIScreen.main.bounds.height * 0.5)
             } else {
                 TotalTimeGraphView(viewModel: viewModel)
-                
-                TotalTime3Summary(viewModel: viewModel)
-                
-                Divider()
-                
-                TotalTimeSummaryByCategory(viewModel: viewModel)
+                    .frame(height: UIScreen.main.bounds.height * 0.5)
+                    .padding(.horizontal)
             }
+            Divider()
+            
+            TotalTime3Summary(viewModel: viewModel)
         }
-        .navigationTitle("총 사용 시간")
+        .navigationTitle("함께한 시간")
         .onAppear {
             viewModel.loadTotalTimeStats()
         }
@@ -49,44 +50,151 @@ struct TotalTimeChartView: View {
 private struct TotalTimeGraphView: View {
     @ObservedObject var viewModel: StatisticsChartViewModel
     
+    private var barHeight: CGFloat {
+        if viewModel.filteredTotalTimeStats.count < 5 {
+            return 120
+        } else if viewModel.filteredTotalTimeStats.count < 7 {
+            return 100
+        } else if viewModel.filteredTotalTimeStats.count < 9 {
+            return 180
+        } else if viewModel.filteredTotalTimeStats.count < 11 {
+            return 60
+        } else {
+            return 40
+        }
+    }
+    
     var body: some View {
-        ScrollView(.horizontal) {
-            Chart(viewModel.filteredTotalTimeStats) { stat in
+        ScrollView {
+            Chart(viewModel.filteredTotalTimeStats.sorted(by: { $0.duration > $1.duration })) { habit in
                 BarMark(
-                    x: .value("누적 시간 (분)", stat.duration),
-                    y: .value("습관", stat.title)
+                    x: .value("누적 시간 (분)", habit.duration),
+                    y: .value("습관", habit.title)
                 )
-                .foregroundStyle(by: .value("습관", stat.title))
+                .foregroundStyle(habit.category.color)
+                .annotation(position: .trailing) {
+                    Text("\(habit.duration)분")
+                        .font(.caption.bold())
+                        .foregroundColor(.gray)
+                        .padding(.leading, 4)
+                }
             }
             .chartYAxis {
                 AxisMarks(position: .leading)
             }
-            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.4)
-            .padding(.horizontal)
+            .frame(height: CGFloat(viewModel.filteredTotalTimeStats.count) * barHeight)
+            
+            Spacer()
         }
-        .scrollIndicators(.hidden)
     }
 }
 
 private struct TotalTime3Summary: View {
     @ObservedObject var viewModel: StatisticsChartViewModel
     
+    private var top1: TotalTimeStat? {
+        viewModel.top3DurationHabits.indices.contains(0) ? viewModel.top3DurationHabits[0] : nil
+    }
+    private var top2: TotalTimeStat? {
+        viewModel.top3DurationHabits.indices.contains(1) ? viewModel.top3DurationHabits[1] : nil
+    }
+    private var top3: TotalTimeStat? {
+        viewModel.top3DurationHabits.indices.contains(2) ? viewModel.top3DurationHabits[2] : nil
+    }
+    
     var body: some View {
         VStack {
-            Text("Top 3 목표시간 습관")
-            ForEach(viewModel.top3DurationHabits) { habit in
-                Text("\(habit.title): \(habit.duration)분 : \(habit.category.title)")
+            VStack(alignment: .leading, spacing: 8) {
+                Text("베스트 3 누적시간")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(Color.textPrimary)
+                    .padding(.bottom, 16)
+                
+                if let top1 {
+                    Top3Card(title: top1.title,
+                             duration: top1.duration,
+                             category: top1.category.title,
+                             crownColor: .yellow,
+                             font: .title3
+                    )
+                }
+                
+                HStack(spacing: 8) {
+                    if let top2 {
+                        Top3Card(title: top2.title,
+                                 duration: top2.duration,
+                                 category: top2.category.title,
+                                 crownColor: .gray,
+                                 font: .headline
+                        )
+                    }
+                    
+                    if let top3 {
+                        Top3Card(title: top3.title,
+                                 duration: top3.duration,
+                                 category: top3.category.title,
+                                 crownColor: Color(red: 205/255, green: 127/255, blue: 50/255),
+                                 font: .headline
+                        )
+                    }
+                }
             }
+            .padding()
         }
+        .frame(maxHeight: .infinity)
+        .background(Color(.systemGroupedBackground))
     }
 }
 
-private struct TotalTimeSummaryByCategory: View {
-    @ObservedObject var viewModel: StatisticsChartViewModel
+private struct Top3Card: View {
+    let title: String
+    let duration: Int
+    let category: String
+    let crownColor: Color
+    let font: Font
     
     var body: some View {
-        ForEach(viewModel.filteredTotalTimeStats) { habit in
-            Text("\(habit.title): \(habit.duration)분")
+        VStack(spacing: 16) {
+            HStack {
+                Spacer()
+                
+                Image(systemName: "crown.fill")
+                    .resizable()
+                    .frame(width: 16, height: 16)
+                    .foregroundStyle(crownColor)
+                
+                Text(title)
+                    .bold()
+                
+                Spacer()
+            }
+            .foregroundStyle(Color.textPrimary)
+            .padding(.top, 8)
+            .lineLimit(1)
+            .truncationMode(.tail)
+            
+            HStack {
+                Spacer()
+                
+                if duration > 59 {
+                    Text("\(duration / 60)시간 \(duration % 60)분")
+                } else {
+                    Text("\(duration)분")
+                }
+                
+                Spacer()
+                
+                Text(category)
+                
+                Spacer()
+            }
+            .foregroundStyle(Color.textSecondary)
+            .fontWeight(.regular)
+            .padding(.bottom, 8)
         }
+        .font(font)
+        .background(Color.cardBg)
+        .cornerRadius(8)
     }
 }
+
