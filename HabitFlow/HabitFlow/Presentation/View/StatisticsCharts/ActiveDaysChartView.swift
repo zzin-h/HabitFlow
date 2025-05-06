@@ -20,7 +20,7 @@ struct ActiveDaysChartView: View {
             
             Spacer()
             
-            StatisticsSummaryView(viewModel: viewModel, completedDates: viewModel.completedDates)
+            ActiveDaysSummaryView(viewModel: viewModel, completedDates: viewModel.completedDates)
                 .padding(.bottom, 48)
         }
         .navigationTitle("함께한 일수")
@@ -100,7 +100,7 @@ private struct ActiveDaysCalendarView: View {
     }
 }
 
-struct StatisticsSummaryView: View {
+private struct ActiveDaysSummaryView: View {
     @ObservedObject var viewModel: StatisticsChartViewModel
     let completedDates: [Date]
     
