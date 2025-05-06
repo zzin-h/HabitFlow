@@ -10,6 +10,7 @@ import SwiftUI
 struct TodayHabitView: View {
     @StateObject private var viewModel: TodayHabitViewModel
     @StateObject private var habitListViewModel: HabitListViewModel
+    @StateObject private var colorSchemeManager = ColorSchemeManager()
     
     init(viewModel: TodayHabitViewModel = TodayHabitDIContainer().makeTodayHabitViewModel(),
          habitListViewModel: HabitListViewModel = HabitListDIContainer().makeHabitListViewModel()) {
@@ -171,6 +172,8 @@ struct TodayHabitView: View {
             }
             .background(Color(.systemGroupedBackground))
         }
+        .environmentObject(colorSchemeManager)
+        .preferredColorScheme(colorSchemeManager.currentScheme)
     }
     
     private var helperMessage: [String] {
