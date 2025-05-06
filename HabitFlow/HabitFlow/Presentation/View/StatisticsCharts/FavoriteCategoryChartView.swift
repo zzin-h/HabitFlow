@@ -84,7 +84,7 @@ private struct CategoryPieGraphView: View {
                                     Text(selectedSlice.title)
                                         .font(.subheadline)
                                         .bold()
-                                        .foregroundColor(.black)
+                                        .foregroundColor(Color.textPrimary)
                                         .opacity(0.7)
                                     
                                     Text("\(Int(selectedSlice.percentage * 100))%")

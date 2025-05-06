@@ -10,18 +10,35 @@ enum TimeSlot: String, CaseIterable, Identifiable, Comparable {
     
     var title: String {
         switch self {
-        case .am6_8: return "06~08시"
-        case .am8_10: return "08~10시"
-        case .am10_12: return "10~12시"
-        case .pm12_14: return "12~14시"
-        case .pm14_16: return "14~16시"
-        case .pm16_18: return "16~18시"
-        case .pm18_20: return "18~20시"
-        case .pm20_22: return "20~22시"
-        case .pm22_24: return "22~24시"
-        case .am0_2: return "00~02시"
-        case .am2_4: return "02~04시"
-        case .am4_6: return "04~06시"
+        case .am6_8: return "06 ~ 08시"
+        case .am8_10: return "08 ~ 10시"
+        case .am10_12: return "10 ~ 12시"
+        case .pm12_14: return "12 ~ 14시"
+        case .pm14_16: return "14 ~ 16시"
+        case .pm16_18: return "16 ~ 18시"
+        case .pm18_20: return "18 ~ 20시"
+        case .pm20_22: return "20 ~ 22시"
+        case .pm22_24: return "22 ~ 24시"
+        case .am0_2: return "00 ~ 02시"
+        case .am2_4: return "02 ~ 04시"
+        case .am4_6: return "04 ~ 06시"
+        }
+    }
+    
+    var shortTitle: String {
+        switch self {
+        case .am6_8: return "06시"
+        case .am8_10: return "08시"
+        case .am10_12: return "10시"
+        case .pm12_14: return "12시"
+        case .pm14_16: return "14시"
+        case .pm16_18: return "16시"
+        case .pm18_20: return "18시"
+        case .pm20_22: return "20시"
+        case .pm22_24: return "22시"
+        case .am0_2: return "24시"
+        case .am2_4: return "02시"
+        case .am4_6: return "04시"
         }
     }
     

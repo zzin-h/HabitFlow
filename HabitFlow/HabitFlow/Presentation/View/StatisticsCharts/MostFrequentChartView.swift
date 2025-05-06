@@ -27,15 +27,30 @@ struct MostFrequentChartView: View {
             .pickerStyle(.segmented)
             .padding()
             
-            switch selectedMostFrequent {
-            case .weekDays:
-                WeekdayGraphView(stats: viewModel.weekdayStats)
-                WeekdayTop3SummaryView(viewModel: viewModel)
-            case .timeSlots:
-                TimeSlotGraphView(stats: viewModel.timeSlotStats)
-                TimeSlotTop3SummaryView(viewModel: viewModel)
+            if viewModel.weekdayStats.isEmpty {
+                Text("충분한 데이터가 없습니다")
+                    .foregroundStyle(Color.gray)
+                    .padding(.top, 32)
+            } else {
+                switch selectedMostFrequent {
+                case .weekDays:
+                    WeekdayGraphView(stats: viewModel.weekdayStats)
+                        .frame(height: UIScreen.main.bounds.height * 0.45)
+                    
+                    Divider()
+                    
+                    WeekdayTop3SummaryView(viewModel: viewModel)
+                case .timeSlots:
+                    TimeSlotGraphView(stats: viewModel.timeSlotStats)
+                        .frame(height: UIScreen.main.bounds.height * 0.45)
+                    
+                    Divider()
+                    
+                    TimeSlotTop3SummaryView(viewModel: viewModel)
+                }
             }
         }
+        .navigationTitle("최다 요일 및 시간대")
         .onAppear {
             viewModel.loadTimePatternStats()
         }
@@ -52,13 +67,20 @@ struct WeekdayGraphView: View {
                     x: .value("요일", stat.weekday.koreanTitle),
                     y: .value("횟수", stat.count)
                 )
-                .foregroundStyle(by: .value("요일", stat.weekday.koreanTitle))
+                .foregroundStyle(Color.secondaryColor)
+                .annotation(position: .top) {
+                    if stat.count > 0 {
+                        Text("\(stat.count)회")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                            .padding(.bottom, 4)
+                    }
+                }
             }
         }
         .chartYAxis {
             AxisMarks(position: .leading)
         }
-        .frame(height: 250)
         .padding()
     }
 }
@@ -66,10 +88,51 @@ struct WeekdayGraphView: View {
 struct WeekdayTop3SummaryView: View {
     @ObservedObject var viewModel: StatisticsChartViewModel
     
+    private var top1: WeekdayStat? {
+        viewModel.top3Weekdays.indices.contains(0) ? viewModel.top3Weekdays[0] : nil
+    }
+    private var top2: WeekdayStat? {
+        viewModel.top3Weekdays.indices.contains(1) ? viewModel.top3Weekdays[1] : nil
+    }
+    private var top3: WeekdayStat? {
+        viewModel.top3Weekdays.indices.contains(2) ? viewModel.top3Weekdays[2] : nil
+    }
+    
     var body: some View {
-        ForEach(viewModel.top3Weekdays) { stat in
-            Text("\(stat.weekday.koreanTitle): \(stat.count)회")
+        VStack {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("베스트 3 요일")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(Color.textPrimary)
+                    .padding(.bottom, 16)
+                
+                if let top1 {
+                    Top3Card(title: top1.weekday.koreanTitle + "요일",
+                             count: top1.count,
+                             crownColor: .yellow,
+                             font: .title3
+                    )
+                }
+                if let top2 {
+                    Top3Card(title: top2.weekday.koreanTitle + "요일",
+                             count: top2.count,
+                             crownColor: .gray,
+                             font: .headline
+                    )
+                }
+                
+                if let top3 {
+                    Top3Card(title: top3.weekday.koreanTitle + "요일",
+                             count: top3.count,
+                             crownColor: Color(red: 205/255, green: 127/255, blue: 50/255),
+                             font: .headline
+                    )
+                }
+            }
+            .padding()
         }
+        .frame(maxHeight: .infinity)
+        .background(Color(.systemGroupedBackground))
     }
 }
 
@@ -77,35 +140,119 @@ struct TimeSlotGraphView: View {
     let stats: [TimeSlotStat]
     
     var body: some View {
-        ScrollView(.horizontal) {
+        VStack {
             Chart {
                 ForEach(stats.sorted(by: { $0.slot < $1.slot }), id: \.slot) { stat in
                     BarMark(
-                        x: .value("시간대", stat.slot.title),
+                        x: .value("시간대", stat.slot.shortTitle),
                         y: .value("빈도", stat.count)
                     )
-                    .foregroundStyle(by: .value("시간대", stat.slot.title))
+                    .annotation(position: .top) {
+                        if stat.count > 0 {
+                            Text("\(stat.count)회")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                                .padding(.bottom, 4)
+                        }
+                    }
                 }
             }
             .chartXAxis {
-                AxisMarks(values: stats.map { $0.slot.title })
+                AxisMarks(values: stats.map { $0.slot.shortTitle })
             }
             .chartYAxis {
                 AxisMarks(position: .leading)
             }
-            .frame(width: UIScreen.main.bounds.width * 1.5, height: 250)
             .padding()
         }
-        .scrollIndicators(.hidden)
     }
 }
 
-struct TimeSlotTop3SummaryView: View {
+private struct TimeSlotTop3SummaryView: View {
     @ObservedObject var viewModel: StatisticsChartViewModel
     
+    private var top1: TimeSlotStat? {
+        viewModel.top3TimeSlots.indices.contains(0) ? viewModel.top3TimeSlots[0] : nil
+    }
+    private var top2: TimeSlotStat? {
+        viewModel.top3TimeSlots.indices.contains(1) ? viewModel.top3TimeSlots[1] : nil
+    }
+    private var top3: TimeSlotStat? {
+        viewModel.top3TimeSlots.indices.contains(2) ? viewModel.top3TimeSlots[2] : nil
+    }
+    
     var body: some View {
-        ForEach(viewModel.top3TimeSlots) { stat in
-            Text("\(stat.slot.title): \(stat.count)회")
+        VStack {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("베스트 3 시간대")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(Color.textPrimary)
+                    .padding(.bottom, 16)
+                
+                if let top1 {
+                    Top3Card(title: top1.slot.title,
+                             count: top1.count,
+                             crownColor: .yellow,
+                             font: .title3
+                    )
+                }
+                if let top2 {
+                    Top3Card(title: top2.slot.title,
+                             count: top2.count,
+                             crownColor: .gray,
+                             font: .headline
+                    )
+                }
+                
+                if let top3 {
+                    Top3Card(title: top3.slot.title,
+                             count: top3.count,
+                             crownColor: Color(red: 205/255, green: 127/255, blue: 50/255),
+                             font: .headline
+                    )
+                }
+            }
+            .padding()
         }
+        .frame(maxHeight: .infinity)
+        .background(Color(.systemGroupedBackground))
+    }
+}
+
+private struct Top3Card: View {
+    let title: String
+    let count: Int
+    let crownColor: Color
+    let font: Font
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            HStack {
+                Spacer()
+                
+                Image(systemName: "crown.fill")
+                    .resizable()
+                    .frame(width: 16, height: 16)
+                    .foregroundStyle(crownColor)
+                
+                Text(title)
+                    .bold()
+                
+                Spacer()
+                Spacer()
+                Spacer()
+                
+                Text("\(count)회")
+                    .foregroundStyle(Color.textSecondary)
+                    .fontWeight(.regular)
+                
+                Spacer()
+            }
+            .foregroundStyle(Color.textPrimary)
+            .padding(.vertical, 16)
+        }
+        .font(font)
+        .background(Color.cardBg)
+        .cornerRadius(8)
     }
 }
