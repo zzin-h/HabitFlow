@@ -8,7 +8,7 @@
 import SwiftUI
 
 class ColorSchemeManager: ObservableObject {
-    @AppStorage("selectedColorScheme") var selectedScheme: String = "system" {
+    @AppStorage("selectedColorScheme") var selectedScheme: String = "light" {
         didSet {
             objectWillChange.send()
         }
