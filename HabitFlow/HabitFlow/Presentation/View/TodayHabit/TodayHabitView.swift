@@ -147,7 +147,7 @@ private struct ToDoListView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("해야 할 습관 (\(viewModel.todos.count))")
+            Text("해야할 습관 (\(viewModel.todos.count))")
                 .foregroundStyle(Color.textPrimary)
                 .font(.subheadline.bold())
                 .padding()
@@ -170,7 +170,7 @@ private struct ToDoListView: View {
                 if viewModel.todos.isEmpty {
                     HStack {
                         Spacer()
-                        Text("해야 할 습관이 없어요")
+                        Text("해야할 습관이 없어요")
                         Spacer()
                     }
                     .padding(.top, 16)
