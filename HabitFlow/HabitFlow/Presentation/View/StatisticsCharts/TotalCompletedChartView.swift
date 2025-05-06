@@ -11,7 +11,6 @@ import Charts
 struct TotalCompletedChartView: View {
     @StateObject private var viewModel: StatisticsChartViewModel
     @State private var selectedPreset: PeriodPreset = .oneWeek
-    @State private var selectedStat: TotalCompletedStat?
     
     init(viewModel: StatisticsChartViewModel = StatisticsChartsDIContainer().makeStatisticsChartViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -31,7 +30,7 @@ struct TotalCompletedChartView: View {
                     viewModel.updatePeriod(newValue.toPeriod())
                 }
                 
-                TotalCompletedGraphView(viewModel: viewModel, selectedStat: $selectedStat, selectedPreset: $selectedPreset)
+                TotalCompletedGraphView(viewModel: viewModel, selectedPreset: $selectedPreset)
                     .padding()
                 
                 VStack {
@@ -61,7 +60,6 @@ struct TotalCompletedChartView: View {
 
 private struct TotalCompletedGraphView: View {
     @ObservedObject var viewModel: StatisticsChartViewModel
-    @Binding var selectedStat: TotalCompletedStat?
     @Binding var selectedPreset: PeriodPreset
     
     var body: some View {
@@ -117,7 +115,7 @@ private struct ChangeStatsView: View {
         let monthlyAnalysis = viewModel.generateMonthlyAnalysis()
         
         VStack(alignment: .leading, spacing: 4) {
-            if viewModel.completedStats.isEmpty {
+            if viewModel.calculateAverage(for: .oneWeek) == 0 {
                 Text("아직 충분한 기록이 없어요")
                     .foregroundStyle(Color.textSecondary)
             } else {
@@ -143,6 +141,7 @@ private struct ChangeStatsView: View {
                         
                     }
                     .onAppear{
+                        viewModel.loadCompletedStats()
                         viewModel.loadPreviousCompletedStats(for: .oneWeek)
                     }
                     

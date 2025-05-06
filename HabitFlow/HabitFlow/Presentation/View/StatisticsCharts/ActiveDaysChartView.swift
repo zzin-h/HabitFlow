@@ -17,15 +17,20 @@ struct ActiveDaysChartView: View {
     var body: some View {
         VStack {
             ActiveDaysCalendarView(viewModel: viewModel)
+            
+            Spacer()
+            
             StatisticsSummaryView(viewModel: viewModel, completedDates: viewModel.completedDates)
+                .padding(.bottom, 48)
         }
+        .navigationTitle("함께한 일수")
         .onAppear {
             viewModel.loadActiveDaysStat()
         }
     }
 }
 
-struct ActiveDaysCalendarView: View {
+private struct ActiveDaysCalendarView: View {
     @ObservedObject var viewModel: StatisticsChartViewModel
     
     var body: some View {
@@ -62,24 +67,33 @@ struct ActiveDaysCalendarView: View {
                     VStack {
                         let day = Calendar.current.component(.day, from: dayCell.date)
                         
-                        Text("\(day)")
-                            .fontWeight(Calendar.current.isDateInToday(dayCell.date) ? .bold : .regular)
-                            .foregroundColor(
-                                Calendar.current.isDateInToday(dayCell.date) ? .blue :
-                                    (dayCell.isInCurrentMonth ? .primary : .gray)
-                            )
+                        if viewModel.days.count > 35 {
+                            Text("1")
+                                .foregroundStyle(.clear)
+                                .frame(height: 50)
+                        }
                         
                         if dayCell.isCompleted {
                             Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 26)
+                                .foregroundStyle(Color.accentColor)
                         } else {
-                            Spacer().frame(height: 24)
+                            Text("\(day)")
+                                .fontWeight(Calendar.current.isDateInToday(dayCell.date) ? .bold : .regular)
+                                .foregroundColor(
+                                    Calendar.current.isDateInToday(dayCell.date) ? Color.accentColor :
+                                        (dayCell.isInCurrentMonth ? Color.textPrimary : Color.textSecondary)
+                                )
                         }
                     }
                     .frame(height: 50)
                 }
             }
+            .frame(height: 300)
         }
+        .frame(height: UIScreen.main.bounds.height * 0.45)
         .onAppear {
             viewModel.fetchAndGenerateDays()
         }
@@ -105,22 +119,6 @@ struct StatisticsSummaryView: View {
             return AnyView(EmptyView())
         }
         
-        if monthStart > today {
-            return AnyView(
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("📅 통계 요약")
-                        .font(.headline)
-                    Text("미래의 날짜로 왔어요.")
-                        .foregroundColor(.gray)
-                        .font(.subheadline)
-                }
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(12)
-                    .padding(.horizontal)
-            )
-        }
-        
         let rangeEnd = min(today, monthEnd)
         
         let monthCompletedDates = completedDates.filter { $0 >= monthStart && $0 <= rangeEnd }
@@ -128,67 +126,85 @@ struct StatisticsSummaryView: View {
         let completionRate = Int(Double(monthCompletedDates.count) / Double(totalDays) * 100)
         
         return AnyView(
-            VStack(alignment: .leading, spacing: 12) {
-                Text("📅 통계 요약")
-                    .font(.headline)
+            VStack(alignment: .leading, spacing: 16) {
+                if monthStart > today {
+                    HStack {
+                        Spacer()
+                        
+                        Text("미래의 날짜로 왔습니다")
+                            .foregroundColor(.gray)
+                            .font(.headline)
+                            .bold()
+                        
+                        Spacer()
+                    }
+                }
                 
                 if let stat = viewModel.activeDaysStat {
                     HStack {
-                        Text("✅ 총 완료 일수")
+                        Text("총 완료 일수")
+                        
                         Spacer()
+                        
                         Text("\(stat.totalDays)일")
-                            .foregroundColor(.green)
                             .fontWeight(.bold)
                     }
+                    
                     HStack {
-                        Text("📈 연속 기록 일수")
+                        Text("연속 수행 일수")
+                        
                         Spacer()
+                        
                         Text("\(stat.streakDays)일")
-                            .foregroundColor(.blue)
                             .fontWeight(.bold)
                     }
                     
                     HStack {
-                        Text("🗓️ \(month)월 달성률")
+                        Text("\(month)월 수행률")
+                        
                         Spacer()
+                        
                         Text("\(completionRate)%")
-                            .foregroundColor(.purple)
                             .fontWeight(.bold)
+                            .foregroundStyle(Color.secondaryColor)
                     }
                     
-                    Text("\(formatDate(monthStart)) ~ \(formatDate(rangeEnd))일 간의 달성 기록이에요.")
-                        .font(.footnote)
-                        .foregroundColor(.gray)
+                    if monthStart <= today {
+                        Text("\(formatDate(monthStart)) ~ \(formatDate(rangeEnd))일 간의 달성 기록이에요.")
+                            .font(.footnote)
+                            .foregroundColor(.gray)
+                    }
                     
                     if let breakGap = viewModel.longestBreakGap(from: monthCompletedDates) {
                         let adjustedStart = calendar.date(byAdding: .day, value: 1, to: breakGap.start)
                         let adjustedEnd = calendar.date(byAdding: .day, value: -1, to: breakGap.end)
                         
-                        HStack {
-                            Text("😴 가장 오래 쉰 구간")
-                            Spacer()
-                            Text("\(formatDate(adjustedStart!)) ~ \(formatDate(adjustedEnd!)) (\(breakGap.days)일)")
-                                .foregroundColor(.red)
-                                .fontWeight(.bold)
+                        if breakGap.days != 0 {
+                            HStack {
+                                Text("휴식 기간")
+                                
+                                Spacer()
+                                
+                                Text("\(formatDate(adjustedStart!)) ~ \(formatDate(adjustedEnd!)) (\(breakGap.days)일)")
+                                    .foregroundColor(Color.primaryColor)
+                                    .fontWeight(.bold)
+                            }
                         }
                     } else {
                         HStack {
-                            Text("😴 가장 오래 쉰 구간")
                             Spacer()
-                            Text("충분한 데이터 없음")
+                            
+                            Text("충분한 기록이 없습니다")
                                 .foregroundColor(.gray)
+                                .font(.headline)
                         }
                     }
-                } else if let error = viewModel.errorMessage {
-                    Text("오류: \(error)")
-                } else {
-                    ProgressView()
                 }
             }
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
-                .padding(.horizontal)
+            .padding()
+            .background(Color(.systemGray6))
+            .cornerRadius(12)
+            .padding(.horizontal)
         )
     }
     
