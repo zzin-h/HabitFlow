@@ -23,6 +23,7 @@ struct NavigationIconView: View {
             NavigationLink(destination: SettingsView()) {
                 Image(systemName: "gearshape")
             }
+            .font(.title2)
         }
         .padding()
     }

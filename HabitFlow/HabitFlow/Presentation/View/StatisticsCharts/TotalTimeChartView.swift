@@ -105,10 +105,14 @@ private struct TotalTime3Summary: View {
     var body: some View {
         VStack {
             VStack(alignment: .leading, spacing: 8) {
-                Text("베스트 3 누적시간")
-                    .font(.subheadline.bold())
-                    .foregroundStyle(Color.textPrimary)
-                    .padding(.bottom, 16)
+                HStack {
+                    Text("베스트 3 누적시간")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(Color.textPrimary)
+                        .padding(.bottom, 16)
+                    
+                    Spacer()
+                }
                 
                 if let top1 {
                     Top3Card(title: top1.title,
@@ -138,10 +142,12 @@ private struct TotalTime3Summary: View {
                         )
                     }
                 }
+                
+                Spacer()
             }
             .padding()
         }
-        .frame(maxHeight: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemGroupedBackground))
     }
 }
