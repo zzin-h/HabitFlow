@@ -30,16 +30,15 @@ struct BestHabitChartView: View {
                 Text("충분한 데이터가 없습니다")
                     .foregroundStyle(Color.gray)
                     .padding(.top, 32)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(height: UIScreen.main.bounds.height * 0.5)
             } else {
                 BestHabitGraphView(viewModel: viewModel)
                     .frame(height: UIScreen.main.bounds.height * 0.5)
                     .padding(.horizontal)
-                
-                Divider()
-                
-                BestHabit3Summary(viewModel: viewModel)
             }
+            Divider()
+            
+            BestHabit3Summary(viewModel: viewModel)
         }
         .navigationTitle("베스트 습관")
         .onAppear {
@@ -186,6 +185,7 @@ private struct Top3Card: View {
                 Spacer()
             }
             .foregroundStyle(Color.textSecondary)
+            .fontWeight(.regular)
             .padding(.bottom, 8)
         }
         .font(font)
