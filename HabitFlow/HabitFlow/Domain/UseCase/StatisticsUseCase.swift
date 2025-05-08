@@ -1,5 +1,5 @@
 //
-//  StatisticsRepository.swift
+//  StatisticsUseCase.swift
 //  HabitFlow
 //
 //  Created by Haejin Park on 4/18/25.
@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-protocol StatisticsRepository {
+protocol StatisticsUseCase {
     func fetchTotalCompletedCount() -> AnyPublisher<Int, Error>
     func fetchActiveDays() -> AnyPublisher<(total: Int, streak: Int), Error>
     func fetchFavoriteCategory() -> AnyPublisher<String, Error>

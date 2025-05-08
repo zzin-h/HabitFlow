@@ -1,5 +1,5 @@
 //
-//  HabitRecordRepositoryImpl.swift
+//  HabitRecordUseCaseImpl.swift
 //  HabitFlow
 //
 //  Created by Haejin Park on 4/16/25.
@@ -8,22 +8,22 @@
 import Foundation
 import Combine
 
-final class HabitRecordRepositoryImpl: HabitRecordRepository {
-    private let storage: HabitRecordCoreDataStorage
+final class HabitRecordUseCaseImpl: HabitRecordUseCase {
+    private let repository: HabitRecordRepository
 
-    init(storage: HabitRecordCoreDataStorage) {
-        self.storage = storage
+    init(repository: HabitRecordRepository) {
+        self.repository = repository
     }
 
     func addRecord(habitId: UUID, date: Date, duration: Int32) -> AnyPublisher<Void, Error> {
         return Future { [weak self] promise in
             guard let self = self else {
-                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                promise(.failure(NSError(domain: "repository.deallocated", code: -1)))
                 return
             }
 
             do {
-                try self.storage.addRecord(habitId: habitId, date: date, duration: duration)
+                try self.repository.addRecord(habitId: habitId, date: date, duration: duration)
                 promise(.success(()))
             } catch {
                 promise(.failure(error))
@@ -35,12 +35,12 @@ final class HabitRecordRepositoryImpl: HabitRecordRepository {
     func deleteRecord(by id: UUID) -> AnyPublisher<Void, Error> {
         return Future { [weak self] promise in
             guard let self = self else {
-                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                promise(.failure(NSError(domain: "repository.deallocated", code: -1)))
                 return
             }
 
             do {
-                try self.storage.deleteRecord(by: id)
+                try self.repository.deleteRecord(by: id)
                 promise(.success(()))
             } catch {
                 promise(.failure(error))
@@ -52,12 +52,12 @@ final class HabitRecordRepositoryImpl: HabitRecordRepository {
     func updateRecord(id: UUID, date: Date, duration: Int32) -> AnyPublisher<Void, Error> {
         return Future { [weak self] promise in
             guard let self = self else {
-                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                promise(.failure(NSError(domain: "repository.deallocated", code: -1)))
                 return
             }
 
             do {
-                try self.storage.updateRecord(recordId: id, newDate: date, newDuration: duration)
+                try self.repository.updateRecord(recordId: id, newDate: date, newDuration: duration)
                 promise(.success(()))
             } catch {
                 promise(.failure(error))
@@ -69,12 +69,12 @@ final class HabitRecordRepositoryImpl: HabitRecordRepository {
     func fetchRecords(for habitId: UUID) -> AnyPublisher<[HabitRecordModel], Error> {
         return Future { [weak self] promise in
             guard let self = self else {
-                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                promise(.failure(NSError(domain: "repository.deallocated", code: -1)))
                 return
             }
 
             do {
-                let entities = try self.storage.fetchRecords(for: habitId)
+                let entities = try self.repository.fetchRecords(for: habitId)
                 let models = entities.map { HabitRecordModel(entity: $0) }
                 promise(.success(models))
             } catch {
@@ -87,12 +87,12 @@ final class HabitRecordRepositoryImpl: HabitRecordRepository {
     func fetchAllRecords() -> AnyPublisher<[HabitRecordModel], Error> {
         return Future { [weak self] promise in
             guard let self = self else {
-                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                promise(.failure(NSError(domain: "repository.deallocated", code: -1)))
                 return
             }
 
             do {
-                let entities = try self.storage.fetchAllRecords()
+                let entities = try self.repository.fetchAllRecords()
                 let models = entities.map { HabitRecordModel(entity: $0) }
                 promise(.success(models))
             } catch {

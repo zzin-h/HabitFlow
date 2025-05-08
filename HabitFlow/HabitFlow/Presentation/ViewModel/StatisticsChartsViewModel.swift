@@ -40,15 +40,8 @@ final class StatisticsChartViewModel: ObservableObject {
     
     @Published var errorMessage: String?
     
-    // MARK: - Use Cases
-    private let fetchTotalCompletedStatsUseCase: FetchTotalCompletedStatsUseCase
-    private let fetchActiveDaysStatUseCase: FetchActiveDaysStatUseCase
-    private let fetchCompletedDatesUseCase: FetchCompletedDatesUseCase
-    private let fetchCategoryStatsUseCase: FetchCategoryStatsUseCase
-    private let fetchBestHabitsWithCategoryUseCase: FetchBestHabitsWithCategoryUseCase
-    private let fetchTotalTimeStatUseCase: FetchTotalTimeStatUseCase
-    private let fetchTimePatternStatUseCase: FetchTimePatternStatUseCase
-    private let fetchSummaryUseCase: FetchSummaryUseCase
+    // MARK: - UseCase
+    private let useCase: StatisticsChartsUseCase
     
     private let categoryDisplayOrder: [HabitCategory] = [
         .healthyIt,
@@ -62,28 +55,14 @@ final class StatisticsChartViewModel: ObservableObject {
     
     // MARK: - Init
     init(
-        fetchTotalCompletedStatsUseCase: FetchTotalCompletedStatsUseCase,
-        fetchActiveDaysStatUseCase: FetchActiveDaysStatUseCase,
-        fetchCompletedDatesUseCase: FetchCompletedDatesUseCase,
-        fetchCategoryStatsUseCase: FetchCategoryStatsUseCase,
-        fetchBestHabitsWithCategoryUseCase: FetchBestHabitsWithCategoryUseCase,
-        fetchTotalTimeStatUseCase: FetchTotalTimeStatUseCase,
-        fetchTimePatternStatUseCase: FetchTimePatternStatUseCase,
-        fetchSummaryUseCase: FetchSummaryUseCase
+        useCase: StatisticsChartsUseCase
     ) {
-        self.fetchTotalCompletedStatsUseCase = fetchTotalCompletedStatsUseCase
-        self.fetchActiveDaysStatUseCase = fetchActiveDaysStatUseCase
-        self.fetchCompletedDatesUseCase = fetchCompletedDatesUseCase
-        self.fetchCategoryStatsUseCase = fetchCategoryStatsUseCase
-        self.fetchBestHabitsWithCategoryUseCase = fetchBestHabitsWithCategoryUseCase
-        self.fetchTotalTimeStatUseCase = fetchTotalTimeStatUseCase
-        self.fetchTimePatternStatUseCase = fetchTimePatternStatUseCase
-        self.fetchSummaryUseCase = fetchSummaryUseCase
+        self.useCase = useCase
     }
     
     // MARK: - TotalCompleted
     func loadPreviousCompletedStats(for periodType: PeriodType) {
-        fetchTotalCompletedStatsUseCase.execute()
+        useCase.fetchTotalCompletedStats()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case let .failure(error) = completion {
@@ -145,7 +124,7 @@ final class StatisticsChartViewModel: ObservableObject {
     }
     
     func loadCompletedStats() {
-        fetchTotalCompletedStatsUseCase.execute()
+        useCase.fetchTotalCompletedStats()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case let .failure(error) = completion {
@@ -301,7 +280,7 @@ final class StatisticsChartViewModel: ObservableObject {
     
     // MARK: - ActiveDays
     func loadActiveDaysStat() {
-        fetchActiveDaysStatUseCase.execute()
+        useCase.fetchActiveDaysStat()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 switch completion {
@@ -317,7 +296,7 @@ final class StatisticsChartViewModel: ObservableObject {
     }
     
     func loadCompletedDates() {
-        fetchCompletedDatesUseCase.execute()
+        useCase.fetchCompletedDates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case .failure(let error) = completion {
@@ -374,7 +353,7 @@ final class StatisticsChartViewModel: ObservableObject {
     }
     
     func fetchAndGenerateDays() {
-        fetchCompletedDatesUseCase.execute()
+        useCase.fetchCompletedDates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case .failure(let error) = completion {
@@ -428,7 +407,7 @@ final class StatisticsChartViewModel: ObservableObject {
     
     // MARK: - FavoriteCategory
     func loadAllCategoryStats() {
-        fetchCategoryStatsUseCase.execute()
+        useCase.fetchCategoryStats()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case let .failure(error) = completion {
@@ -476,7 +455,7 @@ final class StatisticsChartViewModel: ObservableObject {
     
     // MARK: - BestHabit
     func loadAllBestHabits() {
-        fetchBestHabitsWithCategoryUseCase.execute()
+        useCase.fetchBestHabitsWithCategory()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case let .failure(error) = completion {
@@ -500,7 +479,7 @@ final class StatisticsChartViewModel: ObservableObject {
     
     // MARK: - TotalTime
     func loadTotalTimeStats() {
-        fetchTotalTimeStatUseCase.execute()
+        useCase.fetchTotalTimeStat()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case let .failure(error) = completion {
@@ -521,7 +500,7 @@ final class StatisticsChartViewModel: ObservableObject {
     
     // MARK: - TimePattern
     func loadTimePatternStats() {
-        fetchTimePatternStatUseCase.execute()
+        useCase.fetchTimePatternStat()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case let .failure(error) = completion {
@@ -547,7 +526,7 @@ final class StatisticsChartViewModel: ObservableObject {
     
     // MARK: - Summary
     func loadSummary(for period: Period) {
-        fetchSummaryUseCase.execute()
+        useCase.fetchSummary()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case let .failure(error) = completion {

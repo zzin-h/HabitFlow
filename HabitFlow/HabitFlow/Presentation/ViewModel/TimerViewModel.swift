@@ -9,18 +9,24 @@ import Foundation
 import Combine
 
 final class TimerViewModel: ObservableObject {
+    // MARK: - Published Properties
     @Published var remainingTime: Int
     @Published var isRunning: Bool = false
     
     let totalTime: Int
     private var timer: Timer?
     
+    var onComplete: (() -> Void)?
+    var progress: CGFloat {
+        guard totalTime > 0 else { return 0 }
+        return CGFloat(remainingTime) / CGFloat(totalTime)
+    }
+    
+    // MARK: - Init
     init(totalTime: Int) {
         self.totalTime = totalTime
         self.remainingTime = totalTime
     }
-    
-    var onComplete: (() -> Void)?
     
     init(goalMinutes: Int, onComplete: (() -> Void)? = nil) {
         self.totalTime = goalMinutes * 60
@@ -28,11 +34,7 @@ final class TimerViewModel: ObservableObject {
         self.onComplete = onComplete
     }
     
-    var progress: CGFloat {
-        guard totalTime > 0 else { return 0 }
-        return CGFloat(remainingTime) / CGFloat(totalTime)
-    }
-    
+    // MARK: - TimerActions
     func start() {
         guard !isRunning else { return }
         isRunning = true

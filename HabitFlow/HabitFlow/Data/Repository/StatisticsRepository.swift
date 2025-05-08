@@ -1,5 +1,5 @@
 //
-//  StatisticsCoreDataStorage.swift
+//  StatisticsRepository.swift
 //  HabitFlow
 //
 //  Created by Haejin Park on 4/18/25.
@@ -7,7 +7,7 @@
 
 import CoreData
 
-final class StatisticsCoreDataStorage {
+final class StatisticsRepository {
     private let context: NSManagedObjectContext
 
     init(context: NSManagedObjectContext = CoreDataManager.shared.context) {

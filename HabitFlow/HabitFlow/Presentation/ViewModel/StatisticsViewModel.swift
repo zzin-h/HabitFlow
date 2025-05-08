@@ -19,31 +19,16 @@ final class StatisticsViewModel: ObservableObject {
     @Published var mostFrequentDay: String = ""
     @Published var mostFrequentTime: String = ""
 
-    // MARK: - Use Cases
-    private let fetchTotalCompletedCountUseCase: FetchTotalCompletedCountUseCase
-    private let fetchActiveDaysUseCase: FetchActiveDaysUseCase
-    private let fetchFavoriteCategoryUseCase: FetchFavoriteCategoryUseCase
-    private let fetchBestHabitUseCase: FetchBestHabitUseCase
-    private let fetchTotalTimeUseCase: FetchTotalTimeUseCase
-    private let fetchTimeBasedStatsUseCase: FetchTimeBasedStatsUseCase
+    // MARK: - UseCase
+    private let useCase: StatisticsUseCase
 
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Init
     init(
-        fetchTotalCompletedCountUseCase: FetchTotalCompletedCountUseCase,
-        fetchActiveDaysUseCase: FetchActiveDaysUseCase,
-        fetchFavoriteCategoryUseCase: FetchFavoriteCategoryUseCase,
-        fetchBestHabitUseCase: FetchBestHabitUseCase,
-        fetchTotalTimeUseCase: FetchTotalTimeUseCase,
-        fetchTimeBasedStatsUseCase: FetchTimeBasedStatsUseCase
+        useCase: StatisticsUseCase
     ) {
-        self.fetchTotalCompletedCountUseCase = fetchTotalCompletedCountUseCase
-        self.fetchActiveDaysUseCase = fetchActiveDaysUseCase
-        self.fetchFavoriteCategoryUseCase = fetchFavoriteCategoryUseCase
-        self.fetchBestHabitUseCase = fetchBestHabitUseCase
-        self.fetchTotalTimeUseCase = fetchTotalTimeUseCase
-        self.fetchTimeBasedStatsUseCase = fetchTimeBasedStatsUseCase
+        self.useCase = useCase
 
         loadStatistics()
     }
@@ -59,7 +44,7 @@ final class StatisticsViewModel: ObservableObject {
     }
 
     private func fetchTotalCompletedCount() {
-        fetchTotalCompletedCountUseCase.execute()
+        useCase.fetchTotalCompletedCount()
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }) { [weak self] count in
                 self?.totalCompletedCount = count
@@ -68,7 +53,7 @@ final class StatisticsViewModel: ObservableObject {
     }
 
     private func fetchActiveDays() {
-        fetchActiveDaysUseCase.execute()
+        useCase.fetchActiveDays()
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }) { [weak self] result in
                 self?.activeDays = result.total
@@ -78,7 +63,7 @@ final class StatisticsViewModel: ObservableObject {
     }
 
     private func fetchFavoriteCategory() {
-        fetchFavoriteCategoryUseCase.execute()
+        useCase.fetchFavoriteCategory()
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }) { [weak self] category in
                 self?.favoriteCategory = category
@@ -87,7 +72,7 @@ final class StatisticsViewModel: ObservableObject {
     }
 
     private func fetchBestHabit() {
-        fetchBestHabitUseCase.execute()
+        useCase.fetchBestHabit()
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }) { [weak self] habit in
                 self?.bestHabitTitle = habit
@@ -96,7 +81,7 @@ final class StatisticsViewModel: ObservableObject {
     }
 
     private func fetchTotalTimeSpent() {
-        fetchTotalTimeUseCase.execute()
+        useCase.fetchTotalTime()
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }) { [weak self] time in
                 self?.totalTimeSpent = time
@@ -105,7 +90,7 @@ final class StatisticsViewModel: ObservableObject {
     }
 
     private func fetchTimeBasedStats() {
-        fetchTimeBasedStatsUseCase.execute()
+        useCase.fetchTimeBasedStats()
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }) { [weak self] result in
                 self?.mostFrequentDay = result.mostFrequentDay
