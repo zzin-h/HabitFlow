@@ -36,8 +36,8 @@ struct TodayHabitView: View {
                     
                     if !helperMessage.isEmpty {
                         HelperCardView(
-                            text1: helperMessage[0],
-                            text2: helperMessage[1]
+                            text1: helperMessage[1],
+                            text2: helperMessage[0]
                         )
                     }
                     
