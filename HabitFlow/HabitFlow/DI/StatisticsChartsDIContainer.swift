@@ -9,62 +9,22 @@ import Foundation
 
 final class StatisticsChartsDIContainer {
     
-    // MARK: - CoreData Storages
-    private let statisticsChartsStorage: StatisticsChartsCoreDataStorage
-    
-    // MARK: - Repositories
+    // MARK: - Repository
     private let statisticsChartsRepository: StatisticsChartsRepository
+    
+    // MARK: - UseCase
+    private let statisticsChartsUseCase: StatisticsChartsUseCase
     
     // MARK: - Init
     init() {
-        self.statisticsChartsStorage = StatisticsChartsCoreDataStorage()
-        self.statisticsChartsRepository = StatisticsChartsRepositoryImpl(storage: statisticsChartsStorage)
-    }
-    
-    // MARK: - UseCases
-    func makeFetchTotalCompletedStatsUseCase() -> FetchTotalCompletedStatsUseCase {
-        return DefaultFetchTotalCompletedStatsUseCase(repository: statisticsChartsRepository)
-    }
-    
-    func makeFetchActiveDaysStatUseCase() -> FetchActiveDaysStatUseCase {
-        DefaultFetchActiveDaysStatUseCase(repository: statisticsChartsRepository)
-    }
-    
-    func makeFetchCompletedDatesUseCase() -> FetchCompletedDatesUseCase {
-        DefaultFetchCompletedDatesUseCase(repository: statisticsChartsRepository)
-    }
-    
-    func makeFetchCategoryStatsUseCase() -> FetchCategoryStatsUseCase {
-        DefaultFetchCategoryStatsUseCase(repository: statisticsChartsRepository)
-    }
-    
-    func makeFetchBestHabitsWithCategoryUseCase() -> FetchBestHabitsWithCategoryUseCase {
-        DefaultFetchBestHabitsWithCategoryUseCase(repository: statisticsChartsRepository)
-    }
-    
-    func makeFetchTotalTimeStatUseCase() -> FetchTotalTimeStatUseCase {
-        DefaultFetchTotalTimeStatUseCase(repository: statisticsChartsRepository)
-    }
-    
-    func makeFetchTimePatternStatUseCase() -> FetchTimePatternStatUseCase {
-        DefaultFetchTimePatternStatUseCase(repository: statisticsChartsRepository)
-    }
-    
-    func makeFetchSummaryUseCase() -> FetchSummaryUseCase {
-        DefaultFetchSummaryUseCase(repository: statisticsChartsRepository)
+        self.statisticsChartsRepository = StatisticsChartsRepository()
+        self.statisticsChartsUseCase = StatisticsChartsUseCaseImpl(repository: statisticsChartsRepository)
     }
     
     // MARK: - ViewModel
     func makeStatisticsChartViewModel() -> StatisticsChartViewModel {
         return StatisticsChartViewModel(
-            fetchTotalCompletedStatsUseCase: makeFetchTotalCompletedStatsUseCase(),
-            fetchActiveDaysStatUseCase: makeFetchActiveDaysStatUseCase(),
-            fetchCompletedDatesUseCase: makeFetchCompletedDatesUseCase(),
-            fetchCategoryStatsUseCase: makeFetchCategoryStatsUseCase(),
-            fetchBestHabitsWithCategoryUseCase: makeFetchBestHabitsWithCategoryUseCase(),
-            fetchTotalTimeStatUseCase: makeFetchTotalTimeStatUseCase(),
-            fetchTimePatternStatUseCase: makeFetchTimePatternStatUseCase(),
-            fetchSummaryUseCase: makeFetchSummaryUseCase()
+            useCase: statisticsChartsUseCase
         )
     }
 }

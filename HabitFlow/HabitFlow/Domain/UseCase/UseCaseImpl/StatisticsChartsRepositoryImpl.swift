@@ -1,5 +1,5 @@
 //
-//  StatisticsChartsRepositoryImpl.swift
+//  StatisticsChartsUseCaseImpl.swift
 //  HabitFlow
 //
 //  Created by Haejin Park on 4/23/25.
@@ -8,22 +8,22 @@
 import Foundation
 import Combine
 
-final class StatisticsChartsRepositoryImpl: StatisticsChartsRepository {
-    private let storage: StatisticsChartsCoreDataStorage
+final class StatisticsChartsUseCaseImpl: StatisticsChartsUseCase {
+    private let repository: StatisticsChartsRepository
     
-    init(storage: StatisticsChartsCoreDataStorage) {
-        self.storage = storage
+    init(repository: StatisticsChartsRepository) {
+        self.repository = repository
     }
     
     func fetchTotalCompletedStats() -> AnyPublisher<[TotalCompletedStat], Error> {
         return Future { [weak self] promise in
             guard let self = self else {
-                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                promise(.failure(NSError(domain: "repository.deallocated", code: -1)))
                 return
             }
             
             do {
-                let stats = try self.storage.fetchTotalCompletedStats()
+                let stats = try self.repository.fetchTotalCompletedStats()
                 promise(.success(stats))
             } catch {
                 promise(.failure(error))
@@ -35,12 +35,12 @@ final class StatisticsChartsRepositoryImpl: StatisticsChartsRepository {
     func fetchActiveDaysStat() -> AnyPublisher<ActiveDaysStat, Error> {
         return Future { [weak self] promise in
             guard let self = self else {
-                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                promise(.failure(NSError(domain: "repository.deallocated", code: -1)))
                 return
             }
             
             do {
-                let stat = try self.storage.fetchActiveDaysStat()
+                let stat = try self.repository.fetchActiveDaysStat()
                 promise(.success(stat))
             } catch {
                 promise(.failure(error))
@@ -53,7 +53,7 @@ final class StatisticsChartsRepositoryImpl: StatisticsChartsRepository {
         Future { [weak self] promise in
             guard let self else { return }
             do {
-                let dates = try self.storage.fetchCompletedDates()
+                let dates = try self.repository.fetchCompletedDates()
                 promise(.success(dates))
             } catch {
                 promise(.failure(error))
@@ -66,7 +66,7 @@ final class StatisticsChartsRepositoryImpl: StatisticsChartsRepository {
         Future { [weak self] promise in
             guard let self else { return }
             do {
-                let categoryStat = try self.storage.fetchCategoryStats()
+                let categoryStat = try self.repository.fetchCategoryStats()
                 promise(.success(categoryStat))
             } catch {
                 promise(.failure(error))
@@ -79,7 +79,7 @@ final class StatisticsChartsRepositoryImpl: StatisticsChartsRepository {
         Future { [weak self] promise in
             guard let self else { return }
             do {
-                let habitCountDict = try self.storage.fetchBestHabitsWithCategory()
+                let habitCountDict = try self.repository.fetchBestHabitsWithCategory()
                 promise(.success(habitCountDict))
             } catch {
                 promise(.failure(error))
@@ -92,7 +92,7 @@ final class StatisticsChartsRepositoryImpl: StatisticsChartsRepository {
         Future { [weak self] promise in
             guard let self else { return }
             do {
-                let totalTimeStat = try self.storage.fetchTotalTimeStat()
+                let totalTimeStat = try self.repository.fetchTotalTimeStat()
                 promise(.success(totalTimeStat))
             } catch {
                 promise(.failure(error))
@@ -105,7 +105,7 @@ final class StatisticsChartsRepositoryImpl: StatisticsChartsRepository {
         Future { [weak self] promise in
             guard let self else { return }
             do {
-                let timePatternStat = try self.storage.fetchTimePatternStat()
+                let timePatternStat = try self.repository.fetchTimePatternStat()
                 promise(.success(timePatternStat))
             } catch {
                 promise(.failure(error))
@@ -118,7 +118,7 @@ final class StatisticsChartsRepositoryImpl: StatisticsChartsRepository {
         Future { [weak self] promise in
             guard let self else { return }
             do {
-                let summary = try self.storage.fetchSummary(for: Period.weekly(Date()))
+                let summary = try self.repository.fetchSummary(for: Period.weekly(Date()))
                 promise(.success(summary))
             } catch {
                 promise(.failure(error))

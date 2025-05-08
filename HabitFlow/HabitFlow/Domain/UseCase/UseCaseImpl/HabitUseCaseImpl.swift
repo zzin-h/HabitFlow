@@ -1,5 +1,5 @@
 //
-//  HabitRepositoryImpl.swift
+//  HabitUseCaseImpl.swift
 //  HabitFlow
 //
 //  Created by Haejin Park on 4/9/25.
@@ -8,23 +8,23 @@
 import Foundation
 import Combine
 
-final class HabitRepositoryImpl: HabitRepository {
-    private let storage: HabitCoreDataStorage
-    private let recordStorage: HabitRecordCoreDataStorage
+final class HabitUseCaseImpl: HabitUseCase {
+    private let repository: HabitRepository
+    private let recordRepository: HabitRecordRepository
     
-    init(storage: HabitCoreDataStorage, recordStorage: HabitRecordCoreDataStorage) {
-        self.storage = storage
-        self.recordStorage = recordStorage
+    init(repository: HabitRepository, recordRepository: HabitRecordRepository) {
+        self.repository = repository
+        self.recordRepository = recordRepository
     }
     
     func fetchHabits() -> AnyPublisher<[HabitModel], Error> {
         return Future { [weak self] promise in
             guard let self = self else {
-                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                promise(.failure(NSError(domain: "repository.deallocated", code: -1)))
                 return
             }
             do {
-                let habits = try self.storage.fetchAllHabits()
+                let habits = try self.repository.fetchAllHabits()
                 promise(.success(habits))
             } catch {
                 promise(.failure(error))
@@ -36,12 +36,12 @@ final class HabitRepositoryImpl: HabitRepository {
     func fetchHabits(for date: Date) -> AnyPublisher<[HabitModel], Error> {
         return Future { [weak self] promise in
             guard let self = self else {
-                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                promise(.failure(NSError(domain: "repository.deallocated", code: -1)))
                 return
             }
 
             do {
-                let allHabits = try self.storage.fetchAllHabits()
+                let allHabits = try self.repository.fetchAllHabits()
                 let filtered = allHabits.filter { $0.isScheduled(for: date) }
                 promise(.success(filtered))
             } catch {
@@ -54,11 +54,11 @@ final class HabitRepositoryImpl: HabitRepository {
     func addHabit(_ habit: HabitModel) -> AnyPublisher<Void, Error> {
         return Future { [weak self] promise in
             guard let self = self else {
-                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                promise(.failure(NSError(domain: "repository.deallocated", code: -1)))
                 return
             }
             do {
-                try self.storage.addHabit(habit)
+                try self.repository.addHabit(habit)
                 promise(.success(()))
             } catch {
                 promise(.failure(error))
@@ -70,11 +70,11 @@ final class HabitRepositoryImpl: HabitRepository {
     func deleteHabit(_ id: UUID) -> AnyPublisher<Void, Error> {
         return Future { [weak self] promise in
             guard let self = self else {
-                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                promise(.failure(NSError(domain: "repository.deallocated", code: -1)))
                 return
             }
             do {
-                try self.storage.deleteHabit(by: id)
+                try self.repository.deleteHabit(by: id)
                 promise(.success(()))
             } catch {
                 promise(.failure(error))
@@ -86,11 +86,11 @@ final class HabitRepositoryImpl: HabitRepository {
     func updateHabit(_ habit: HabitModel) -> AnyPublisher<Void, Error> {
         return Future { [weak self] promise in
             guard let self = self else {
-                promise(.failure(NSError(domain: "storage.deallocated", code: -1)))
+                promise(.failure(NSError(domain: "repository.deallocated", code: -1)))
                 return
             }
             do {
-                try self.storage.updateHabit(habit)
+                try self.repository.updateHabit(habit)
                 promise(.success(()))
             } catch {
                 promise(.failure(error))
@@ -101,7 +101,7 @@ final class HabitRepositoryImpl: HabitRepository {
     
     func updateHabitStatus(_ habitId: UUID, completedAt: Date) {
         do {
-            try storage.updateHabitStatus(habitId: habitId, completedAt: completedAt)
+            try repository.updateHabitStatus(habitId: habitId, completedAt: completedAt)
         } catch {
             print("Error updating habit status: \(error)")
         }
@@ -109,7 +109,7 @@ final class HabitRepositoryImpl: HabitRepository {
     
     func addHabitRecord(_ record: HabitRecordModel) {
         do {
-            try recordStorage.addRecord(
+            try recordRepository.addRecord(
                 habitId: record.habit.id,
                 date: record.date,
                 duration: Int32(record.duration)

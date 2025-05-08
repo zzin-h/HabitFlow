@@ -1,5 +1,5 @@
 //
-//  HabitRepository.swift
+//  HabitUseCase.swift
 //  HabitFlow
 //
 //  Created by Haejin Park on 4/9/25.
@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-protocol HabitRepository {
+protocol HabitUseCase {
     func fetchHabits() -> AnyPublisher<[HabitModel], Error>
     func fetchHabits(for date: Date) -> AnyPublisher<[HabitModel], Error>
     func addHabit(_ habit: HabitModel) -> AnyPublisher<Void, Error>

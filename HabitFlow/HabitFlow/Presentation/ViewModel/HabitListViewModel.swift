@@ -14,32 +14,23 @@ final class HabitListViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     // MARK: - Dependencies
-    private let fetchHabitUseCase: FetchHabitUseCase
-    private let addHabitUseCase: AddHabitUseCase
-    private let deleteHabitUseCase: DeleteHabitUseCase
-    private let updateHabitUseCase: UpdateHabitUseCase
+    private let useCase: HabitUseCase
 
     // MARK: - Combine
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Init
     init(
-        fetchHabitUseCase: FetchHabitUseCase,
-        addHabitUseCase: AddHabitUseCase,
-        deleteHabitUseCase: DeleteHabitUseCase,
-        updateHabitUseCase: UpdateHabitUseCase
+        useCase: HabitUseCase
     ) {
-        self.fetchHabitUseCase = fetchHabitUseCase
-        self.addHabitUseCase = addHabitUseCase
-        self.deleteHabitUseCase = deleteHabitUseCase
-        self.updateHabitUseCase = updateHabitUseCase
+        self.useCase = useCase
         
         fetchHabits()
     }
 
     // MARK: - Public Methods
     func fetchHabits() {
-        fetchHabitUseCase.execute()
+        useCase.fetchHabits()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case let .failure(error) = completion {
@@ -52,7 +43,7 @@ final class HabitListViewModel: ObservableObject {
     }
 
     func addHabit(_ habit: HabitModel) {
-        addHabitUseCase.execute(habit)
+        useCase.addHabit(habit)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 switch completion {
@@ -66,7 +57,7 @@ final class HabitListViewModel: ObservableObject {
     }
 
     func deleteHabit(id: UUID) {
-        deleteHabitUseCase.execute(id)
+        useCase.deleteHabit(id)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 switch completion {
@@ -80,7 +71,7 @@ final class HabitListViewModel: ObservableObject {
     }
     
     func updateHabit(_ habit: HabitModel) {
-        updateHabitUseCase.execute(habit)
+        useCase.updateHabit(habit)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 switch completion {

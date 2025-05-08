@@ -9,21 +9,25 @@ import Foundation
 import Combine
 
 final class TodayHabitViewModel: ObservableObject {
+    // MARK: - Published Properties
     @Published var todos: [HabitModel] = []
     @Published var completed: [HabitModel] = []
 
-    private let habitRepository: HabitRepository
-    private let habitRecordRepository: HabitRecordRepository
+    // MARK: - UseCase
+    private let habitUseCase: HabitUseCase
+    private let habitRecordUseCase: HabitRecordUseCase
     private var cancellables = Set<AnyCancellable>()
 
-    init(habitRepository: HabitRepository, habitRecordRepository: HabitRecordRepository) {
-        self.habitRepository = habitRepository
-        self.habitRecordRepository = habitRecordRepository
+    // MARK: - Init
+    init(habitUseCase: HabitUseCase, habitRecordUseCase: HabitRecordUseCase) {
+        self.habitUseCase = habitUseCase
+        self.habitRecordUseCase = habitRecordUseCase
     }
-
+    
+    // MARK: - Actions
     func loadHabits(for date: Date) {
-        let habitsPublisher = habitRepository.fetchHabits(for: date)
-        let recordsPublisher = habitRecordRepository.fetchAllRecords()
+        let habitsPublisher = habitUseCase.fetchHabits(for: date)
+        let recordsPublisher = habitRecordUseCase.fetchAllRecords()
 
         Publishers.Zip(habitsPublisher, recordsPublisher)
             .receive(on: DispatchQueue.main)
@@ -62,7 +66,7 @@ final class TodayHabitViewModel: ObservableObject {
             habit: habit
         )
         
-        habitRecordRepository.addRecord(
+        habitRecordUseCase.addRecord(
             habitId: record.habit.id,
             date: record.date,
             duration: Int32(record.duration)

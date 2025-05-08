@@ -1,5 +1,5 @@
 //
-//  HabitRecordCoreDataStorage.swift
+//  HabitRecordRepository.swift
 //  HabitFlow
 //
 //  Created by Haejin Park on 4/16/25.
@@ -7,7 +7,7 @@
 
 import CoreData
 
-final class HabitRecordCoreDataStorage {
+final class HabitRecordRepository {
     private let context: NSManagedObjectContext
 
     init(context: NSManagedObjectContext = CoreDataManager.shared.context) {

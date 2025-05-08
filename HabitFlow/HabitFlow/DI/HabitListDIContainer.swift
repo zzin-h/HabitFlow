@@ -9,39 +9,19 @@ import Foundation
 
 struct HabitListDIContainer {
     
-    // MARK: - CoreData Storage
-    private let storage = HabitCoreDataStorage()
-    private let recordStorage = HabitRecordCoreDataStorage()
-
     // MARK: - Repository
-    private var repository: HabitRepository {
-        return HabitRepositoryImpl(storage: storage, recordStorage: recordStorage)
-    }
+    private let repository = HabitRepository()
+    private let recordRepository = HabitRecordRepository()
 
-    // MARK: - UseCases
-    private var fetchHabitUseCase: FetchHabitUseCase {
-        return DefaultFetchHabitUseCase(repository: repository)
-    }
-
-    private var addHabitUseCase: AddHabitUseCase {
-        return DefaultAddHabitUseCase(repository: repository)
-    }
-
-    private var deleteHabitUseCase: DeleteHabitUseCase {
-        return DefaultDeleteHabitUseCase(repository: repository)
+    // MARK: - UseCase
+    private var useCase: HabitUseCase {
+        return HabitUseCaseImpl(repository: repository, recordRepository: recordRepository)
     }
     
-    private var updateHabitUseCase: UpdateHabitUseCase {
-        return DefaultUpdateHabitUseCase(repository: repository)
-    }
-
     // MARK: - ViewModel
     func makeHabitListViewModel() -> HabitListViewModel {
         return HabitListViewModel(
-            fetchHabitUseCase: fetchHabitUseCase,
-            addHabitUseCase: addHabitUseCase,
-            deleteHabitUseCase: deleteHabitUseCase,
-            updateHabitUseCase: updateHabitUseCase
+            useCase: useCase
         )
     }
 }
