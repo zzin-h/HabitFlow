@@ -5,22 +5,36 @@
 //  Created by Haejin Park on 4/16/25.
 //
 
-enum Weekdays: String, Codable, CaseIterable, Comparable {
-    case mon, tue, wed, thu, fri, sat, sun
+import Foundation
 
-    var koreanTitle: String {
+enum Weekdays: String, Codable, CaseIterable, Comparable {
+    case sun, mon, tue, wed, thu, fri, sat
+
+    var index: Int {
         switch self {
-        case .mon: return "월"
-        case .tue: return "화"
-        case .wed: return "수"
-        case .thu: return "목"
-        case .fri: return "금"
-        case .sat: return "토"
-        case .sun: return "일"
+        case .sun: return 0
+        case .mon: return 1
+        case .tue: return 2
+        case .wed: return 3
+        case .thu: return 4
+        case .fri: return 5
+        case .sat: return 6
         }
     }
 
+    var shortTitle: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        return formatter.shortWeekdaySymbols[index]
+    }
+
+    var fullTitle: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        return formatter.weekdaySymbols[index]
+    }
+
     static func < (lhs: Weekdays, rhs: Weekdays) -> Bool {
-        allCases.firstIndex(of: lhs)! < allCases.firstIndex(of: rhs)!
+        lhs.index < rhs.index
     }
 }

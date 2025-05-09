@@ -1,0 +1,160 @@
+// TodayHabitView
+"to_do_list" = "やることリスト";
+"done_list" = "完了リスト";
+"complete_today_only" = "今日のリストだけ完了できます";
+"past_day_message" = "過去の日のリストです";
+"future_day_message" = "これからやるリストです";
+"today_habit_nav_title" = "今日の習慣";
+"no_habits_to_do" = "やることはありません";
+"min" = "分";
+"mins" = "分";
+
+// SettingsView
+"appearance" = "表示モード";
+"light_mode" = "ライトモード";
+"dark_mode" = "ダークモード";
+"settings_nav_title" = "設定";
+
+// HabitListView
+"every_days" = "毎日";
+"every_weekdays" = "%@ごと";
+"every_interval_days" = "%d日ごと";
+"habit_list_nav_title" = "習慣リスト";
+"any_habits_yet" = "まだ習慣がありません";
+
+// HabitAddEditView
+"title" = "タイトル";
+"title_notice" = "タイトルを入力してください。";
+"category" = "カテゴリ";
+"repeat" = "繰り返し";
+"repeat_notice" = "繰り返し間隔を入力してください。";
+"goal_time" = "目標時間";
+"goal_time_notice" = "目標時間を入力してください。";
+
+"every" = "毎";
+"repeat_days" = "日ごと";
+"new_nav_title" = "新規";
+"edit_nav_title" = "習慣の編集";
+"new_btn" = "追加";
+"edit_btn" = "完了";
+"cancel_btn" = "キャンセル";
+
+// HabitRecordView
+"records_notice" = "詳細な記録を追加、編集、削除できます。";
+"none_records_notice" = "まだ記録がありません。";
+
+"total" = "合計";
+"times" = "回";
+"times_en_none" = "回";
+"hour" = "時間";
+
+// HabitRecordAddEditView
+"new_record_nav_title" = "新規";
+"edit_record_nav_title" = "記録の編集";
+
+"completed_record" = "完了した記録";
+"completed_date" = "完了日";
+"completed_time" = "完了時刻";
+"completed_duration" = "所要時間";
+"completed_duration_notice" = "分単位で入力してください";
+
+// StatisticsOverviewView
+"statistics_nav_title" = "習慣の統計";
+
+"completed_habits" = "完了の習慣";
+"active_days" = "一緒の日数";
+"favorite_category" = "ベストカテゴリ";
+"best_habit" = "ベスト習慣";
+"total_time" = "一緒の時間";
+"most_frequent" = "最多曜日・時間帯";
+"weekly_report" = "週間レポート";
+
+"days" = "日";
+"consecutive_days" = "日連続";
+"consecutive" = "";
+
+// TotalCompletedChartView
+"7_days" = "7日";
+"30_days" = "30日";
+"not_enough_record" = "まだ十分な記録がありません";
+"analyzed_noitce" = "間の変化を分析しました";
+"last_period_notice" = "前の%@の記録との比較です";
+"avg_notice" = "1日平均%.1f回達成しました";
+
+"analysis_same_1" = "先週と同じ回数でルーティンを続けました。";
+"analysis_same_2" = "安定して続けられていますね😊";
+"analysis_up_big_1" = "先週より%d回も多く達成しました🔥";
+"analysis_up_big_2" = "達成率が%.1f%%上昇しました。どんどん良くなってますね！";
+"analysis_up_small_1" = "少しずつ成長しています💪";
+"analysis_up_small_2" = "先週より%d回多くできました。継続が大切です！";
+"analysis_down_big_1" = "先週より%d回少なかったですね。最近ちょっと忙しかったのでは？";
+"analysis_down_big_2" = "また明日から再チャレンジしましょう💛";
+"analysis_down_small_1" = "先週より少し減りましたが、大丈夫です。リズムを取り戻しましょう🍀";
+"analysis_down_small_2" = "達成率が%.1f%%下がりました";
+
+"monthly_same_1" = "先月と同じ回数ルーティンを達成しました。";
+"monthly_same_2" = "継続することが一番難しいですが、よく頑張っていますね👏";
+"monthly_increase_high_1" = "先月より%d回も多く達成しました😍";
+"monthly_increase_high_2" = "%.1f%%アップ。目に見える成長ですね！";
+"monthly_increase_low_1" = "少し頑張った一ヶ月でした👍";
+"monthly_increase_low_2" = "%d回増えました。素晴らしいです！";
+"monthly_decrease_high_1" = "先月より%d回少なくなりました。";
+"monthly_decrease_high_2" = "体調があまり良くなかったのかもしれません。きっと回復できますよ💪";
+"monthly_decrease_low_1" = "少し減ってしまいましたが、大丈夫です！また始めましょう🌱";
+"monthly_decrease_low_2" = "%.1f%%減少しました。";
+
+//ActiveDaysChartView
+"total_completed_days" = "合計達成日数";
+"consecutive_active_days" = "連続実行日数";
+"monthly_completion_rate" = "%@の達成率";
+"period_achievement" = "%@ - %@の達成記録です";
+"longest_rest_period" = "最長休止期間";
+"future_date_notice" = "未来の日付に移動しました";
+
+// BestHabitChartView
+"best_3" = "ベスト3";
+
+// Report
+"weekly_report_title" = "先週のレポート";
+"weekly_report_summary" = "1週間で%d個の習慣を%d回実践しました";
+"weekly_report_top_habit" = "最も実践した習慣は";
+"weekly_report_time_day" = "主に%@の%@に行いました";
+"weekly_report_total_time" = "自分のために%d時間%d分を取れました";
+"weekly_report_total_time_mins" = "自分のために%d分を取れました";
+"weekly_report_update_notice" = "毎週月曜日にレポートが更新されます";
+
+// Enums
+"weekday" = "曜日";
+"custom" = "カスタム";
+"healthyIt" = "ヘルシット";
+"canDoIt" = "デキルット";
+"moneyIt" = "マネット";
+"greenIt" = "グリット";
+"myMindIt" = "ココロット";
+
+"time_period" = "時間帯";
+"time_range_6_8" = "6 - 8時";
+"time_range_8_10" = "8 - 10時";
+"time_range_10_12" = "10 - 12時";
+"time_range_12_14" = "12 - 14時";
+"time_range_14_16" = "14 - 16時";
+"time_range_16_18" = "16 - 18時";
+"time_range_18_20" = "18 - 20時";
+"time_range_20_22" = "20 - 22時";
+"time_range_22_24" = "22 - 24時";
+"time_range_0_2" = "0 - 2時";
+"time_range_2_4" = "2 - 4時";
+"time_range_4_6" = "4 - 6時";
+
+"time_short_6" = "6時";
+"time_short_8" = "8時";
+"time_short_10" = "10時";
+"time_short_12" = "12時";
+"time_short_14" = "14時";
+"time_short_16" = "16時";
+"time_short_18" = "18時";
+"time_short_20" = "20時";
+"time_short_22" = "22時";
+"time_short_0" = "0時";
+"time_short_2" = "2時";
+"time_short_4" = "4時";

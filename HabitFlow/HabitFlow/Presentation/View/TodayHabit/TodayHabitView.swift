@@ -51,8 +51,12 @@ struct TodayHabitView: View {
                             }
                         }) {
                             HStack {
-                                Text("완료한 습관 (\(viewModel.completed.count))")
-                                    .foregroundStyle(Color.textPrimary)
+                                HStack(spacing: 0) {
+                                    Text(NSLocalizedString("done_list", comment: "done_list"))
+                                    Text(" (\(viewModel.completed.count))")
+                                }
+                                .foregroundStyle(Color.textPrimary)
+                                
                                 Image(systemName: "chevron.up")
                             }
                             .font(.subheadline.bold())
@@ -92,7 +96,7 @@ struct TodayHabitView: View {
                 }
                 .offset(x: UIScreen.main.bounds.width / 2 - 60, y: UIScreen.main.bounds.height / 2 - 80)
             }
-            .navigationTitle("오늘의 습관")
+            .navigationTitle(String(localized: "today_habit_nav_title"))
             .navigationBarHidden(true)
             .animation(.easeInOut(duration: 0.3), value: showingTimer)
             .sheet(isPresented: $isSheetPresented) {
@@ -132,9 +136,11 @@ struct TodayHabitView: View {
         if calendar.isDateInToday(selectedDate) {
             return []
         } else if selectedDate < calendar.startOfDay(for: Date()) {
-            return ["오늘의 습관만 완료할 수 있어요", "지난 날의 습관이에요"]
+            return [String(localized: "complete_today_only"),
+                    String(localized: "past_day_message")]
         } else {
-            return ["오늘의 습관만 완료할 수 있어요", "앞으로 해야할 습관이에요"]
+            return [String(localized: "complete_today_only"),
+                    String(localized: "future_day_message")]
         }
     }
 }
@@ -147,10 +153,13 @@ private struct ToDoListView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("해야할 습관 (\(viewModel.todos.count))")
-                .foregroundStyle(Color.textPrimary)
-                .font(.subheadline.bold())
-                .padding()
+            HStack(spacing: 0) {
+                Text(NSLocalizedString("to_do_list", comment: "to_do_list"))
+                Text(" (\(viewModel.todos.count))")
+            }
+            .foregroundStyle(Color.textPrimary)
+            .font(.subheadline.bold())
+            .padding()
             
             ScrollView {
                 ForEach(viewModel.todos) { habit in
@@ -170,7 +179,7 @@ private struct ToDoListView: View {
                 if viewModel.todos.isEmpty {
                     HStack {
                         Spacer()
-                        Text("해야할 습관이 없어요")
+                        Text(NSLocalizedString("no_habits_to_do", comment: "no_habits_to_do"))
                         Spacer()
                     }
                     .padding(.top, 16)
@@ -195,7 +204,10 @@ private struct CompletionListView: View {
                 .padding(.top, 8)
             
             HStack {
-                Text("완료한 습관 (\(completedHabits.count))")
+                HStack(spacing: 0) {
+                    Text(NSLocalizedString("done_list", comment: "done_list"))
+                    Text(" (\(completedHabits.count))")
+                }
                 
                 Spacer()
                 
@@ -265,12 +277,16 @@ private struct HabitCardView: View {
                 Text(habit.title)
                     .font(.subheadline.bold())
                     .foregroundColor(isCompleted ? Color("TextSecondary") : Color("TextPrimary"))
+                    .lineLimit(1)
                 
                 Spacer()
                 
                 if let goal = habit.goalMinutes, goal > 0 {
                     HStack {
-                        Text("\(goal)분")
+                        HStack(spacing: 0) {
+                            Text("\(goal)")
+                            Text(NSLocalizedString("min", comment: "min"))
+                        }
                         Image(systemName: "clock.fill")
                             .padding(-4)
                     }

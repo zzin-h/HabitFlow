@@ -9,15 +9,17 @@ import SwiftUI
 
 struct HabitRecordView: View {
     let habit: HabitModel
-
+    @Environment(\.dismiss) var dismiss
+    
     @StateObject private var viewModel: HabitRecordViewModel
-    @State private var showingAddRecordSheet = false
-    @State private var editingRecord: HabitRecordModel? = nil
 
     init(habit: HabitModel) {
         self.habit = habit
         _viewModel = StateObject(wrappedValue: HabitRecordDIContainer().makeHabitRecordViewModel(habitId: habit.id))
     }
+    
+    @State private var showingAddRecordSheet = false
+    @State private var editingRecord: HabitRecordModel? = nil
 
     var body: some View {
         let groupedRecords = Dictionary(grouping: viewModel.records, by: { yearMonthString(from: $0.date) })
@@ -27,6 +29,9 @@ struct HabitRecordView: View {
         VStack {
             VStack {
                 HStack(alignment: .center) {
+                    Button(String(localized: "cancel_btn")) {
+                        dismiss()
+                    }
                     Image(systemName: "plus")
                         .foregroundStyle(.clear)
                     
@@ -34,9 +39,12 @@ struct HabitRecordView: View {
                     
                     Text(habit.title)
                         .font(.headline.bold())
+                        .lineLimit(1)
                     
                     Spacer()
                     
+                    Text(NSLocalizedString("cancel_btn", comment: "cancel_btn"))
+                        .foregroundStyle(.clear)
                     Button {
                         showingAddRecordSheet = true
                     } label: {
@@ -45,17 +53,26 @@ struct HabitRecordView: View {
                 }
                 
                 HStack(alignment: .center) {
-                    Text("총 \(viewModel.records.count)회")
+                    HStack(spacing: 0) {
+                        Text(NSLocalizedString("total", comment: "total"))
+                        Text(" \(viewModel.records.count)")
+                        Text(NSLocalizedString("times", comment: "times"))
+                    }
                     
                     if totalDuration > 0 {
-                        Text("\(totalDuration / 60)시간 \(totalDuration % 60)분")
+                        HStack(spacing: 0) {
+                            Text("\(totalDuration / 60)")
+                            Text(NSLocalizedString("hour", comment: "hour"))
+                            Text(" \(totalDuration % 60)")
+                            Text(NSLocalizedString("min", comment: "min"))
+                        }
                     }
                 }
                 .font(.subheadline.bold())
                 .foregroundStyle(Color.textSecondary)
                 .padding(.vertical, 4)
                 
-                Text("세부 기록을 추가, 수정, 삭제할 수 있습니다")
+                Text(NSLocalizedString("records_notice", comment: "records_notice"))
                     .font(.caption)
                     .foregroundStyle(Color(.systemGray2))
             }
@@ -64,7 +81,7 @@ struct HabitRecordView: View {
             if viewModel.records.isEmpty {
                 Spacer()
                 
-                Text("아직 기록이 없어요")
+                Text(NSLocalizedString("none_records_notice", comment: "none_records_notice"))
                     .font(.body)
                     .foregroundColor(.gray)
                 
@@ -76,11 +93,17 @@ struct HabitRecordView: View {
                             Text(month)
                                 .font(.headline)
                             
-                            Text("\(records.count)회")
+                            HStack(spacing: 0) {
+                                Text("\(records.count)")
+                                Text(NSLocalizedString("times", comment: "times"))
+                            }
                                 .font(.subheadline.bold())
                             
                             if durationSums[month] ?? 0 > 0 {
-                                Text("\(durationSums[month] ?? 0)분")
+                                HStack(spacing: 0) {
+                                    Text("\(durationSums[month] ?? 0)분")
+                                    Text(NSLocalizedString("min", comment: "min"))
+                                }
                                     .font(.subheadline.bold())
                             }
                         }) {
@@ -91,7 +114,10 @@ struct HabitRecordView: View {
                                     Spacer()
                                     
                                     if record.duration > 0 {
-                                        Text("\(record.duration)분")
+                                        HStack(spacing: 0) {
+                                            Text("\(record.duration)")
+                                            Text(NSLocalizedString("min", comment: "min"))
+                                        }
                                     }
                                 }
                                 .font(.subheadline)
@@ -131,15 +157,15 @@ struct HabitRecordView: View {
     
     private func yearMonthString(from date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ko_KR")
-        formatter.dateFormat = "yyyy년 M월"
+        formatter.locale = Locale.current
+        formatter.setLocalizedDateFormatFromTemplate("yyyyMMMM")
         return formatter.string(from: date)
     }
 
     private func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ko_KR")
-        formatter.dateFormat = "yyyy년 M월 d일 EEEE HH:mm"
+        formatter.locale = Locale.current
+        formatter.setLocalizedDateFormatFromTemplate("yyyyMMMMdEEEEHm")
         return formatter.string(from: date)
     }
 }

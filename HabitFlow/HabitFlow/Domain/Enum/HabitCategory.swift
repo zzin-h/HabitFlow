@@ -12,11 +12,11 @@ enum HabitCategory: String, Codable, CaseIterable {
 
     var title: String {
         switch self {
-        case .healthyIt: return "헬시잇"
-        case .canDoIt: return "할수잇"
-        case .moneyIt: return "머니잇"
-        case .greenIt: return "그린잇"
-        case .myMindIt: return "내맘잇"
+        case .healthyIt: return String(localized: "healthyIt")
+        case .canDoIt: return String(localized: "canDoIt")
+        case .moneyIt: return String(localized: "moneyIt")
+        case .greenIt: return String(localized: "greenIt")
+        case .myMindIt: return String(localized: "myMindIt")
         }
     }
 

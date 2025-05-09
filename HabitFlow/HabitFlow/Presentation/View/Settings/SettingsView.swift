@@ -9,16 +9,16 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var colorSchemeManager: ColorSchemeManager
-
+    
     var body: some View {
         Form {
-            Picker("화면모드 설정", selection: $colorSchemeManager.selectedScheme) {
-                Text("라이트 모드").tag("light")
-                Text("다크 모드").tag("dark")
+            Picker(String(localized: "appearance"), selection: $colorSchemeManager.selectedScheme) {
+                Text(NSLocalizedString("light_mode", comment: "light_mode")).tag("light")
+                Text(NSLocalizedString("dark_mode", comment: "dark_mode")).tag("dark")
             }
             .pickerStyle(.menu)
         }
-        .navigationTitle("설정")
+        .navigationTitle(String(localized: "settings_nav_title"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }

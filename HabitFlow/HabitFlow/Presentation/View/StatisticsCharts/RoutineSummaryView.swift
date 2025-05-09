@@ -28,7 +28,7 @@ struct RoutineSummaryView: View {
                             .foregroundStyle(Color.primaryColor)
                             .rotationEffect(.degrees(320))
                         
-                        Text("지난주 리포트")
+                        Text(NSLocalizedString("weekly_report_title", comment: "weekly_report_title"))
                         
                         Spacer()
                         
@@ -50,13 +50,7 @@ struct RoutineSummaryView: View {
                                     .foregroundStyle(Color.secondaryColor)
                                     .padding(.trailing, 8)
                                 
-                                Text("한 주간 ")
-                                Text("\(summary.routineCount)개")
-                                    .bold()
-                                Text("의 습관을 ")
-                                Text("\(summary.totalCount)회 ")
-                                    .bold()
-                                Text("실천했어요.")
+                                Text(String(format: NSLocalizedString("weekly_report_summary", comment: ""), summary.routineCount, summary.totalCount))
                             }
                             
                             HStack(alignment: .center, spacing: 0) {
@@ -65,10 +59,10 @@ struct RoutineSummaryView: View {
                                     .foregroundStyle(Color.secondaryColor)
                                     .padding(.trailing, 8)
                                 
-                                Text("가장 많이 실천한 습관은")
+                                Text(NSLocalizedString("weekly_report_top_habit", comment: "weekly_report_top_habit"))
                             }
                         } else {
-                            Text("아직 충분한 기록이 없어요")
+                            Text(NSLocalizedString("not_enough_record", comment: "not_enough_record"))
                                 .foregroundStyle(Color.textSecondary)
                         }
                         
@@ -80,7 +74,6 @@ struct RoutineSummaryView: View {
                                         .frame(width: 6, height: 6)
                                         .foregroundStyle(Color.accentColor)
                                     Text(titles[index])
-                                        .bold()
                                 }
                             }
                         }
@@ -94,10 +87,7 @@ struct RoutineSummaryView: View {
                                     .foregroundStyle(Color.secondaryColor)
                                     .padding(.trailing, 8)
                                 
-                                Text("주로 ")
-                                Text("\(weekday.koreanTitle)요일, \(time.title)")
-                                    .bold()
-                                Text("에 수행했어요.")
+                                Text(String(format: NSLocalizedString("weekly_report_time_day", comment: ""), weekday.fullTitle, time.title))
                             }
                         }
                         
@@ -108,10 +98,16 @@ struct RoutineSummaryView: View {
                                     .foregroundStyle(Color.secondaryColor)
                                     .padding(.trailing, 8)
                                 
-                                Text("총 ")
-                                Text("\(formatHour(summary.totalDuration))시간 \(formatMin(summary.totalDuration))분")
-                                    .bold()
-                                Text(" 동안 나를 위한 시간을 가졌어요.")
+                                Text(String(format: NSLocalizedString("weekly_report_total_time", comment: ""), formatHour(summary.totalDuration), formatMin(summary.totalDuration)))
+                            }
+                        } else {
+                            HStack(alignment: .center, spacing: 0) {
+                                Image(systemName: "lightbulb.max.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(Color.secondaryColor)
+                                    .padding(.trailing, 8)
+                                
+                                Text(String(format: NSLocalizedString("weekly_report_total_time_mins", comment: ""), formatMin(summary.totalDuration)))
                             }
                         }
                     }
@@ -125,7 +121,7 @@ struct RoutineSummaryView: View {
                 HStack(alignment: .center) {
                     Spacer()
                     
-                    Text("매주 월요일마다 리포트가 갱신됩니다")
+                    Text(NSLocalizedString("weekly_report_update_notice", comment: "weekly_report_update_notice"))
                         .font(.caption)
                         .foregroundStyle(Color(.systemGray2))
                     
@@ -137,7 +133,7 @@ struct RoutineSummaryView: View {
                 HStack(alignment: .center) {
                     Spacer()
                     
-                    Text("충분한 데이터가 없습니다")
+                    Text(NSLocalizedString("not_enough_record", comment: "not_enough_record"))
                         .bold()
                         .foregroundStyle(Color.textSecondary)
                     

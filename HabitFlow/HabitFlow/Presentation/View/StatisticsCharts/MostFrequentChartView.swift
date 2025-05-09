@@ -28,7 +28,7 @@ struct MostFrequentChartView: View {
             .padding()
             
             if viewModel.weekdayStats.isEmpty {
-                Text("충분한 데이터가 없습니다")
+                Text(NSLocalizedString("not_enough_record", comment: "not_enough_record"))
                     .foregroundStyle(Color.gray)
                     .padding(.top, 32)
             } else {
@@ -50,7 +50,7 @@ struct MostFrequentChartView: View {
                 }
             }
         }
-        .navigationTitle("최다 요일 및 시간대")
+        .navigationTitle(String(localized: "most_frequent"))
         .onAppear {
             viewModel.loadTimePatternStats()
         }
@@ -64,13 +64,13 @@ struct WeekdayGraphView: View {
         Chart {
             ForEach(stats.sorted(by: { $0.weekday < $1.weekday }), id: \.weekday) { stat in
                 BarMark(
-                    x: .value("요일", stat.weekday.koreanTitle),
+                    x: .value("요일", stat.weekday.shortTitle),
                     y: .value("횟수", stat.count)
                 )
                 .foregroundStyle(Color.secondaryColor)
                 .annotation(position: .top) {
                     if stat.count > 0 {
-                        Text("\(stat.count)회")
+                        Text("\(stat.count)" + NSLocalizedString("times_en_none", comment: "times_en_none"))
                             .font(.caption)
                             .foregroundColor(.gray)
                             .padding(.bottom, 4)
@@ -101,20 +101,20 @@ struct WeekdayTop3SummaryView: View {
     var body: some View {
         VStack {
             VStack(alignment: .leading, spacing: 8) {
-                Text("베스트 3 요일")
+                Text(NSLocalizedString("best_3", comment: "best_3"))
                     .font(.subheadline.bold())
                     .foregroundStyle(Color.textPrimary)
                     .padding(.bottom, 16)
                 
                 if let top1 {
-                    Top3Card(title: top1.weekday.koreanTitle + "요일",
+                    Top3Card(title: top1.weekday.fullTitle,
                              count: top1.count,
                              crownColor: .yellow,
                              font: .title3
                     )
                 }
                 if let top2 {
-                    Top3Card(title: top2.weekday.koreanTitle + "요일",
+                    Top3Card(title: top2.weekday.fullTitle,
                              count: top2.count,
                              crownColor: .gray,
                              font: .headline
@@ -122,7 +122,7 @@ struct WeekdayTop3SummaryView: View {
                 }
                 
                 if let top3 {
-                    Top3Card(title: top3.weekday.koreanTitle + "요일",
+                    Top3Card(title: top3.weekday.fullTitle,
                              count: top3.count,
                              crownColor: Color(red: 205/255, green: 127/255, blue: 50/255),
                              font: .headline
@@ -149,7 +149,7 @@ struct TimeSlotGraphView: View {
                     )
                     .annotation(position: .top) {
                         if stat.count > 0 {
-                            Text("\(stat.count)회")
+                            Text("\(stat.count)" + NSLocalizedString("times_en_none", comment: "times_en_none"))
                                 .font(.caption)
                                 .foregroundColor(.gray)
                                 .padding(.bottom, 4)
@@ -184,7 +184,7 @@ private struct TimeSlotTop3SummaryView: View {
     var body: some View {
         VStack {
             VStack(alignment: .leading, spacing: 8) {
-                Text("베스트 3 시간대")
+                Text(NSLocalizedString("best_3", comment: "best_3"))
                     .font(.subheadline.bold())
                     .foregroundStyle(Color.textPrimary)
                     .padding(.bottom, 16)
@@ -242,7 +242,7 @@ private struct Top3Card: View {
                 Spacer()
                 Spacer()
                 
-                Text("\(count)회")
+                Text("\(count)" + NSLocalizedString("times", comment: "times"))
                     .foregroundStyle(Color.textSecondary)
                     .fontWeight(.regular)
                 

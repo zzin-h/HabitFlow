@@ -53,7 +53,7 @@ struct FavoriteCategoryChartView: View {
                 
             }
         }
-        .navigationTitle("관심 카테고리")
+        .navigationTitle(String(localized: "favorite_category"))
         .onAppear {
             viewModel.loadAllCategoryStats()
         }
@@ -124,7 +124,10 @@ private struct CategorySummaryView: View {
                         
                         Spacer()
                         
-                        Text("\(stat.totalCount)회")
+                        HStack(spacing: 0) {
+                            Text("\(stat.totalCount)")
+                            Text(NSLocalizedString("times", comment: "times"))
+                        }
                             .font(stat.title == maxTitle ? .headline : .subheadline)
                         
                         if totalCount > 0 {

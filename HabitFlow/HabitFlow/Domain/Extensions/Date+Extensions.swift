@@ -8,9 +8,9 @@
 import Foundation
 
 extension Date {
-    func weekdayShortSymbol(locale: Locale = Locale(identifier: "ko_KR")) -> String {
+    func weekdayShortSymbol() -> String {
         let formatter = DateFormatter()
-        formatter.locale = locale
+        formatter.locale = Locale.current
         formatter.dateFormat = "E"
         return formatter.string(from: self)
     }
