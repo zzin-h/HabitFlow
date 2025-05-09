@@ -10,9 +10,9 @@ enum RoutineType: String, Codable, CaseIterable {
     
     var title: String {
         switch self {
-        case .daily: return "매일"
-        case .weekly: return "요일"
-        case .interval: return "커스텀"
+        case .daily: return String(localized: "every_days")
+        case .weekly: return String(localized: "weekday")
+        case .interval: return String(localized: "custom")
             
         }
     }

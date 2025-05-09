@@ -23,7 +23,7 @@ struct ActiveDaysChartView: View {
             ActiveDaysSummaryView(viewModel: viewModel, completedDates: viewModel.completedDates)
                 .padding(.bottom, 48)
         }
-        .navigationTitle("함께한 일수")
+        .navigationTitle(String(localized: "active_days"))
         .onAppear {
             viewModel.loadActiveDaysStat()
         }
@@ -38,15 +38,17 @@ private struct ActiveDaysCalendarView: View {
             HStack {
                 Button(action: {
                     viewModel.previousMonth()
+                    viewModel.fetchAndGenerateDays()
                 }) {
                     Image(systemName: "chevron.left")
                 }
                 
-                Text("\(viewModel.currentMonth.year.description)년 \(viewModel.currentMonth.month)월")
+                Text("\(formatDate(viewModel.currentMonth))")
                     .font(.headline)
                 
                 Button(action: {
                     viewModel.nextMonth()
+                    viewModel.fetchAndGenerateDays()
                 }) {
                     Image(systemName: "chevron.right")
                 }
@@ -54,8 +56,8 @@ private struct ActiveDaysCalendarView: View {
             .padding()
             
             HStack {
-                ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
-                    Text(day)
+                ForEach(Weekdays.allCases, id: \.self) { day in
+                    Text(day.shortTitle)
                         .frame(maxWidth: .infinity)
                         .font(.subheadline)
                         .foregroundColor(.gray)
@@ -79,6 +81,7 @@ private struct ActiveDaysCalendarView: View {
                                 .scaledToFit()
                                 .frame(width: 26)
                                 .foregroundStyle(Color.accentColor)
+                                .opacity(dayCell.isInCurrentMonth ? 1 : 0.6)
                         } else {
                             Text("\(day)")
                                 .fontWeight(Calendar.current.isDateInToday(dayCell.date) ? .bold : .regular)
@@ -97,6 +100,12 @@ private struct ActiveDaysCalendarView: View {
         .onAppear {
             viewModel.fetchAndGenerateDays()
         }
+    }
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        formatter.setLocalizedDateFormatFromTemplate("YYYYMMM")
+        return formatter.string(from: date)
     }
 }
 
@@ -131,7 +140,7 @@ private struct ActiveDaysSummaryView: View {
                     HStack {
                         Spacer()
                         
-                        Text("미래의 날짜로 왔습니다")
+                        Text(NSLocalizedString("future_date_notice", comment: "future_date_notice"))
                             .foregroundColor(.gray)
                             .font(.headline)
                             .bold()
@@ -142,25 +151,25 @@ private struct ActiveDaysSummaryView: View {
                 
                 if let stat = viewModel.activeDaysStat {
                     HStack {
-                        Text("총 완료 일수")
+                        Text(NSLocalizedString("total_completed_days", comment: ""))
                         
                         Spacer()
                         
-                        Text("\(stat.totalDays)일")
+                        Text("\(stat.totalDays)" + NSLocalizedString("days", comment: "days"))
                             .fontWeight(.bold)
                     }
                     
                     HStack {
-                        Text("연속 수행 일수")
+                        Text(NSLocalizedString("consecutive_active_days", comment: ""))
                         
                         Spacer()
                         
-                        Text("\(stat.streakDays)일")
+                        Text("\(stat.streakDays)" + NSLocalizedString("days", comment: "days"))
                             .fontWeight(.bold)
                     }
                     
                     HStack {
-                        Text("\(month)월 수행률")
+                        Text(String(format: NSLocalizedString("monthly_completion_rate", comment: ""), formatMonth(viewModel.currentMonth)))
                         
                         Spacer()
                         
@@ -170,7 +179,7 @@ private struct ActiveDaysSummaryView: View {
                     }
                     
                     if monthStart <= today {
-                        Text("\(formatDate(monthStart)) ~ \(formatDate(rangeEnd))일 간의 달성 기록이에요.")
+                        Text(String(format: NSLocalizedString("period_achievement", comment: ""), formatDate(monthStart), formatDate(rangeEnd)))
                             .font(.footnote)
                             .foregroundColor(.gray)
                     }
@@ -181,36 +190,45 @@ private struct ActiveDaysSummaryView: View {
                         
                         if breakGap.days != 0 {
                             HStack {
-                                Text("휴식 기간")
+                                Text(NSLocalizedString("longest_rest_period", comment: ""))
                                 
                                 Spacer()
                                 
-                                Text("\(formatDate(adjustedStart!)) ~ \(formatDate(adjustedEnd!)) (\(breakGap.days)일)")
-                                    .foregroundColor(Color.primaryColor)
-                                    .fontWeight(.bold)
+                                HStack(spacing: 0) {
+                                    Text("\(formatDate(adjustedStart!)) - \(formatDate(adjustedEnd!))")
+                                    Text(" (\(breakGap.days) " + NSLocalizedString("days", comment: "days") + ")")
+                                }
+                                .foregroundColor(Color.primaryColor)
+                                .fontWeight(.bold)
                             }
                         }
                     } else {
                         HStack {
                             Spacer()
                             
-                            Text("충분한 기록이 없습니다")
+                            Text(NSLocalizedString("not_enough_record", comment: "not_enough_record"))
                                 .foregroundColor(.gray)
                                 .font(.headline)
                         }
                     }
                 }
             }
-            .padding()
-            .background(Color(.systemGray6))
-            .cornerRadius(12)
-            .padding(.horizontal)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+                .padding(.horizontal)
         )
     }
     
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "M/d"
+        return formatter.string(from: date)
+    }
+    
+    private func formatMonth(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM"
         return formatter.string(from: date)
     }
 }

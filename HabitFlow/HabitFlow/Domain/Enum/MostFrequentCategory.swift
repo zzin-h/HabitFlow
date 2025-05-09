@@ -12,8 +12,8 @@ enum MostFrequentCategory: String, Codable, CaseIterable, Identifiable {
     
     var title: String {
         switch self {
-        case .weekDays: return "요일"
-        case .timeSlots: return "시간대"
+        case .weekDays: return String(localized: "weekday")
+        case .timeSlots: return String(localized: "time_period")
         }
     }
 }

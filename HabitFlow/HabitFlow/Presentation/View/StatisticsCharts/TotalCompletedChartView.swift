@@ -21,7 +21,7 @@ struct TotalCompletedChartView: View {
             VStack(alignment: .leading, spacing: 16) {
                 Picker("기간", selection: $selectedPreset) {
                     ForEach(PeriodPreset.allCases) { preset in
-                        Text(preset.rawValue).tag(preset)
+                        Text(preset.title).tag(preset)
                     }
                 }
                 .padding()
@@ -36,10 +36,13 @@ struct TotalCompletedChartView: View {
                 VStack {
                     VStack(alignment: .leading) {
                         ChangeStatsView(viewModel: viewModel, selectedPreset: $selectedPreset)
+                            .padding(.top, 16)
                         
                         AverageStatsView(selectedPreset: $selectedPreset, weekly: viewModel.calculateAverage(for: .oneWeek), monthly: viewModel.calculateAverage(for: .oneMonth))
+                        
+                        Spacer()
                     }
-                    .frame(width: UIScreen.main.bounds.width * 0.85, height: UIScreen.main.bounds.height * 0.2)
+                    .frame(width: UIScreen.main.bounds.width * 0.85, height: UIScreen.main.bounds.height * 0.25)
                     .background(Color.cardBg)
                     .cornerRadius(16)
                     .padding()
@@ -51,7 +54,7 @@ struct TotalCompletedChartView: View {
             }
             .padding()
         }
-        .navigationTitle("완료한 습관")
+        .navigationTitle(String(localized: "completed_habits"))
         .onAppear {
             viewModel.loadCompletedStats()
         }
@@ -116,25 +119,25 @@ private struct ChangeStatsView: View {
         
         VStack(alignment: .leading, spacing: 4) {
             if viewModel.calculateAverage(for: .oneWeek) == 0 {
-                Text("아직 충분한 기록이 없어요")
+                Text(NSLocalizedString("not_enough_record", comment: "not_enough_record"))
                     .foregroundStyle(Color.textSecondary)
             } else {
-                Text("\(selectedPreset.rawValue) 동안의 변화를 분석했어요")
-                    .font(.headline)
+                HStack(spacing: 0) {
+                    Text("\(selectedPreset.title)")
+                    Text(NSLocalizedString("analyzed_noitce", comment: "analyzed_noitce"))
+                }
+                .font(.headline)
                 
                 switch selectedPreset {
                 case .oneWeek:
                     VStack(alignment: .leading) {
-                        HStack(alignment: .center, spacing: 0) {
-                            Text("지난 ")
-                            Text(weeklyAnalysis[1])
-                            Text("의 기록 대비 변화량입니다")
-                        }
-                        .font(.caption)
-                        .foregroundStyle(Color.textSecondary)
+                        Text(String(format: NSLocalizedString("last_period_notice", comment: ""), weeklyAnalysis[1]))
+                            .font(.caption)
+                            .foregroundStyle(Color.textSecondary)
                         
                         Text(weeklyAnalysis[2])
                             .padding(.vertical, 4)
+                            .fixedSize(horizontal: false, vertical: true)
                         
                         Text(weeklyAnalysis[3])
                             .padding(.bottom, 4)
@@ -147,13 +150,9 @@ private struct ChangeStatsView: View {
                     
                 case .oneMonth:
                     VStack(alignment: .leading) {
-                        HStack(alignment: .center, spacing: 0) {
-                            Text("지난 ")
-                            Text(monthlyAnalysis[1])
-                            Text("의 기록 대비 변화량입니다")
-                        }
-                        .font(.caption)
-                        .foregroundStyle(Color.textSecondary)
+                        Text(String(format: NSLocalizedString("last_period_notice", comment: ""), monthlyAnalysis[1]))
+                            .font(.caption)
+                            .foregroundStyle(Color.textSecondary)
                         
                         Text(monthlyAnalysis[2])
                             .padding(.vertical, 4)
@@ -186,9 +185,9 @@ private struct AverageStatsView: View {
             if weekly != 0 || monthly != 0 {
                 switch selectedPreset {
                 case .oneWeek:
-                    Text("이번주 하루 평균 \(String(format: "%.1f", weekly))회 완료했어요")
+                    Text(String(format: NSLocalizedString("avg_notice", comment: ""), weekly))
                 case .oneMonth:
-                    Text("이번 달 하루 평균 \(String(format: "%.1f", monthly))회 완료했어요.")
+                    Text(String(format: NSLocalizedString("avg_notice", comment: ""), monthly))
                 }
             }
         }

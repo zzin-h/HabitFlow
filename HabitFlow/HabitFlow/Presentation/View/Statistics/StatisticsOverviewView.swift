@@ -28,31 +28,32 @@ struct StatisticsOverviewView: View {
             
             LazyVGrid(columns: columns, spacing: 8) {
                 StatisticsCardView(
-                    title: "완료한 습관",
+                    title: String(localized: "completed_habits"),
                     icon: "checkmark.circle.fill",
-                    value: ["총 \(viewModel.totalCompletedCount)회"],
+                    value: [String(localized: "total") + " \(viewModel.totalCompletedCount)" + String(localized: "times")],
                     color: HabitCategory.healthyIt.color,
                     actionView: .totalCompleted
                 )
                 
                 StatisticsCardView(
-                    title: "함께한 일수",
+                    title: String(localized: "active_days"),
                     icon: "calendar.circle.fill",
-                    value: ["총 \(viewModel.activeDays)일", "연속 \(viewModel.streakDays)일"],
+                    value: [String(localized: "total") + " \(viewModel.activeDays)" + String(localized: "days"),
+                            String(localized: "consecutive") + "\(viewModel.streakDays)" + String(localized: "consecutive_days")],
                     color: HabitCategory.canDoIt.color,
                     actionView: .activeDays
                 )
                 
                 StatisticsCardView(
-                    title: "관심 카테고리",
+                    title: String(localized: "favorite_category"),
                     icon: "tag.circle.fill",
-                    value: [convertToKorean(category: viewModel.favoriteCategory)],
+                    value: [convertToLocal(category: viewModel.favoriteCategory)],
                     color: HabitCategory.moneyIt.color,
                     actionView: .favoriteCategory
                 )
                 
                 StatisticsCardView(
-                    title: "베스트 습관",
+                    title: String(localized: "best_habit"),
                     icon: "star.circle.fill",
                     value: [viewModel.bestHabitTitle],
                     color: HabitCategory.greenIt.color,
@@ -60,15 +61,15 @@ struct StatisticsOverviewView: View {
                 )
                 
                 StatisticsCardView(
-                    title: "함께한 시간",
+                    title: String(localized: "total_time"),
                     icon: "clock.fill",
-                    value: ["총 \(viewModel.totalTimeSpent / 60)시간 \(viewModel.totalTimeSpent % 60)분"],
+                    value: [String(localized: "total") + " \(viewModel.totalTimeSpent / 60)" + String(localized: "hour") + "  \(viewModel.totalTimeSpent % 60)" + String(localized: "min")],
                     color: HabitCategory.myMindIt.color,
                     actionView: .totalTime
                 )
                 
                 StatisticsCardView(
-                    title: "최다 요일 및 시간대",
+                    title: String(localized: "most_frequent"),
                     icon: "hand.thumbsup.circle.fill",
                     value: ["\(viewModel.mostFrequentDay)", "\(viewModel.mostFrequentTime)"],
                     color: .indigo,
@@ -85,7 +86,7 @@ struct StatisticsOverviewView: View {
                             .font(.largeTitle)
                         
                         VStack(alignment: .leading) {
-                            Text("주간 리포트")
+                            Text(NSLocalizedString("weekly_report", comment: "weekly_report"))
                                 .font(.headline)
                                 .foregroundStyle(Color.textPrimary)
                             
@@ -104,7 +105,7 @@ struct StatisticsOverviewView: View {
             
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("습관 요약")
+        .navigationTitle(String(localized: "statistics_nav_title"))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             viewModel.loadStatistics()
@@ -114,20 +115,14 @@ struct StatisticsOverviewView: View {
         }
     }
     
-    private func convertToKorean(category: String) -> String {
+    private func convertToLocal(category: String) -> String {
         switch category {
-        case "healthyIt":
-            return "헬시잇"
-        case "canDoIt":
-            return "할수잇"
-        case "moneyIt":
-            return "머니잇"
-        case "greenIt":
-            return "그린잇"
-        case "myMindIt":
-            return "내맘잇"
-        default:
-            return "없음"
+        case "healthyIt": return String(localized: "healthyIt")
+        case "canDoIt": return String(localized: "canDoIt")
+        case "moneyIt": return String(localized: "moneyIt")
+        case "greenIt": return String(localized: "greenIt")
+        case "myMindIt": return String(localized: "myMindIt")
+        default: return ""
         }
     }
     
@@ -155,8 +150,9 @@ struct StatisticsOverviewView: View {
         let lastSunday = calendar.date(byAdding: .day, value: 6, to: lastMonday)!
         
         let formatter = DateFormatter()
-        formatter.dateFormat = "M월 d일"
+        formatter.locale = Locale.current
+        formatter.setLocalizedDateFormatFromTemplate("MMMd")
         
-        return "\(formatter.string(from: lastMonday)) ~ \(formatter.string(from: lastSunday))"
+        return "\(formatter.string(from: lastMonday)) - \(formatter.string(from: lastSunday))"
     }
 }

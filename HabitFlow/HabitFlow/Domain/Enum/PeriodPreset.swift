@@ -8,10 +8,17 @@
 import SwiftUI
 
 enum PeriodPreset: String, CaseIterable, Identifiable {
-    case oneWeek = "1주"
-    case oneMonth = "1개월"
+    case oneWeek, oneMonth
 
     var id: String { rawValue }
+    
+    var title: String {
+        switch self {
+        case .oneWeek: return String(localized: "7_days")
+        case .oneMonth: return String(localized: "30_days")
+            
+        }
+    }
 
     func toPeriod() -> Period {
         let now = Date()

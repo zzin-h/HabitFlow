@@ -24,7 +24,7 @@ struct HabitListView: View {
                 HStack {
                     Spacer()
                     
-                    Text("아직 습관이 없어요")
+                    Text(NSLocalizedString("any_habits_yet", comment: "any_habits_yet"))
                     
                     Spacer()
                 }
@@ -64,7 +64,7 @@ struct HabitListView: View {
                 }
             }
         }
-        .navigationTitle("습관 목록")
+        .navigationTitle(String(localized: "habit_list_nav_title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -113,7 +113,10 @@ private struct HabitRowView: View {
                     
                     if let goal = habit.goalMinutes {
                         if goal > 0 {
-                            Text("|  \(goal)분")
+                            HStack(spacing: 0) {
+                                Text("|  \(goal)")
+                                Text(NSLocalizedString("min", comment: "min"))
+                            }
                         }
                     }
                 }
@@ -137,13 +140,13 @@ private struct HabitRowView: View {
     private var routineDescription: String {
         switch habit.routineType {
         case .daily:
-            return "매일"
+            return String(localized: "every_days")
         case .weekly:
-            let days = habit.selectedDays?.compactMap { Weekdays(rawValue: $0) }.sorted().map { $0.koreanTitle }.joined(separator: " ") ?? ""
-            return "\(days) 주기"
+            let days = habit.selectedDays?.compactMap { Weekdays(rawValue: $0) }.sorted().map { $0.shortTitle }.joined(separator: " ") ?? ""
+            return String(format: NSLocalizedString("every_weekdays", comment: ""), days)
         case .interval:
             let interval = habit.intervalDays ?? 0
-            return "\(interval)일 주기"
+            return String(format: NSLocalizedString("every_interval_days", comment: ""), interval)
         }
     }
 }

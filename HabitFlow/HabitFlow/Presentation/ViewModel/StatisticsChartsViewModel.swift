@@ -87,7 +87,7 @@ final class StatisticsChartViewModel: ObservableObject {
                     let today = calendar.startOfDay(for: now)
                     let endOfLast30Days = calendar.date(byAdding: .day, value: -30, to: today)!
                     let startOfLast30Days = calendar.date(byAdding: .day, value: -59, to: today)!
-
+                    
                     startDate = startOfLast30Days
                     endDate = endOfLast30Days
                 }
@@ -191,10 +191,11 @@ final class StatisticsChartViewModel: ObservableObject {
         let startOfLastWeek = calendar.date(byAdding: .day, value: -13, to: now)!
         
         let formatter = DateFormatter()
-        formatter.dateFormat = "M월 d일"
+        formatter.locale = Locale.current
+        formatter.setLocalizedDateFormatFromTemplate("MMMd")
         
-        let currentRange = "\(formatter.string(from: startOfCurrentWeek)) ~ \(formatter.string(from: endOfCurrentWeek))"
-        let lastRange = "\(formatter.string(from: startOfLastWeek)) ~ \(formatter.string(from: endOfLastWeek))"
+        let currentRange = "\(formatter.string(from: startOfCurrentWeek)) - \(formatter.string(from: endOfCurrentWeek))"
+        let lastRange = "\(formatter.string(from: startOfLastWeek)) - \(formatter.string(from: endOfLastWeek))"
         
         return ["\(currentRange)", "\(lastRange)"]
     }
@@ -207,22 +208,23 @@ final class StatisticsChartViewModel: ObservableObject {
         var analysis: [String] = rangeInfo
         
         if weekly.isSame {
-            analysis += ["지난주와 똑같은 횟수로 루틴을 지켰어요", "안정적으로 유지되고 있어요😊"]
+            analysis += [NSLocalizedString("analysis_same_1", comment: ""),
+                         NSLocalizedString("analysis_same_2", comment: "")]
         } else if weekly.isIncreased {
             if weekly.difference >= 5 {
-                analysis += ["지난주보다 \(weekly.difference)개나 더 완료했어요🔥",
-                             "수행률이 \(Int(weekly.percentage))% 상승했어요. 점점 좋아지고 있어요!"]
+                analysis += [String(format: NSLocalizedString("analysis_up_big_1", comment: ""), weekly.difference),
+                             String(format: NSLocalizedString("analysis_up_big_2", comment: ""), weekly.percentage)]
             } else {
-                analysis += ["조금씩 성장 중이에요💪",
-                             "지난주보다 \(weekly.difference)개 더 했어요. 꾸준함이 중요하니까요!"]
+                analysis += [NSLocalizedString("analysis_up_small_1", comment: ""),
+                             String(format: NSLocalizedString("analysis_up_small_2", comment: ""), weekly.difference)]
             }
         } else {
             if weekly.difference >= 5 {
-                analysis += ["지난주보다 \(weekly.difference)개 줄었어요. 요즘 좀 바빴던 건 아닐까요?",
-                             "내일부터 다시 도전해봐요💛"]
+                analysis += [String(format: NSLocalizedString("analysis_down_big_1", comment: ""), weekly.difference),
+                             NSLocalizedString("analysis_down_big_2", comment: "")]
             } else {
-                analysis += ["지난주보다 조금 줄었지만 괜찮아요. 다시 리듬을 찾으면 돼요🍀",
-                             "수행률이 \(Int(weekly.percentage))% 감소했어요"]
+                analysis += [NSLocalizedString("analysis_down_small_1", comment: ""),
+                             String(format: NSLocalizedString("analysis_down_small_2", comment: ""), weekly.percentage)]
             }
         }
         
@@ -232,18 +234,19 @@ final class StatisticsChartViewModel: ObservableObject {
     func monthlyChangeDateRangeString() -> [String] {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
-
+        
         let endOfLast30Days = calendar.date(byAdding: .day, value: -30, to: today)!
         let startOfLast30Days = calendar.date(byAdding: .day, value: -59, to: today)!
-
+        
         let startOfThis30Days = calendar.date(byAdding: .day, value: -29, to: today)!
-
+        
         let formatter = DateFormatter()
-        formatter.dateFormat = "M월 d일"
-
-        let thisMonthRange = "\(formatter.string(from: startOfThis30Days)) ~ \(formatter.string(from: today))"
-        let lastMonthRange = "\(formatter.string(from: startOfLast30Days)) ~ \(formatter.string(from: endOfLast30Days))"
-
+        formatter.locale = Locale.current
+        formatter.setLocalizedDateFormatFromTemplate("MMMd")
+        
+        let thisMonthRange = "\(formatter.string(from: startOfThis30Days)) - \(formatter.string(from: today))"
+        let lastMonthRange = "\(formatter.string(from: startOfLast30Days)) - \(formatter.string(from: endOfLast30Days))"
+        
         return ["\(thisMonthRange)", "\(lastMonthRange)"]
     }
     
@@ -255,23 +258,23 @@ final class StatisticsChartViewModel: ObservableObject {
         var analysis: [String] = rangeInfo
         
         if monthly.isSame {
-            analysis += ["지난달과 같은 루틴 수행량이에요",
-                         "꾸준함이 가장 어려운데 정말 잘하고 있어요👏"]
+            analysis += [NSLocalizedString("monthly_same_1", comment: ""),
+                         NSLocalizedString("monthly_same_2", comment: "")]
         } else if monthly.isIncreased {
             if monthly.difference >= 15 {
-                analysis += ["지난달보다 \(monthly.difference)개 더 완료했어요😍",
-                             "\(Int(monthly.percentage))% 상승했어요. 눈에 띄는 성장입니다!"]
+                analysis += [String(format: NSLocalizedString("monthly_increase_high_1", comment: ""), monthly.difference),
+                             String(format: NSLocalizedString("monthly_increase_high_2", comment: ""), monthly.percentage)]
             } else {
-                analysis += ["조금 더 노력한 한 달이었어요👍",
-                             "\(monthly.difference)개 늘었어요. 멋져요!"]
+                analysis += [NSLocalizedString("monthly_increase_low_1", comment: ""),
+                             String(format: NSLocalizedString("monthly_increase_low_2", comment: ""), monthly.difference)]
             }
         } else {
             if monthly.difference >= 15 {
-                analysis += ["지난달보다 \(monthly.difference)개 줄었어요",
-                             "컨디션이 좋지 않았던 걸 수도 있어요. 다시 회복할 수 있어요💪"]
+                analysis += [String(format: NSLocalizedString("monthly_decrease_high_1", comment: ""), monthly.difference),
+                             NSLocalizedString("monthly_decrease_high_2", comment: "")]
             } else {
-                analysis += ["루틴 수행이 살짝 줄었어요. 괜찮아요! 다시 시작해봐요🌱",
-                             "\(Int(monthly.percentage))% 감소했어요"]
+                analysis += [NSLocalizedString("monthly_decrease_low_1", comment: ""),
+                             String(format: NSLocalizedString("monthly_decrease_low_2", comment: ""), monthly.percentage)]
             }
         }
         
@@ -600,7 +603,7 @@ extension StatisticsChartViewModel {
             isSame: isSame,
             isIncreased: isIncreased,
             difference: difference,
-            percentage: abs(percentage)
+            percentage: Double(abs(percentage))
         )
     }
 }

@@ -9,9 +9,8 @@ import SwiftUI
 
 struct HabitAddEditView: View {
     @Environment(\.dismiss) var dismiss
-    @ObservedObject var viewModel: HabitListViewModel
     
-    var editingHabit: HabitModel?
+    @ObservedObject var viewModel: HabitListViewModel
     
     @State private var title: String = ""
     @State private var selectedCategory: HabitCategory = .healthyIt
@@ -22,27 +21,27 @@ struct HabitAddEditView: View {
     @State private var isEmptyRoutine: Bool = false
     @State private var goalMinutes: String = ""
     @State private var hasGoal: Bool = true
-    @State private var isEmptyGoal: Bool = false
     
+    var editingHabit: HabitModel?
     var onSave: (() -> Void)?
     
     var body: some View {
         NavigationStack {
             Form {
-                Section(footer: Text("제목을 입력해주세요.").foregroundStyle(isEmptyTitle ? Color.primaryColor : .clear)) {
-                    TextField("제목", text: $title)
+                Section(footer: Text(NSLocalizedString("title_notice", comment: "title_notice")).foregroundStyle(isEmptyTitle ? Color.primaryColor : .clear)) {
+                    TextField(String(localized: "title"), text: $title)
                 }
                 
                 Section() {
-                    Picker("카테고리", selection: $selectedCategory) {
+                    Picker(String(localized: "category"), selection: $selectedCategory) {
                         ForEach(HabitCategory.allCases, id: \.self) { category in
                             Text(category.title).tag(category)
                         }
                     }
                 }
                 
-                Section(footer: Text("반복 주기를 입력해주세요").foregroundStyle(isEmptyRoutine ? Color.primaryColor : .clear)) {
-                    Picker("반복", selection: $routineType) {
+                Section(footer: Text(NSLocalizedString("repeat_notice", comment: "repeat_notice")).foregroundStyle(isEmptyRoutine ? Color.primaryColor : .clear)) {
+                    Picker(String(localized: "repeat"), selection: $routineType) {
                         ForEach(RoutineType.allCases, id: \.self) { type in
                             Text(type.title).tag(type)
                         }
@@ -50,12 +49,12 @@ struct HabitAddEditView: View {
                     
                     if routineType == .interval {
                         HStack {
-                            Text("매")
+                            Text(NSLocalizedString("every", comment: "every"))
                             TextField("3", text: $intervalDays)
                                 .keyboardType(.numberPad)
                                 .frame(width: 30)
                                 .multilineTextAlignment(.center)
-                            Text("일마다")
+                            Text(NSLocalizedString("repeat_days", comment: "repeat_days"))
                         }
                     }
                 }
@@ -64,24 +63,30 @@ struct HabitAddEditView: View {
                     MultipleDayPicker(selectedDays: $selectedDays)
                 }
                 
-                Section(footer: Text("목표 시간을 입력해주세요").foregroundStyle(isEmptyRoutine ? Color.primaryColor : .clear)) {
-                    Toggle("목표 시간", isOn: $hasGoal)
+                Section(footer: Text(NSLocalizedString("goal_time_notice", comment: "goal_time_notice")).foregroundStyle(hasGoal == true && goalMinutes.isEmpty ? Color.primaryColor : .clear)) {
+                    Toggle(String(localized: "goal_time"), isOn: $hasGoal)
                     if hasGoal {
                         HStack {
                             TextField("10", text: $goalMinutes)
                                 .keyboardType(.numberPad)
                                 .frame(width: 30)
                                 .multilineTextAlignment(.leading)
-                            Text("분")
+                            Text(NSLocalizedString("min", comment: "min"))
                         }
                     }
                 }
             }
-            .navigationTitle(editingHabit != nil ? "습관" : "새로운 습관")
+            .navigationTitle(editingHabit != nil ? String(localized: "edit_nav_title") : String(localized: "new_nav_title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(String(localized: "cancel_btn")) {
+                        dismiss()
+                    }
+                }
+                
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(editingHabit != nil ? "수정" : "추가") {
+                    Button(editingHabit != nil ? String(localized: "edit_btn") : String(localized: "new_btn")) {
                         if validateInputs() {
                             if let habit = editingHabit {
                                 updateHabit(habit)
@@ -91,12 +96,6 @@ struct HabitAddEditView: View {
                             }
                             dismiss()
                         }
-                    }
-                }
-                
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("취소") {
-                        dismiss()
                     }
                 }
             }
@@ -178,7 +177,7 @@ private struct MultipleDayPicker: View {
                     toggleSelection(for: day)
                 }) {
                     HStack {
-                        Text(day.koreanTitle + "요일")
+                        Text(day.fullTitle)
                             .foregroundStyle(Color.textPrimary)
                         
                         Spacer()

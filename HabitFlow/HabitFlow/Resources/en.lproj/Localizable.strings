@@ -1,0 +1,160 @@
+// TodayHabitView
+"to_do_list" = "To Do List";
+"done_list" = "Done List";
+"complete_today_only" = "You can only complete today's habits";
+"past_day_message" = "This is a past day's habit";
+"future_day_message" = "This is a future habit";
+"today_habit_nav_title" = "Today's";
+"no_habits_to_do" = "No habits to do";
+"min" = "m";
+"mins" = "mins";
+
+// SettingsView
+"appearance" = "Appearance";
+"light_mode" = "Light Mode";
+"dark_mode" = "Dark Mode";
+"settings_nav_title" = "Settings";
+
+// HabitListView
+"every_days" = "Every day";
+"every_weekdays" = "Every %@";
+"every_interval_days" = "Every %d days";
+"habit_list_nav_title" = "Habit List";
+"any_habits_yet" = "You don’t have any habits yet";
+
+// HabitAddEditView
+"title" = "Title";
+"title_notice" = "Please enter a title.";
+"category" = "Category";
+"repeat" = "Repeat";
+"repeat_notice" = "Please enter a repeat interval.";
+"goal_time" = "Goal Time";
+"goal_time_notice" = "Please enter a goal time.";
+
+"every" = "Every";
+"repeat_days" = "days";
+"new_nav_title" = "New";
+"edit_nav_title" = "Edit Habit";
+"new_btn" = "Add";
+"edit_btn" = "Done";
+"cancel_btn" = "Cancel";
+
+// HabitRecordView
+"records_notice" = "You can add, edit, or delete detailed records.";
+"none_records_notice" = "No records yet.";
+
+"total" = "Total";
+"times" = " times";
+"times_en_none" = "";
+"hour" = "h";
+
+// HabitRecordAddEditView
+"new_record_nav_title" = "New";
+"edit_record_nav_title" = "Edit Record";
+
+"completed_record" = "Completed Record";
+"completed_date" = "Completion Date";
+"completed_time" = "Completion Time";
+"completed_duration" = "Duration";
+"completed_duration_notice" = "Enter in minutes";
+
+// StatisticsOverviewView
+"statistics_nav_title" = "Statistics";
+
+"completed_habits" = "Completed Habits";
+"active_days" = "Active Days";
+"favorite_category" = "Favorite Category";
+"best_habit" = "Best Habit";
+"total_time" = "Duration";
+"most_frequent" = "Top Day & Time";
+"weekly_report" = "Weekly Report";
+
+"days" = " days";
+"consecutive_days" = " days in a row";
+"consecutive" = "";
+
+// TotalCompletedChartView
+"7_days" = "7 days";
+"30_days" = "30 days";
+"not_enough_record" = "Not enough records yet";
+"analyzed_noitce" = " progress analyzed";
+"last_period_notice" = "Change from previous %@";
+"avg_notice" = "Completed an average of %.1f times per day";
+
+"analysis_same_1" = "You completed your routine the same number of times as last week.";
+"analysis_same_2" = "You're keeping a steady pace😊";
+"analysis_up_big_1" = "You completed %d more times than last week🔥";
+"analysis_up_big_2" = "Your performance increased by %.1f%%. You're getting better and better!";
+"analysis_up_small_1" = "You're growing little by little💪";
+"analysis_up_small_2" = "You did %d more than last week. Staying consistent is key!";
+"analysis_down_big_1" = "You did %d fewer than last week. Were you extra busy lately?";
+"analysis_down_big_2" = "Let’s start again tomorrow💛";
+"analysis_down_small_1" = "A small drop from last week, but that’s okay. You'll get back into rhythm🍀";
+"analysis_down_small_2" = "Your performance dropped by %.1f%%";
+
+"monthly_same_1" = "You completed the same number of routines as last month";
+"monthly_same_2" = "Consistency is the hardest part—great job staying on track!👏";
+"monthly_increase_high_1" = "You completed %d more routines than last month!😍";
+"monthly_increase_high_2" = "%.1f%% increase. That’s impressive growth!";
+"monthly_increase_low_1" = "You pushed a bit harder this month👍";
+"monthly_increase_low_2" = "Up by %d routines. Awesome!";
+"monthly_decrease_high_1" = "You did %d fewer routines than last month";
+"monthly_decrease_high_2" = "Maybe you weren't feeling your best. You can bounce back!💪";
+"monthly_decrease_low_1" = "Routine activity dropped a little. That’s okay—start fresh!🌱";
+"monthly_decrease_low_2" = "%.1f%% decrease.";
+
+//ActiveDaysChartView
+"total_completed_days" = "Total Completed Days";
+"consecutive_active_days" = "Consecutive Days";
+"monthly_completion_rate" = "%@ Completion Rate";
+"period_achievement" = "Achievement record from %@ to %@";
+"longest_rest_period" = "Longest Rest Period";
+"future_date_notice" = "You've moved to a future date";
+
+// BestHabitChartView
+"best_3" = "Best 3";
+
+// Report
+"weekly_report_title" = "Last Week's Report";
+"weekly_report_summary" = "You practiced %d habits %d times";
+"weekly_report_top_habit" = "The habit you practiced most often:";
+"weekly_report_time_day" = "Mainly done on %@ at %@";
+"weekly_report_total_time" = "You spent %d hrs %d mins on yourself";
+"weekly_report_total_time_mins" = "You spent %d minutes on yourself";
+"weekly_report_update_notice" = "Reports are updated every Monday";
+
+// Enums
+"weekday" = "Weekday";
+"custom" = "Custom";
+"healthyIt" = "Wellnest";
+"canDoIt" = "Doable";
+"moneyIt" = "Savvify";
+"greenIt" = "Greenergy";
+"myMindIt" = "Mindly";
+
+"time_period" = "Time Slot";
+"time_range_6_8" = "6 – 8 AM";
+"time_range_8_10" = "8 – 10 AM";
+"time_range_10_12" = "10 – 12 AM";
+"time_range_12_14" = "12 – 2 PM";
+"time_range_14_16" = "2 – 4 PM";
+"time_range_16_18" = "4 – 6 PM";
+"time_range_18_20" = "6 – 8 PM";
+"time_range_20_22" = "8 – 10 PM";
+"time_range_22_24" = "10 – 12 PM";
+"time_range_0_2" = "12 – 2 AM";
+"time_range_2_4" = "2 – 4 AM";
+"time_range_4_6" = "4 – 6 AM";
+
+"time_short_6" = "6am";
+"time_short_8" = "8am";
+"time_short_10" = "10a";
+"time_short_12" = "noon";
+"time_short_14" = "2pm";
+"time_short_16" = "4pm";
+"time_short_18" = "6pm";
+"time_short_20" = "8pm";
+"time_short_22" = "10p";
+"time_short_0" = "12a";
+"time_short_2" = "2am";
+"time_short_4" = "4am";

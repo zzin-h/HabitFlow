@@ -87,7 +87,8 @@ struct WeeklyCalendarView: View {
     
     private var formattedToday: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy년 MM월 dd일 EEEE"
+        formatter.locale = Locale.current
+        formatter.setLocalizedDateFormatFromTemplate("yyyyMMMdEEEE")
         return formatter.string(from: Date())
     }
 }

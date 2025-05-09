@@ -27,7 +27,7 @@ struct TotalTimeChartView: View {
             .padding(.horizontal)
             
             if viewModel.filteredTotalTimeStats.isEmpty {
-                Text("충분한 데이터가 없습니다")
+                Text(NSLocalizedString("not_enough_record", comment: "not_enough_record"))
                     .foregroundStyle(Color.gray)
                     .padding(.top, 32)
                     .frame(height: UIScreen.main.bounds.height * 0.5)
@@ -40,7 +40,7 @@ struct TotalTimeChartView: View {
             
             TotalTime3Summary(viewModel: viewModel)
         }
-        .navigationTitle("함께한 시간")
+        .navigationTitle(String(localized: "total_time"))
         .onAppear {
             viewModel.loadTotalTimeStats()
         }
@@ -73,7 +73,7 @@ private struct TotalTimeGraphView: View {
                 )
                 .foregroundStyle(habit.category.color)
                 .annotation(position: .trailing) {
-                    Text("\(habit.duration)분")
+                    Text("\(habit.duration) " + NSLocalizedString("mins", comment: "mins"))
                         .font(.caption.bold())
                         .foregroundColor(.gray)
                         .padding(.leading, 4)
@@ -106,7 +106,7 @@ private struct TotalTime3Summary: View {
         VStack {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text("베스트 3 누적시간")
+                    Text(NSLocalizedString("best_3", comment: "best_3"))
                         .font(.subheadline.bold())
                         .foregroundStyle(Color.textPrimary)
                         .padding(.bottom, 16)
@@ -171,6 +171,7 @@ private struct Top3Card: View {
                 
                 Text(title)
                     .bold()
+                    .lineLimit(1)
                 
                 Spacer()
             }
@@ -183,9 +184,9 @@ private struct Top3Card: View {
                 Spacer()
                 
                 if duration > 59 {
-                    Text("\(duration / 60)시간 \(duration % 60)분")
+                    Text("\(duration / 60)" + NSLocalizedString("hour", comment: "hour") + " \(duration % 60)" + NSLocalizedString("min", comment: "min"))
                 } else {
-                    Text("\(duration)분")
+                    Text("\(duration) " + NSLocalizedString("mins", comment: "mins"))
                 }
                 
                 Spacer()

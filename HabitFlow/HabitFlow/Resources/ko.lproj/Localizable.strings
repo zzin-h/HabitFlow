@@ -1,0 +1,159 @@
+// TodayHabitView
+"to_do_list" = "해야할 습관";
+"done_list" = "완료한 습관";
+"complete_today_only" = "오늘의 습관만 완료할 수 있어요";
+"past_day_message" = "지난 날의 습관이에요";
+"future_day_message" = "앞으로 해야할 습관이에요";
+"today_habit_nav_title" = "오늘의 습관";
+"no_habits_to_do" = "해야할 습관이 없어요";
+"min" = "분";
+"mins" = "분";
+
+// SettingsView
+"appearance" = "화면모드 설정";
+"light_mode" = "라이트 모드";
+"dark_mode" = "다크 모드";
+"settings_nav_title" = "설정";
+
+// HabitListView
+"every_days" = "매일";
+"every_weekdays" = "%@ 주기";
+"every_interval_days" = "%d일 주기";
+"habit_list_nav_title" = "습관 목록";
+"any_habits_yet" = "아직 습관이 없어요";
+
+// HabitAddEditView
+"title" = "제목";
+"title_notice" = "제목을 입력해주세요.";
+"category" = "카테고리";
+"repeat" = "반복";
+"repeat_notice" = "반복 주기를 입력해주세요.";
+"goal_time" = "목표 시간";
+"goal_time_notice" = "목표 시간을 입력해주세요.";
+
+"every" = "매";
+"repeat_days" = "일마다";
+"new_nav_title" = "새로운 습관";
+"edit_nav_title" = "습관";
+"new_btn" = "추가";
+"edit_btn" = "수정";
+"cancel_btn" = "취소";
+
+// HabitRecordView
+"records_notice" = "세부 기록을 추가, 수정, 삭제할 수 있습니다";
+"none_records_notice" = "아직 기록이 없어요";
+
+"total" = "총";
+"times" = "회";
+"times_en_none" = "회";
+"hour" = "시간";
+
+// HabitRecordAddEditView
+"new_record_nav_title" = "새로운 기록";
+"edit_record_nav_title" = "기록";
+
+"completed_record" = "완료 기록";
+"completed_date" = "완료 날짜";
+"completed_time" = "완료 시각";
+"completed_duration" = "수행 시간";
+"completed_duration_notice" = "분 단위 입력";
+
+// StatisticsOverviewView
+"statistics_nav_title" = "습관 통계";
+"completed_habits" = "완료한 습관";
+"active_days" = "함께한 일수";
+"favorite_category" = "관심 카테고리";
+"best_habit" = "베스트 습관";
+"total_time" = "함께한 시간";
+"most_frequent" = "최다 요일 및 시간대";
+"weekly_report" = "주간 리포트";
+
+"days" = "일";
+"consecutive_days" = "일";
+"consecutive" = "연속 ";
+
+// TotalCompletedChartView
+"7_days" = "7일";
+"30_days" = "30일";
+"not_enough_record" = "아직 충분한 기록이 없어요";
+"analyzed_noitce" = " 동안의 변화를 분석했어요";
+"last_period_notice" = "지난 %@의 기록 대비 변화량입니다";
+"avg_notice" = "하루 평균 %.1f회 완료했어요";
+
+"analysis_same_1" = "지난주와 똑같은 횟수로 루틴을 지켰어요";
+"analysis_same_2" = "안정적으로 유지되고 있어요😊";
+"analysis_up_big_1" = "지난주보다 %d개나 더 완료했어요🔥";
+"analysis_up_big_2" = "수행률이 %.1f%%상승했어요. 점점 좋아지고 있어요!";
+"analysis_up_small_1" = "조금씩 성장 중이에요💪";
+"analysis_up_small_2" = "지난주보다 %d개 더 했어요. 꾸준함이 중요하니까요!";
+"analysis_down_big_1" = "지난주보다 %d개 줄었어요. 요즘 좀 바빴던 건 아닐까요?";
+"analysis_down_big_2" = "내일부터 다시 도전해봐요💛";
+"analysis_down_small_1" = "지난주보다 조금 줄었지만 괜찮아요. 다시 리듬을 찾으면 돼요🍀";
+"analysis_down_small_2" = "수행률이 %.1f%%감소했어요";
+
+"monthly_same_1" = "지난달과 같은 루틴 수행량이에요";
+"monthly_same_2" = "꾸준함이 가장 어려운데 정말 잘하고 있어요👏";
+"monthly_increase_high_1" = "지난달보다 %d개 더 완료했어요😍";
+"monthly_increase_high_2" = "%.1f%% 상승했어요. 눈에 띄는 성장입니다!";
+"monthly_increase_low_1" = "조금 더 노력한 한 달이었어요👍";
+"monthly_increase_low_2" = "%d개 늘었어요. 멋져요!";
+"monthly_decrease_high_1" = "지난달보다 %d개 줄었어요";
+"monthly_decrease_high_2" = "컨디션이 좋지 않았던 걸 수도 있어요. 다시 회복할 수 있어요💪";
+"monthly_decrease_low_1" = "루틴 수행이 살짝 줄었어요. 괜찮아요! 다시 시작해봐요🌱";
+"monthly_decrease_low_2" = "%.1f%% 감소했어요";
+
+//ActiveDaysChartView
+"total_completed_days" = "총 완료 일수";
+"consecutive_active_days" = "연속 수행 일수";
+"monthly_completion_rate" = "%@ 수행률";
+"period_achievement" = "%@ - %@ 간의 달성 기록이에요";
+"longest_rest_period" = "오래 휴식한 기간";
+"future_date_notice" = "미래의 날짜로 왔습니다";
+
+// BestHabitChartView
+"best_3" = "베스트 3";
+
+// Report
+"weekly_report_title" = "지난주 리포트";
+"weekly_report_summary" = "한 주간 %d개의 습관을 %d회 실천했어요";
+"weekly_report_top_habit" = "가장 많이 실천한 습관은";
+"weekly_report_time_day" = "주로 %@, %@에 수행했어요";
+"weekly_report_total_time" = "총 %d시간 %d분 동안 나를 위한 시간을 가졌어요";
+"weekly_report_total_time_mins" = "총 %d분 동안 나를 위한 시간을 가졌어요";
+"weekly_report_update_notice" = "매주 월요일마다 리포트가 갱신됩니다";
+
+// Enums
+"weekday" = "요일";
+"custom" = "커스텀";
+"healthyIt" = "헬시잇";
+"canDoIt" = "할수잇";
+"moneyIt" = "머니잇";
+"greenIt" = "그린잇";
+"myMindIt" = "내맘잇";
+
+"time_period" = "시간대";
+"time_range_6_8" = "06 - 08시";
+"time_range_8_10" = "08 - 10시";
+"time_range_10_12" = "10 - 12시";
+"time_range_12_14" = "12 - 14시";
+"time_range_14_16" = "14 - 16시";
+"time_range_16_18" = "16 - 18시";
+"time_range_18_20" = "18 - 20시";
+"time_range_20_22" = "20 - 22시";
+"time_range_22_24" = "22 - 24시";
+"time_range_0_2" = "00 - 02시";
+"time_range_2_4" = "02 - 04시";
+"time_range_4_6" = "04 - 06시";
+
+"time_short_6" = "06시";
+"time_short_8" = "08시";
+"time_short_10" = "10시";
+"time_short_12" = "12시";
+"time_short_14" = "14시";
+"time_short_16" = "16시";
+"time_short_18" = "18시";
+"time_short_20" = "20시";
+"time_short_22" = "22시";
+"time_short_0" = "24시";
+"time_short_2" = "02시";
+"time_short_4" = "04시";

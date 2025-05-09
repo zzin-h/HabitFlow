@@ -27,7 +27,7 @@ struct BestHabitChartView: View {
             .padding(.horizontal)
             
             if viewModel.filteredHabits.isEmpty {
-                Text("충분한 데이터가 없습니다")
+                Text(NSLocalizedString("not_enough_record", comment: "not_enough_record"))
                     .foregroundStyle(Color.gray)
                     .padding(.top, 32)
                     .frame(height: UIScreen.main.bounds.height * 0.5)
@@ -40,7 +40,7 @@ struct BestHabitChartView: View {
             
             BestHabit3Summary(viewModel: viewModel)
         }
-        .navigationTitle("베스트 습관")
+        .navigationTitle(String(localized: "best_habit"))
         .onAppear {
             viewModel.loadAllBestHabits()
         }
@@ -73,7 +73,7 @@ private struct BestHabitGraphView: View {
                 )
                 .foregroundStyle(habit.category.color)
                 .annotation(position: .trailing) {
-                    Text("\(habit.count)회")
+                    Text("\(habit.count)" + NSLocalizedString("times", comment: "times"))
                         .font(.caption.bold())
                         .foregroundColor(.gray)
                         .padding(.leading, 4)
@@ -106,7 +106,7 @@ private struct BestHabit3Summary: View {
         VStack {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text("베스트 3 습관")
+                    Text(NSLocalizedString("best_3", comment: "best_3"))
                         .font(.subheadline.bold())
                         .foregroundStyle(Color.textPrimary)
                         .padding(.bottom, 16)
@@ -171,6 +171,7 @@ private struct Top3Card: View {
                 
                 Text(title)
                     .bold()
+                    .lineLimit(1)
                 
                 Spacer()
             }
@@ -182,7 +183,7 @@ private struct Top3Card: View {
             HStack {
                 Spacer()
                 
-                Text("\(count)회")
+                Text("\(count)" + NSLocalizedString("times", comment: "times"))
                 
                 Spacer()
                 

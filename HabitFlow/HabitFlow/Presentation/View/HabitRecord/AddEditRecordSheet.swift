@@ -9,13 +9,11 @@ import SwiftUI
 
 struct AddEditRecordSheet: View {
     @Environment(\.dismiss) private var dismiss
+    
     @ObservedObject var viewModel: HabitRecordViewModel
-
+    
     let habit: HabitModel
     let existingRecord: HabitRecordModel?
-
-    @State private var selectedDate: Date
-    @State private var durationMinutes: String
 
     init(
         viewModel: HabitRecordViewModel,
@@ -34,13 +32,16 @@ struct AddEditRecordSheet: View {
             _durationMinutes = State(initialValue: "")
         }
     }
+    
+    @State private var selectedDate: Date
+    @State private var durationMinutes: String
 
     var body: some View {
         NavigationStack {
             Form {
-                Section(header: Text("완료일")) {
+                Section(header: Text(NSLocalizedString("completed_record", comment: "completed_record"))) {
                     DatePicker(
-                        "날짜",
+                        String(localized: "completed_date"),
                         selection: $selectedDate,
                         in: ...Date(),
                         displayedComponents: .date
@@ -48,30 +49,30 @@ struct AddEditRecordSheet: View {
                     .padding(.vertical, 2)
                     
                     DatePicker(
-                        "시각",
+                        String(localized: "completed_time"),
                         selection: $selectedDate,
                         displayedComponents: .hourAndMinute
                     )
                 }
 
                 if habit.goalMinutes! > 0 {
-                    Section(header: Text("수행 시간")) {
-                        TextField("분 단위 입력", text: $durationMinutes)
+                    Section(header: Text(NSLocalizedString("completed_duration", comment: "completed_duration"))) {
+                        TextField(String(localized: "completed_duration_notice"), text: $durationMinutes)
                             .keyboardType(.numberPad)
                     }
                 }
             }
-            .navigationTitle(existingRecord != nil ? "기록" : "새로운 기록")
+            .navigationTitle(existingRecord != nil ? String(localized: "edit_record_nav_title") : String(localized: "new_record_nav_title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("취소") {
+                    Button(String(localized: "cancel_btn")) {
                         dismiss()
                     }
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(existingRecord != nil ? "수정" : "추가") {
+                    Button(existingRecord != nil ? String(localized: "edit_btn") : String(localized: "new_btn")) {
                         saveRecord()
                     }
                     .disabled(!isValid)
