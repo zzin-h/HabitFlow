@@ -92,6 +92,18 @@ private struct ActiveDaysCalendarView: View {
                         }
                     }
                     .frame(height: 50)
+                    .gesture(
+                        DragGesture()
+                            .onEnded { value in
+                                if value.translation.width < -50 {
+                                    viewModel.nextMonth()
+                                    viewModel.fetchAndGenerateDays()
+                                } else if value.translation.width > 50 {
+                                    viewModel.previousMonth()
+                                    viewModel.fetchAndGenerateDays()
+                                }
+                            }
+                    )
                 }
             }
             .frame(height: 300)

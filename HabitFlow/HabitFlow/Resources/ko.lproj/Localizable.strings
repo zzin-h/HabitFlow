@@ -122,6 +122,11 @@
 "weekly_report_total_time_mins" = "총 %d분 동안 나를 위한 시간을 가졌어요";
 "weekly_report_update_notice" = "매주 월요일마다 리포트가 갱신됩니다";
 
+// Timer
+"focus_and_complete" = "집중해서 완료해봐요!";
+"habit_achieved" = "%@ 달성!";
+"goal_time_complete" = "목표 시간이 완료되었습니다.";
+
 // Enums
 "weekday" = "요일";
 "custom" = "커스텀";

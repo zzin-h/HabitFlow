@@ -123,6 +123,11 @@
 "weekly_report_total_time_mins" = "You spent %d minutes on yourself";
 "weekly_report_update_notice" = "Reports are updated every Monday";
 
+// Timer
+"focus_and_complete" = "Stay focused and finish it!";
+"habit_achieved" = "%@ achieved!";
+"goal_time_complete" = "Target time completed.";
+
 // Enums
 "weekday" = "Weekday";
 "custom" = "Custom";

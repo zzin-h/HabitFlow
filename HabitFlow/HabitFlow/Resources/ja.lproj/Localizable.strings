@@ -123,6 +123,11 @@
 "weekly_report_total_time_mins" = "自分のために%d分を取れました";
 "weekly_report_update_notice" = "毎週月曜日にレポートが更新されます";
 
+// Timer
+"focus_and_complete" = "集中してやり遂げよう！";
+"habit_achieved" = "%@を達成！";
+"goal_time_complete" = "目標時間が完了しました。";
+
 // Enums
 "weekday" = "曜日";
 "custom" = "カスタム";
