@@ -9,7 +9,13 @@
         <attribute name="routineType" optional="YES" attributeType="String"/>
         <attribute name="selectedDays" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData"/>
         <attribute name="title" attributeType="String"/>
+        <relationship name="notifications" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="HabitNotificationEntity" inverseName="habit" inverseEntity="HabitNotificationEntity"/>
         <relationship name="records" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="HabitRecordEntity" inverseName="habit" inverseEntity="HabitRecordEntity"/>
+    </entity>
+    <entity name="HabitNotificationEntity" representedClassName="HabitNotificationEntity" syncable="YES">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="time" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="habit" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HabitEntity" inverseName="notifications" inverseEntity="HabitEntity"/>
     </entity>
     <entity name="HabitRecordEntity" representedClassName="HabitRecordEntity" syncable="YES">
         <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>

@@ -12,16 +12,25 @@ struct HabitListDIContainer {
     // MARK: - Repository
     private let repository = HabitRepository()
     private let recordRepository = HabitRecordRepository()
-
+    private let notificationRepository = HabitNotificationRepository()
+    
     // MARK: - UseCase
     private var useCase: HabitUseCase {
         return HabitUseCaseImpl(repository: repository, recordRepository: recordRepository)
     }
     
+    private var notificationUseCase: HabitNotificationUseCase {
+        return HabitNotificationUseCaseImpl(
+            repository: notificationRepository,
+            context: CoreDataManager.shared.context
+        )
+    }
+    
     // MARK: - ViewModel
     func makeHabitListViewModel() -> HabitListViewModel {
         return HabitListViewModel(
-            useCase: useCase
+            useCase: useCase,
+            notificationUseCase: notificationUseCase
         )
     }
 }

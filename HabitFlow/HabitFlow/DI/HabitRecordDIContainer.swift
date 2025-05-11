@@ -21,7 +21,7 @@ final class HabitRecordDIContainer {
         self.useCase = HabitRecordUseCaseImpl(repository: repository)
     }
 
-    // MARK: - ViewModel Factory
+    // MARK: - ViewModel
     func makeHabitRecordViewModel(habitId: UUID) -> HabitRecordViewModel {
         return HabitRecordViewModel(
             habitId: habitId,

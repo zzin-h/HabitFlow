@@ -23,7 +23,7 @@ struct TimerView: View {
                 .foregroundStyle(Color.textPrimary)
                 .padding(.top, 32)
             
-            Text("집중해서 완료해봐요!")
+            Text(NSLocalizedString("focus_and_complete", comment: ""))
                 .font(.subheadline)
                 .foregroundStyle(Color.textSecondary)
                 .padding(.top, 16)
@@ -77,8 +77,8 @@ struct TimerView: View {
         }
         .alert(isPresented: $showAlert) {
             Alert(
-                title: Text("\(habitTitle) 달성!"),
-                message: Text("목표 시간이 완료되었습니다."),
+                title: Text(String(format: NSLocalizedString("habit_achieved", comment: ""), habitTitle)),
+                message: Text(NSLocalizedString("goal_time_complete", comment: "")),
                 dismissButton: .cancel(Text("OK"))
             )
         }

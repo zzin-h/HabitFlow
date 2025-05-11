@@ -10,12 +10,16 @@ import SwiftUI
 struct TodayHabitView: View {
     @StateObject private var viewModel: TodayHabitViewModel
     @StateObject private var habitListViewModel: HabitListViewModel
+    @StateObject private var notifyViewModel: HabitNotificationViewModel
     @StateObject private var colorSchemeManager = ColorSchemeManager()
     
     init(viewModel: TodayHabitViewModel = TodayHabitDIContainer().makeTodayHabitViewModel(),
-         habitListViewModel: HabitListViewModel = HabitListDIContainer().makeHabitListViewModel()) {
+         habitListViewModel: HabitListViewModel = HabitListDIContainer().makeHabitListViewModel(),
+         notifyViewModel: HabitNotificationViewModel = HabitNotificationDIContainer().makeHabitNotificationViewModel()
+    ) {
         _viewModel = StateObject(wrappedValue: viewModel)
         _habitListViewModel = StateObject(wrappedValue: habitListViewModel)
+        _notifyViewModel = StateObject(wrappedValue: notifyViewModel)
     }
     
     @State private var selectedDate: Date = Date()
@@ -102,6 +106,7 @@ struct TodayHabitView: View {
             .sheet(isPresented: $isSheetPresented) {
                 HabitAddEditView(
                     viewModel: habitListViewModel,
+                    notifyViewModel: notifyViewModel,
                     onSave: {
                         isSheetPresented = false
                         viewModel.loadHabits(for: selectedDate)

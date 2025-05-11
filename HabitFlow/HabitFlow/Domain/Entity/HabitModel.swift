@@ -17,6 +17,7 @@ struct HabitModel: Identifiable {
     let intervalDays: Int?
     let goalMinutes: Int?
     let records: [HabitRecordModel]
+    let notifications: [HabitNotificationModel]
 
     init(
         id: UUID,
@@ -27,7 +28,8 @@ struct HabitModel: Identifiable {
         selectedDays: [String]? = nil,
         intervalDays: Int? = nil,
         goalMinutes: Int? = nil,
-        records: [HabitRecordModel] = []
+        records: [HabitRecordModel] = [],
+        notifications: [HabitNotificationModel] = []
     ) {
         self.id = id
         self.title = title
@@ -38,6 +40,7 @@ struct HabitModel: Identifiable {
         self.intervalDays = intervalDays
         self.goalMinutes = goalMinutes
         self.records = records
+        self.notifications = notifications
     }
 
     init(entity: HabitEntity) {
@@ -50,5 +53,6 @@ struct HabitModel: Identifiable {
         self.intervalDays = Int(entity.intervalDays)
         self.goalMinutes = Int(entity.goalMinutes)
         self.records = []
+        self.notifications = []
     }
 }

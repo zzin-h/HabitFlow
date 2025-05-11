@@ -30,6 +30,7 @@
 "repeat_notice" = "Please enter a repeat interval.";
 "goal_time" = "Goal Time";
 "goal_time_notice" = "Please enter a goal time.";
+"notify" = "Reminder";
 
 "every" = "Every";
 "repeat_days" = "days";
@@ -122,6 +123,16 @@
 "weekly_report_total_time" = "You spent %d hrs %d mins on yourself";
 "weekly_report_total_time_mins" = "You spent %d minutes on yourself";
 "weekly_report_update_notice" = "Reports are updated every Monday";
+
+// Timer
+"focus_and_complete" = "Stay focused and finish it!";
+"habit_achieved" = "%@ achieved!";
+"goal_time_complete" = "Target time completed.";
+
+// Notification
+"habit_reminder_today" = "Time for your habit!";
+"habit_reminder_weekday_cycle" = "Time to do your weekday routine (%@)!";
+"habit_reminder_day_cycle" = "Time to do your %d-day routine!";
 
 // Enums
 "weekday" = "Weekday";

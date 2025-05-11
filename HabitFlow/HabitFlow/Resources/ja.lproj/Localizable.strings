@@ -30,6 +30,7 @@
 "repeat_notice" = "繰り返し間隔を入力してください。";
 "goal_time" = "目標時間";
 "goal_time_notice" = "目標時間を入力してください。";
+"notify" = "リマインダー";
 
 "every" = "毎";
 "repeat_days" = "日ごと";
@@ -122,6 +123,16 @@
 "weekly_report_total_time" = "自分のために%d時間%d分を取れました";
 "weekly_report_total_time_mins" = "自分のために%d分を取れました";
 "weekly_report_update_notice" = "毎週月曜日にレポートが更新されます";
+
+// Timer
+"focus_and_complete" = "集中してやり遂げよう！";
+"habit_achieved" = "%@を達成！";
+"goal_time_complete" = "目標時間が完了しました。";
+
+// Notification
+"habit_reminder_today" = "今日の習慣、始めましょう！";
+"habit_reminder_weekday_cycle" = "週の習慣（%@）、始めましょう！";
+"habit_reminder_day_cycle" = "%d日ごとの習慣、始めましょう！";
 
 // Enums
 "weekday" = "曜日";
