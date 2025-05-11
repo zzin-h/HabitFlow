@@ -6,13 +6,37 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		84F1063E2DCF86F000B62839 /* HabitNotificationEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F1063C2DCF86F000B62839 /* HabitNotificationEntity+CoreDataClass.swift */; };
+		84F1063F2DCF86F000B62839 /* HabitNotificationEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F1063D2DCF86F000B62839 /* HabitNotificationEntity+CoreDataProperties.swift */; };
+		84F106412DCF86F000B62839 /* HabitEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F1063B2DCF86F000B62839 /* HabitEntity+CoreDataProperties.swift */; };
+		84F1064E2DCF879400B62839 /* HabitEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F1064D2DCF879400B62839 /* HabitEntity+CoreDataClass.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		84F100102DA4EE3200B62839 /* HabitFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HabitFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		84F1063B2DCF86F000B62839 /* HabitEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "HabitEntity+CoreDataProperties.swift"; path = "HabitFlow/Core/Persistence/HabitEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		84F1063C2DCF86F000B62839 /* HabitNotificationEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "HabitNotificationEntity+CoreDataClass.swift"; path = "HabitFlow/Core/Persistence/HabitNotificationEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
+		84F1063D2DCF86F000B62839 /* HabitNotificationEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "HabitNotificationEntity+CoreDataProperties.swift"; path = "HabitFlow/Core/Persistence/HabitNotificationEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		84F1064D2DCF879400B62839 /* HabitEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "HabitEntity+CoreDataClass.swift"; path = "HabitFlow/Core/Persistence/HabitEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		84F1066A2DCFA38E00B62839 /* Exceptions for "HabitFlow" folder in "HabitFlow" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 84F1000F2DA4EE3200B62839 /* HabitFlow */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		84F100122DA4EE3200B62839 /* HabitFlow */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				84F1066A2DCFA38E00B62839 /* Exceptions for "HabitFlow" folder in "HabitFlow" target */,
+			);
 			path = HabitFlow;
 			sourceTree = "<group>";
 		};
@@ -32,6 +56,10 @@
 		84F100072DA4EE3200B62839 = {
 			isa = PBXGroup;
 			children = (
+				84F1064D2DCF879400B62839 /* HabitEntity+CoreDataClass.swift */,
+				84F1063B2DCF86F000B62839 /* HabitEntity+CoreDataProperties.swift */,
+				84F1063C2DCF86F000B62839 /* HabitNotificationEntity+CoreDataClass.swift */,
+				84F1063D2DCF86F000B62839 /* HabitNotificationEntity+CoreDataProperties.swift */,
 				84F100122DA4EE3200B62839 /* HabitFlow */,
 				84F100112DA4EE3200B62839 /* Products */,
 			);
@@ -121,6 +149,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84F1064E2DCF879400B62839 /* HabitEntity+CoreDataClass.swift in Sources */,
+				84F1063E2DCF86F000B62839 /* HabitNotificationEntity+CoreDataClass.swift in Sources */,
+				84F1063F2DCF86F000B62839 /* HabitNotificationEntity+CoreDataProperties.swift in Sources */,
+				84F106412DCF86F000B62839 /* HabitEntity+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,6 +289,7 @@
 				DEVELOPMENT_TEAM = MCADUG6F79;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HabitFlow/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -292,6 +325,7 @@
 				DEVELOPMENT_TEAM = MCADUG6F79;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HabitFlow/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

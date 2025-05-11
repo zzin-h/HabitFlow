@@ -30,6 +30,7 @@
 "repeat_notice" = "반복 주기를 입력해주세요.";
 "goal_time" = "목표 시간";
 "goal_time_notice" = "목표 시간을 입력해주세요.";
+"notify" = "알림 설정";
 
 "every" = "매";
 "repeat_days" = "일마다";
@@ -126,6 +127,11 @@
 "focus_and_complete" = "집중해서 완료해봐요!";
 "habit_achieved" = "%@ 달성!";
 "goal_time_complete" = "목표 시간이 완료되었습니다.";
+
+// Notification
+"habit_reminder_today" = "오늘의 습관을 실천할 시간이에요!";
+"habit_reminder_weekday_cycle" = "%@ 주기의 습관을 실천할 시간이에요!";
+"habit_reminder_day_cycle" = "%d일 주기의 습관을 실천할 시간이에요!";
 
 // Enums
 "weekday" = "요일";

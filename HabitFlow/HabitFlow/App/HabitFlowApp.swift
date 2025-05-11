@@ -9,7 +9,10 @@ import SwiftUI
 
 @main
 struct HabitFlowApp: App {
-
+    init() {
+        AppLaunchManager.shared.initializeApp()
+    }
+    
     var body: some Scene {
         WindowGroup {
             TodayHabitView()

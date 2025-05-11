@@ -11,6 +11,7 @@ struct HabitAddEditView: View {
     @Environment(\.dismiss) var dismiss
     
     @ObservedObject var viewModel: HabitListViewModel
+    @ObservedObject var notifyViewModel: HabitNotificationViewModel
     
     @State private var title: String = ""
     @State private var selectedCategory: HabitCategory = .healthyIt
@@ -71,8 +72,22 @@ struct HabitAddEditView: View {
                                 .keyboardType(.numberPad)
                                 .frame(width: 30)
                                 .multilineTextAlignment(.leading)
-                            Text(NSLocalizedString("min", comment: "min"))
+                            Text(NSLocalizedString("mins", comment: "mins"))
                         }
+                    }
+                }
+                
+                Section {
+                    Toggle(String(localized: "notify"), isOn: $notifyViewModel.isNotificationOn)
+                        .onChange(of: notifyViewModel.isNotificationOn) { newValue in
+                            if newValue == false, let habit = editingHabit {
+                                notifyViewModel.deleteNotification(habitId: habit.id)
+                            }
+                        }
+                    if notifyViewModel.isNotificationOn {
+                        DatePicker("", selection: $notifyViewModel.notificationTime, displayedComponents: .hourAndMinute)
+                            .labelsHidden()
+                            .datePickerStyle(.wheel)
                     }
                 }
             }
@@ -112,6 +127,8 @@ struct HabitAddEditView: View {
                     } else {
                         hasGoal = false
                     }
+                    
+                    notifyViewModel.setHabitId(habit.id)
                 }
             }
         }
@@ -128,7 +145,12 @@ struct HabitAddEditView: View {
             intervalDays: routineType == .interval ? Int(intervalDays) ?? 1 : nil,
             goalMinutes: hasGoal ? Int(goalMinutes) ?? 0 : nil
         )
-        viewModel.addHabit(newHabit)
+        
+        if notifyViewModel.isNotificationOn {
+            viewModel.addHabitWithNotification(newHabit, notify: notifyViewModel.isNotificationOn, notifyTime: notifyViewModel.notificationTime)
+        } else {
+            viewModel.addHabit(newHabit)
+        }
     }
     
     private func updateHabit(_ habit: HabitModel) {
@@ -142,7 +164,16 @@ struct HabitAddEditView: View {
             intervalDays: routineType == .interval ? Int(intervalDays) ?? 1 : nil,
             goalMinutes: hasGoal ? Int(goalMinutes) ?? 0 : nil
         )
-        viewModel.updateHabit(updated)
+        
+        if notifyViewModel.isNotificationOn {
+            if habit.notifications.isEmpty {
+                notifyViewModel.addNotification(habitId: habit.id, time: notifyViewModel.notificationTime)
+            } else {
+                viewModel.updateHabitWithNotification(updated, notify: notifyViewModel.isNotificationOn, notifyTime: notifyViewModel.notificationTime)
+            }
+        } else {
+            viewModel.updateHabit(updated)
+        }
     }
     
     private func validateInputs() -> Bool {

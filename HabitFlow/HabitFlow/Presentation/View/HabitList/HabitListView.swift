@@ -9,9 +9,11 @@ import SwiftUI
 
 struct HabitListView: View {
     @StateObject private var viewModel: HabitListViewModel
+    @StateObject private var notifyViewModel: HabitNotificationViewModel
     
     init(viewModel: HabitListViewModel = HabitListDIContainer().makeHabitListViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        _notifyViewModel = StateObject(wrappedValue: HabitNotificationDIContainer().makeHabitNotificationViewModel())
     }
     
     @State private var showingAddView = false
@@ -47,14 +49,14 @@ struct HabitListView: View {
                                     Button(role: .destructive) {
                                         viewModel.deleteHabit(id: habit.id)
                                     } label: {
-                                        Label("삭제", systemImage: "trash")
+                                        Label("", systemImage: "trash")
                                     }
                                     .tint(Color.primaryColor)
                                     
                                     Button {
                                         selectedHabitToEdit = habit
                                     } label: {
-                                        Label("수정", systemImage: "pencil")
+                                        Label("", systemImage: "pencil")
                                     }
                                     .tint(Color.secondaryColor)
                                 }
@@ -79,10 +81,10 @@ struct HabitListView: View {
             viewModel.fetchHabits()
         }
         .sheet(isPresented: $showingAddView) {
-            HabitAddEditView(viewModel: viewModel)
+            HabitAddEditView(viewModel: viewModel, notifyViewModel: notifyViewModel)
         }
         .sheet(item: $selectedHabitToEdit) { habit in
-            HabitAddEditView(viewModel: viewModel, editingHabit: habit)
+            HabitAddEditView(viewModel: viewModel, notifyViewModel: notifyViewModel, editingHabit: habit)
         }
         .sheet(item: $selectedHabitForStats) { habit in
             HabitRecordView(habit: habit)

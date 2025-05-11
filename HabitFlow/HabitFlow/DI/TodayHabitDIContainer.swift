@@ -32,7 +32,7 @@ final class TodayHabitDIContainer {
         )
     }
 
-    // MARK: - ViewModel Factory
+    // MARK: - ViewModel
     func makeTodayHabitViewModel() -> TodayHabitViewModel {
         return TodayHabitViewModel(
             habitUseCase: habitUseCase,
