@@ -135,11 +135,12 @@ struct HabitAddEditView: View {
     }
     
     private func addHabit() {
+        let todayStart = Calendar.current.startOfDay(for: Date())
         let newHabit = HabitModel(
             id: UUID(),
             title: title,
             category: selectedCategory,
-            createdAt: Date(),
+            createdAt: todayStart,
             routineType: routineType,
             selectedDays: routineType == .weekly ? selectedDays.map { $0.rawValue } : nil,
             intervalDays: routineType == .interval ? Int(intervalDays) ?? 1 : nil,
