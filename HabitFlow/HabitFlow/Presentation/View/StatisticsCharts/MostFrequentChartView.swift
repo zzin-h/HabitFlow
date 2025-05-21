@@ -54,6 +54,16 @@ struct MostFrequentChartView: View {
         .onAppear {
             viewModel.loadTimePatternStats()
         }
+        .gesture(
+            DragGesture()
+                .onEnded { value in
+                    if value.translation.width > -50 {
+                        selectedMostFrequent = .weekDays
+                    } else if value.translation.width < 50 {
+                        selectedMostFrequent = .timeSlots
+                    }
+                }
+        )
     }
 }
 

@@ -17,47 +17,52 @@ struct TotalCompletedChartView: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Picker("기간", selection: $selectedPreset) {
-                    ForEach(PeriodPreset.allCases) { preset in
-                        Text(preset.title).tag(preset)
-                    }
+        VStack(spacing: 16) {
+            Picker("기간", selection: $selectedPreset) {
+                ForEach(PeriodPreset.allCases) { preset in
+                    Text(preset.title).tag(preset)
                 }
+            }
+            .padding()
+            .pickerStyle(.segmented)
+            .onChange(of: selectedPreset) { newValue in
+                viewModel.updatePeriod(newValue.toPeriod())
+            }
+            
+            TotalCompletedGraphView(viewModel: viewModel, selectedPreset: $selectedPreset)
                 .padding()
-                .pickerStyle(.segmented)
-                .onChange(of: selectedPreset) { newValue in
-                    viewModel.updatePeriod(newValue.toPeriod())
-                }
-                
-                TotalCompletedGraphView(viewModel: viewModel, selectedPreset: $selectedPreset)
-                    .padding()
-                
-                VStack {
-                    VStack(alignment: .leading) {
-                        ChangeStatsView(viewModel: viewModel, selectedPreset: $selectedPreset)
-                            .padding(.top, 16)
-                        
-                        AverageStatsView(selectedPreset: $selectedPreset, weekly: viewModel.calculateAverage(for: .oneWeek), monthly: viewModel.calculateAverage(for: .oneMonth))
-                        
-                        Spacer()
-                    }
-                    .frame(width: UIScreen.main.bounds.width * 0.85, height: UIScreen.main.bounds.height * 0.25)
-                    .background(Color.cardBg)
-                    .cornerRadius(16)
-                    .padding()
+            
+            VStack {
+                VStack(alignment: .leading) {
+                    ChangeStatsView(viewModel: viewModel, selectedPreset: $selectedPreset)
+                        .padding(.top, 16)
+                    
+                    AverageStatsView(selectedPreset: $selectedPreset, weekly: viewModel.calculateAverage(for: .oneWeek), monthly: viewModel.calculateAverage(for: .oneMonth))
                     
                     Spacer()
                 }
-                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.5)
-                .background(Color(.systemGroupedBackground))
+                .frame(width: UIScreen.main.bounds.width * 0.85, height: UIScreen.main.bounds.height * 0.25)
+                .background(Color.cardBg)
+                .cornerRadius(16)
+                .padding()
             }
-            .padding()
+            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.4)
+            .background(Color(.systemGroupedBackground))
         }
         .navigationTitle(String(localized: "completed_habits"))
         .onAppear {
             viewModel.loadCompletedStats()
         }
+        .gesture(
+            DragGesture()
+                .onEnded { value in
+                    if value.translation.width > -50 {
+                        selectedPreset = .oneWeek
+                    } else if value.translation.width < 50 {
+                        selectedPreset = .oneMonth
+                    }
+                }
+        )
     }
 }
 
@@ -162,6 +167,7 @@ private struct ChangeStatsView: View {
                         
                     }
                     .onAppear{
+                        viewModel.loadCompletedStats()
                         viewModel.loadPreviousCompletedStats(for: .oneMonth)
                     }
                 }

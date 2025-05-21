@@ -11,6 +11,7 @@ import Charts
 struct TotalTimeChartView: View {
     @StateObject private var viewModel: StatisticsChartViewModel
     
+    private let categories = HabitCategory.allCases
     
     init(viewModel: StatisticsChartViewModel = StatisticsChartsDIContainer().makeStatisticsChartViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -19,7 +20,7 @@ struct TotalTimeChartView: View {
     var body: some View {
         VStack {
             Picker("카테고리", selection: $viewModel.selectedCategory) {
-                ForEach(HabitCategory.allCases, id: \.self) { category in
+                ForEach(categories, id: \.self) { category in
                     Text(category.title).tag(category)
                 }
             }
@@ -44,6 +45,20 @@ struct TotalTimeChartView: View {
         .onAppear {
             viewModel.loadTotalTimeStats()
         }
+        .gesture(
+            DragGesture()
+                .onEnded { value in
+                    let threshold: CGFloat = 50
+                    let currentIndex = categories.firstIndex(of: viewModel.selectedCategory) ?? 0
+                    if value.translation.width < -threshold {
+                        let nextIndex = min(currentIndex + 1, categories.count - 1)
+                        viewModel.selectedCategory = categories[nextIndex]
+                    } else if value.translation.width > threshold {
+                        let prevIndex = max(currentIndex - 1, 0)
+                        viewModel.selectedCategory = categories[prevIndex]
+                    }
+                }
+        )
     }
 }
 
@@ -73,7 +88,7 @@ private struct TotalTimeGraphView: View {
                 )
                 .foregroundStyle(habit.category.color)
                 .annotation(position: .trailing) {
-                    Text("\(habit.duration) " + NSLocalizedString("mins", comment: "mins"))
+                    Text("\(habit.duration)" + NSLocalizedString("mins", comment: "mins"))
                         .font(.caption.bold())
                         .foregroundColor(.gray)
                         .padding(.leading, 4)
@@ -204,4 +219,3 @@ private struct Top3Card: View {
         .cornerRadius(8)
     }
 }
-

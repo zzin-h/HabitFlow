@@ -91,7 +91,7 @@ struct RoutineSummaryView: View {
                             }
                         }
                         
-                        if formatHour(summary.totalDuration) > 0 {
+                        if formatHour(summary.totalDuration) > 59 {
                             HStack(alignment: .center, spacing: 0) {
                                 Image(systemName: "lightbulb.max.fill")
                                     .font(.caption)
@@ -100,7 +100,7 @@ struct RoutineSummaryView: View {
                                 
                                 Text(String(format: NSLocalizedString("weekly_report_total_time", comment: ""), formatHour(summary.totalDuration), formatMin(summary.totalDuration)))
                             }
-                        } else {
+                        } else if formatHour(summary.totalDuration) > 0 {
                             HStack(alignment: .center, spacing: 0) {
                                 Image(systemName: "lightbulb.max.fill")
                                     .font(.caption)
