@@ -130,16 +130,19 @@ struct HabitAddEditView: View {
                     
                     notifyViewModel.setHabitId(habit.id)
                 }
+                
+                UIApplication.shared.hideKeyboard()
             }
         }
     }
     
     private func addHabit() {
+        let todayStart = Calendar.current.startOfDay(for: Date())
         let newHabit = HabitModel(
             id: UUID(),
             title: title,
             category: selectedCategory,
-            createdAt: Date(),
+            createdAt: todayStart,
             routineType: routineType,
             selectedDays: routineType == .weekly ? selectedDays.map { $0.rawValue } : nil,
             intervalDays: routineType == .interval ? Int(intervalDays) ?? 1 : nil,
@@ -168,6 +171,7 @@ struct HabitAddEditView: View {
         if notifyViewModel.isNotificationOn {
             if habit.notifications.isEmpty {
                 notifyViewModel.addNotification(habitId: habit.id, time: notifyViewModel.notificationTime)
+                viewModel.updateHabitWithNotification(updated, notify: notifyViewModel.isNotificationOn, notifyTime: notifyViewModel.notificationTime)
             } else {
                 viewModel.updateHabitWithNotification(updated, notify: notifyViewModel.isNotificationOn, notifyTime: notifyViewModel.notificationTime)
             }

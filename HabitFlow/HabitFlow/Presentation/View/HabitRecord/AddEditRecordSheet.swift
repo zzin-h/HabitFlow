@@ -47,6 +47,7 @@ struct AddEditRecordSheet: View {
                         displayedComponents: .date
                     )
                     .padding(.vertical, 2)
+                    .background(Color.cardBg)
                     
                     DatePicker(
                         String(localized: "completed_time"),
@@ -77,6 +78,9 @@ struct AddEditRecordSheet: View {
                     }
                     .disabled(!isValid)
                 }
+            }
+            .onAppear {
+                UIApplication.shared.hideKeyboard()
             }
         }
     }

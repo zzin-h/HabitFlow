@@ -13,5 +13,6 @@ protocol HabitRecordUseCase {
     func deleteRecord(by id: UUID) -> AnyPublisher<Void, Error>
     func updateRecord(id: UUID, date: Date, duration: Int32) -> AnyPublisher<Void, Error>
     func fetchRecords(for habitId: UUID) -> AnyPublisher<[HabitRecordModel], Error>
+    func fetchRangeRecords(around date: Date, range: Int) -> AnyPublisher<[HabitRecordModel], Error>
     func fetchAllRecords() -> AnyPublisher<[HabitRecordModel], Error>
 }

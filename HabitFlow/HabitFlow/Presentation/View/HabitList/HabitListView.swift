@@ -48,6 +48,7 @@ struct HabitListView: View {
                                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                     Button(role: .destructive) {
                                         viewModel.deleteHabit(id: habit.id)
+                                        notifyViewModel.deleteNotification(habitId: habit.id)
                                     } label: {
                                         Label("", systemImage: "trash")
                                     }

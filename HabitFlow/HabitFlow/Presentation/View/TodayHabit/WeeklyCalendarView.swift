@@ -79,6 +79,13 @@ struct WeeklyCalendarView: View {
                     .onAppear {
                         scrollProxy.scrollTo(centerIndex, anchor: .center)
                     }
+                    .onChange(of: selectedDate) { newDate in
+                        if let newIndex = dateRange.firstIndex(where: { calendar.isDate($0, inSameDayAs: newDate) }) {
+                            withAnimation {
+                                scrollProxy.scrollTo(newIndex, anchor: .center)
+                            }
+                        }
+                    }
                 }
                 .frame(height: 60)
             }
