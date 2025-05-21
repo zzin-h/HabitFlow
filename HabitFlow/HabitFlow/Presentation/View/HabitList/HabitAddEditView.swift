@@ -168,6 +168,7 @@ struct HabitAddEditView: View {
         if notifyViewModel.isNotificationOn {
             if habit.notifications.isEmpty {
                 notifyViewModel.addNotification(habitId: habit.id, time: notifyViewModel.notificationTime)
+                viewModel.updateHabitWithNotification(updated, notify: notifyViewModel.isNotificationOn, notifyTime: notifyViewModel.notificationTime)
             } else {
                 viewModel.updateHabitWithNotification(updated, notify: notifyViewModel.isNotificationOn, notifyTime: notifyViewModel.notificationTime)
             }

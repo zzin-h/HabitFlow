@@ -81,7 +81,7 @@ final class HabitNotificationUseCaseImpl: HabitNotificationUseCase {
             
             do {
                 try self.repository.deleteNotification(for: habitId)
-                removeAllNotifications(for: habitId)
+                removeAllNotifications(for: habitId, completion: {})
                 promise(.success(()))
             } catch {
                 promise(.failure(error))
@@ -90,15 +90,19 @@ final class HabitNotificationUseCaseImpl: HabitNotificationUseCase {
         .eraseToAnyPublisher()
     }
     
-    func removeAllNotifications(for habitId: UUID) {
+    func removeAllNotifications(for habitId: UUID, completion: @escaping () -> Void) {
         let prefix = habitId.uuidString
         center.getPendingNotificationRequests { requests in
             let matchingIdentifiers = requests
                 .map { $0.identifier }
                 .filter { $0.hasPrefix(prefix) }
-
             self.center.removePendingNotificationRequests(withIdentifiers: matchingIdentifiers)
+            
             print("🗑 삭제된 알림 IDs: \(matchingIdentifiers)")
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                completion()
+            }
         }
     }
     
@@ -138,30 +142,28 @@ final class HabitNotificationUseCaseImpl: HabitNotificationUseCase {
                     throw NSError(domain: "Habit not found or invalid", code: 404)
                 }
                 
-                self.center.removePendingNotificationRequests(withIdentifiers: [habitId.uuidString])
-                
-                let routineType = habit.routineType
-                switch routineType {
-                case "daily":
-                    self.scheduleDaily(habitId: habitId, title: title, time: time)
-                    
-                case "weekly":
-                    if let weekdays = habit.selectedDays {
-                        self.scheduleWeekly(habitId: habitId, title: title, time: time, weekdays: weekdays as? [String] ?? [])
+                removeAllNotifications(for: habitId) {
+                    let routineType = habit.routineType
+                    switch routineType {
+                    case "daily":
+                        self.scheduleDaily(habitId: habitId, title: title, time: time)
+                        
+                    case "weekly":
+                        if let weekdays = habit.selectedDays {
+                            self.scheduleWeekly(habitId: habitId, title: title, time: time, weekdays: weekdays as? [String] ?? [])
+                        }
+                        
+                    case "interval":
+                        self.scheduleInterval(habitId: habitId, title: title, time: time, startDate: habit.createdAt, intervalDays: Int(habit.intervalDays))
+                        
+                    case .none:
+                        return
+                        
+                    case .some(_):
+                        return
                     }
-                    
-                case "interval":
-                    self.scheduleInterval(habitId: habitId, title: title, time: time, startDate: habit.createdAt, intervalDays: Int(habit.intervalDays))
-                    
-                case .none:
-                    return
-                    
-                case .some(_):
-                    return
                 }
-                
                 promise(.success(()))
-                
             } catch {
                 promise(.failure(error))
             }
