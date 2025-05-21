@@ -64,6 +64,7 @@ struct AddEditRecordSheet: View {
             }
             .navigationTitle(existingRecord != nil ? String(localized: "edit_record_nav_title") : String(localized: "new_record_nav_title"))
             .navigationBarTitleDisplayMode(.inline)
+            .hideKeyboardOnTap()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(String(localized: "cancel_btn")) {
