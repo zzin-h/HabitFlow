@@ -81,6 +81,7 @@ final class HabitNotificationUseCaseImpl: HabitNotificationUseCase {
             
             do {
                 try self.repository.deleteNotification(for: habitId)
+                removeAllNotifications(for: habitId)
                 promise(.success(()))
             } catch {
                 promise(.failure(error))
@@ -89,8 +90,20 @@ final class HabitNotificationUseCaseImpl: HabitNotificationUseCase {
         .eraseToAnyPublisher()
     }
     
+    func removeAllNotifications(for habitId: UUID) {
+        let prefix = habitId.uuidString
+        center.getPendingNotificationRequests { requests in
+            let matchingIdentifiers = requests
+                .map { $0.identifier }
+                .filter { $0.hasPrefix(prefix) }
+
+            self.center.removePendingNotificationRequests(withIdentifiers: matchingIdentifiers)
+            print("🗑 삭제된 알림 IDs: \(matchingIdentifiers)")
+        }
+    }
+    
     func requestNotificationAuthorization() {
-        UNUserNotificationCenter.current().requestAuthorization(
+        center.requestAuthorization(
             options: [.alert, .sound, .badge]
         ) { granted, error in
             if let error = error {
@@ -100,7 +113,7 @@ final class HabitNotificationUseCaseImpl: HabitNotificationUseCase {
             }
         }
         
-        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+        center.getPendingNotificationRequests { requests in
             print("🔔 현재 등록된 알림 개수: \(requests.count)")
             for req in requests {
                 print("📝 알림 ID: \(req.identifier)")
@@ -168,16 +181,14 @@ final class HabitNotificationUseCaseImpl: HabitNotificationUseCase {
                       let title = habit.title,
                       let time = habit.notifications?.time else { continue }
                 
-                let identifiers = (0..<60).map { "\(habitId.uuidString)_interval_\($0)" }
+                let identifiers = (0..<21).map { "\(habitId.uuidString)_interval_\($0)" }
                 center.removePendingNotificationRequests(withIdentifiers: identifiers)
                 
                 scheduleIntervalFromToday(habitId: habitId, title: title, time: time, intervalDays: Int(habit.intervalDays))
             }
             
-            print("✅ interval 알림 업데이트 완료")
-            
         } catch {
-            print("⛔️ interval 알림 업데이트 실패: \(error.localizedDescription)")
+            print("⛔️ Fetch Error: \(error.localizedDescription)")
         }
     }
     
@@ -236,7 +247,7 @@ final class HabitNotificationUseCaseImpl: HabitNotificationUseCase {
         
         let timeComponents = calendar.dateComponents([.hour, .minute], from: time)
         
-        for i in 0..<60 {
+        for i in 0..<21 {
             if let date = calendar.date(byAdding: .day, value: intervalDays * i, to: startDate) {
                 var triggerDate = calendar.dateComponents([.year, .month, .day], from: date)
                 triggerDate.hour = timeComponents.hour
@@ -269,7 +280,7 @@ final class HabitNotificationUseCaseImpl: HabitNotificationUseCase {
         
         let today = Date()
         
-        for i in 0..<60 {
+        for i in 0..<21 {
             if let date = calendar.date(byAdding: .day, value: intervalDays * i, to: today) {
                 var triggerDate = calendar.dateComponents([.year, .month, .day], from: date)
                 triggerDate.hour = timeComponents.hour
