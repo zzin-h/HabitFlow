@@ -77,11 +77,9 @@ struct WeeklyCalendarView: View {
                         .padding(.horizontal, 4)
                     }
                     .onAppear {
-                        // 최초엔 centerIndex로 스크롤
                         scrollProxy.scrollTo(centerIndex, anchor: .center)
                     }
                     .onChange(of: selectedDate) { newDate in
-                        // selectedDate가 바뀌면 중앙으로 스크롤
                         if let newIndex = dateRange.firstIndex(where: { calendar.isDate($0, inSameDayAs: newDate) }) {
                             withAnimation {
                                 scrollProxy.scrollTo(newIndex, anchor: .center)

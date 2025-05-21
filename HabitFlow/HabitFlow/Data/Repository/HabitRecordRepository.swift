@@ -36,6 +36,20 @@ final class HabitRecordRepository {
         request.predicate = NSPredicate(format: "habit.id == %@", habitId as CVarArg)
         return try context.fetch(request)
     }
+    
+    func fetchRangeRecords(for date: Date, range: Int) throws -> [HabitRecordEntity] {
+        let request: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()
+        let calendar = Calendar.current
+        let center = calendar.startOfDay(for: date)
+        
+        guard let start = calendar.date(byAdding: .day, value: -range, to: center),
+              let end = calendar.date(byAdding: .day, value: range + 1, to: center) else {
+            return []
+        }
+        
+        request.predicate = NSPredicate(format: "date >= %@ AND date < %@", start as NSDate, end as NSDate)
+        return try context.fetch(request)
+    }
 
     func fetchAllRecords() throws -> [HabitRecordEntity] {
         let request: NSFetchRequest<HabitRecordEntity> = HabitRecordEntity.fetchRequest()

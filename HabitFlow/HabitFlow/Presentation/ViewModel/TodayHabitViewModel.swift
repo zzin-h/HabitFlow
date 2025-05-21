@@ -12,12 +12,17 @@ final class TodayHabitViewModel: ObservableObject {
     // MARK: - Published Properties
     @Published var todos: [HabitModel] = []
     @Published var completed: [HabitModel] = []
-
+    @Published var allRecords: [HabitRecordModel] = []
+    
     // MARK: - UseCase
     private let habitUseCase: HabitUseCase
     private let habitRecordUseCase: HabitRecordUseCase
+    
+    private let calendar = Calendar.current
+    private var currentDate: Date = Calendar.current.startOfDay(for: Date())
+    private let range: Int = 10
+    
     private var cancellables = Set<AnyCancellable>()
-
     // MARK: - Init
     init(habitUseCase: HabitUseCase, habitRecordUseCase: HabitRecordUseCase) {
         self.habitUseCase = habitUseCase
@@ -25,11 +30,29 @@ final class TodayHabitViewModel: ObservableObject {
     }
     
     // MARK: - Actions
+    func loadRecords(for centerDate: Date) {
+        habitRecordUseCase.fetchRangeRecords(around: centerDate, range: range)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { completion in
+                    if case let .failure(error) = completion {
+                        print("❌ Error loading records: \(error)")
+                    }
+                },
+                receiveValue: { [weak self] records in
+                    self?.allRecords = records
+                }
+            )
+            .store(in: &cancellables)
+    }
+    
     func loadHabits(for date: Date) {
+        currentDate = calendar.startOfDay(for: date)
+        
         let habitsPublisher = habitUseCase.fetchHabits(for: date)
-        let recordsPublisher = habitRecordUseCase.fetchAllRecords()
-
-        Publishers.Zip(habitsPublisher, recordsPublisher)
+        let recordsPublisher = habitRecordUseCase.fetchRangeRecords(around: date, range: range)
+        
+        Publishers.CombineLatest(habitsPublisher, recordsPublisher)
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: { completion in
@@ -37,22 +60,22 @@ final class TodayHabitViewModel: ObservableObject {
                         print("❌ Error loading habits and records: \(error)")
                     }
                 },
-                receiveValue: { [weak self] (habits, records) in
+                receiveValue: { [weak self] (habits, allRecords) in
                     guard let self = self else { return }
-
-                    let completed = habits.filter { habit in
-                        records.contains(where: {
-                            $0.habit.id == habit.id &&
-                            Calendar.current.isDate($0.date, inSameDayAs: date)
-                        })
+                    
+                    let todayRecords = allRecords.filter {
+                        self.calendar.isDate($0.date, inSameDayAs: date)
                     }
-
+                    
+                    let completed = habits.filter { habit in
+                        todayRecords.contains(where: { $0.habit.id == habit.id })
+                    }
                     let todos = habits.filter { habit in
                         !completed.contains(where: { $0.id == habit.id })
                     }
-
                     self.todos = todos
-                    self.completed = completed
+                    self.completed = todayRecords.map { $0.habit }
+                    self.allRecords = allRecords
                 }
             )
             .store(in: &cancellables)

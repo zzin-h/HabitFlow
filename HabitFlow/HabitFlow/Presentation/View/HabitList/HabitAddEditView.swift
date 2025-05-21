@@ -93,7 +93,6 @@ struct HabitAddEditView: View {
             }
             .navigationTitle(editingHabit != nil ? String(localized: "edit_nav_title") : String(localized: "new_nav_title"))
             .navigationBarTitleDisplayMode(.inline)
-            .hideKeyboardOnTap()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(String(localized: "cancel_btn")) {
@@ -131,6 +130,8 @@ struct HabitAddEditView: View {
                     
                     notifyViewModel.setHabitId(habit.id)
                 }
+                
+                UIApplication.shared.hideKeyboard()
             }
         }
     }

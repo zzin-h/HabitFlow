@@ -83,6 +83,23 @@ final class HabitRecordUseCaseImpl: HabitRecordUseCase {
         }
         .eraseToAnyPublisher()
     }
+    
+    func fetchRangeRecords(around date: Date, range: Int) -> AnyPublisher<[HabitRecordModel], Error> {
+        Future { [weak self] promise in
+            guard let self = self else {
+                promise(.failure(NSError(domain: "repository.deallocated", code: -1)))
+                return
+            }
+            do {
+                let entities = try self.repository.fetchRangeRecords(for: date, range: range)
+                let models = entities.map { HabitRecordModel(entity: $0) }
+                promise(.success(models))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
 
     func fetchAllRecords() -> AnyPublisher<[HabitRecordModel], Error> {
         return Future { [weak self] promise in
