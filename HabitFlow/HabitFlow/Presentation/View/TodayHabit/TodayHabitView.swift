@@ -29,6 +29,19 @@ struct TodayHabitView: View {
     @State private var isDoneList: Bool = false
     @State private var dragOffset: CGFloat = 0
     
+    private let calendar = Calendar.current
+    private let totalDays = 21
+    private var centerIndex: Int { totalDays / 2 }
+    
+    private var dateRange: [Date] {
+        guard let start = calendar.date(byAdding: .day, value: -centerIndex, to: Date()) else {
+            return []
+        }
+        return (0..<totalDays).compactMap {
+            calendar.date(byAdding: .day, value: $0, to: start)
+        }
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -81,10 +94,21 @@ struct TodayHabitView: View {
                         .onEnded { value in
                             let threshold: CGFloat = 50
                             let calendar = Calendar.current
+
+                            guard let currentIndex = dateRange.firstIndex(where: { calendar.isDate($0, inSameDayAs: selectedDate) }) else {
+                                return
+                            }
+
                             if value.translation.width > threshold {
-                                selectedDate = calendar.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate
+                                let prevIndex = currentIndex - 1
+                                if prevIndex >= 0 {
+                                    selectedDate = dateRange[prevIndex]
+                                }
                             } else if value.translation.width < -threshold {
-                                selectedDate = calendar.date(byAdding: .day, value: 1, to: selectedDate) ?? selectedDate
+                                let nextIndex = currentIndex + 1
+                                if nextIndex < dateRange.count {
+                                    selectedDate = dateRange[nextIndex]
+                                }
                             }
                         }
                 )
