@@ -129,6 +129,11 @@ struct HabitAddEditView: View {
                     }
                     
                     notifyViewModel.setHabitId(habit.id)
+                    notifyViewModel.isNotificationOn = !habit.notifications.isEmpty
+                    notifyViewModel.notificationTime = habit.notifications.first?.time ?? Date()
+                } else {
+                    notifyViewModel.isNotificationOn = false
+                    notifyViewModel.notificationTime = Date()
                 }
                 
                 UIApplication.shared.hideKeyboard()
