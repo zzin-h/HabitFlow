@@ -26,12 +26,17 @@ struct WeeklyCalendarView: View {
     
     var body: some View {
         VStack(alignment: .center, spacing: 10) {
-            Text(formattedToday)
-                .font(.subheadline)
-                .bold()
-                .foregroundStyle(.textPrimary)
-                .padding(.horizontal)
-                .padding(.bottom, 6)
+            Button(action: {
+                selectedDate = Date()
+            }) {
+                Text(formattedToday)
+                    .font(.subheadline)
+                    .bold()
+                    .foregroundStyle(.textPrimary)
+                    .padding(.horizontal)
+                    .padding(.bottom, 6)
+                    .contentShape(Rectangle())
+            }
             
             ScrollViewReader { scrollProxy in
                 GeometryReader { geometry in
