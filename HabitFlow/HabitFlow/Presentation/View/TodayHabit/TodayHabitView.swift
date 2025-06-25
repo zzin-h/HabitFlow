@@ -76,6 +76,18 @@ struct TodayHabitView: View {
                     viewModel.loadHabits(for: newDate)
                     habitListViewModel.fetchHabits()
                 }
+                .gesture(
+                    DragGesture()
+                        .onEnded { value in
+                            let threshold: CGFloat = 50
+                            let calendar = Calendar.current
+                            if value.translation.width > threshold {
+                                selectedDate = calendar.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate
+                            } else if value.translation.width < -threshold {
+                                selectedDate = calendar.date(byAdding: .day, value: 1, to: selectedDate) ?? selectedDate
+                            }
+                        }
+                )
                 
                 if !viewModel.completed.isEmpty {
                     CompletionListView(
@@ -132,18 +144,6 @@ struct TodayHabitView: View {
             }
             .background(Color(.systemGroupedBackground))
         }
-        .gesture(
-            DragGesture()
-                .onEnded { value in
-                    let threshold: CGFloat = 50
-                    let calendar = Calendar.current
-                    if value.translation.width > threshold {
-                        selectedDate = calendar.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate
-                    } else if value.translation.width < -threshold {
-                        selectedDate = calendar.date(byAdding: .day, value: 1, to: selectedDate) ?? selectedDate
-                    }
-                }
-        )
         .environmentObject(colorSchemeManager)
         .preferredColorScheme(colorSchemeManager.currentScheme)
     }
